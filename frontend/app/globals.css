@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  /* FRILO Identity Colors */
+  --frilo-blue: #2563EB;
+  /* blue-600 */
+  --frilo-purple: #7E22CE;
+  /* purple-700 */
+
+  --background: #ffffff;
+  --foreground: #111827;
+  /* gray-900 */
+  --muted: #6B7280;
+  /* gray-500 */
+
+  --card: #ffffff;
+  --card-foreground: #111827;
+}
+
+@theme inline {
+  --color-frilo-blue: var(--frilo-blue);
+  --color-frilo-purple: var(--frilo-purple);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  /* Custom Gradients */
+  --image-gradient: linear-gradient(to right, var(--frilo-blue), var(--frilo-purple));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f172a;
+    /* slate-900 */
+    --foreground: #f8fafc;
+    /* slate-50 */
+    --muted: #94a3b8;
+    /* slate-400 */
+
+    --card: #1e293b;
+    /* slate-800 */
+    --card-foreground: #f8fafc;
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600;
+  }
+
+  .bg-gradient-frilo {
+    @apply bg-gradient-to-r from-blue-600 to-purple-600;
+  }
+
+  .bg-dark-frilo {
+    @apply bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900;
+  }
+}
