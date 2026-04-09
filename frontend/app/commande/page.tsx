@@ -57,7 +57,6 @@ function OrderTunnelContent() {
     const [orderRef, setOrderRef] = useState<string>("");
 
     const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, STEPS.length));
-    const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
     const handlePayment = async () => {
         setIsSubmitting(true);
@@ -154,8 +153,7 @@ function OrderTunnelContent() {
                         <div>
                             <h2 className="text-2xl font-bold mb-6 text-center">Connexion ou Création de compte</h2>
                             <AuthForms onSuccess={(user) => {
-                                console.log("User logged in:", user);
-                                // Save user to context/state
+                                void user;
                                 nextStep();
                             }} />
                         </div>
@@ -165,7 +163,6 @@ function OrderTunnelContent() {
                         <div>
                             <h2 className="text-2xl font-bold mb-6">Détails de votre projet</h2>
                             <ProjectDetailsForm onSuccess={(data) => {
-                                console.log("Project details:", data);
                                 setFormData(prev => ({ ...prev, ...data }));
                                 nextStep();
                             }} />
@@ -199,7 +196,7 @@ function OrderTunnelContent() {
                                 Notre équipe va prendre le relais et vous recevrez un email de confirmation.
                             </p>
                             <Button variant="outline" asChild>
-                                <a href="/">Retour à l&apos;accueil</a>
+                                <Link href="/">Retour à l&apos;accueil</Link>
                             </Button>
                         </div>
                     )}

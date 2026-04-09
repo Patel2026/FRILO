@@ -19,13 +19,20 @@ export const registerSchema = z.object({
 export type LoginCredentials = z.infer<typeof loginSchema>;
 export type RegisterCredentials = z.infer<typeof registerSchema>;
 
+export interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    role: 'client' | 'admin';
+}
+
 export const authService = {
     async getCsrfCookie() {
         // Not needed for Token Auth
         // await api.get('/sanctum/csrf-cookie');
     },
 
-    async login(credentials: LoginCredentials) {
+    async login(credentials: LoginCredentials): Promise<AuthUser> {
         const response = await api.post('/login', credentials);
         if (response.data.token) {
             localStorage.setItem('auth_token', response.data.token);
@@ -33,7 +40,7 @@ export const authService = {
         return response.data.user;
     },
 
-    async register(credentials: RegisterCredentials) {
+    async register(credentials: RegisterCredentials): Promise<AuthUser> {
         const response = await api.post('/register', credentials);
         if (response.data.token) {
             localStorage.setItem('auth_token', response.data.token);
@@ -46,11 +53,11 @@ export const authService = {
         localStorage.removeItem('auth_token');
     },
 
-    async getUser() {
+    async getUser(): Promise<AuthUser | null> {
         try {
             const response = await api.get('/user');
             return response.data;
-        } catch (error) {
+        } catch {
             return null;
         }
     }

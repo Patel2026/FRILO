@@ -10,6 +10,10 @@ Open a terminal in `frilo/backend`:
 
 ```bash
 cd backend
+cp .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate --seed
 php artisan serve
 ```
 *The API will be available at `http://localhost:8000`*
@@ -20,9 +24,20 @@ Open a **new** terminal in `frilo/frontend`:
 
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
 *The Frontend will be available at `http://localhost:3000`*
+
+## Quality Checks
+
+```bash
+cd backend
+composer qa
+
+cd ../frontend
+npm run qa
+```
 
 ## Default Credentials
 - **Admin**: `admin@frilo.com` / `password`

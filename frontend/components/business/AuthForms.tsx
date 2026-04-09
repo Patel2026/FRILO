@@ -3,25 +3,19 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/Button";
-import { authService, loginSchema, registerSchema, LoginCredentials, RegisterCredentials } from "@/services/auth.service";
+import { authService, loginSchema, registerSchema, LoginCredentials, RegisterCredentials, AuthUser } from "@/services/auth.service";
 import { cn } from "@/lib/utils";
-import { CheckCircle, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 interface AuthFormsProps {
-    onSuccess: (user: any) => void;
+    onSuccess: (user: AuthUser) => void;
     defaultMode?: 'login' | 'register';
 }
 
 export function AuthForms({ onSuccess, defaultMode = 'login' }: AuthFormsProps) {
     const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
     const [error, setError] = useState<string | null>(null);
-
-    const toggleMode = () => {
-        setMode(prev => prev === 'login' ? 'register' : 'login');
-        setError(null);
-    };
 
     return (
         <div className="max-w-md mx-auto">
@@ -62,7 +56,7 @@ export function AuthForms({ onSuccess, defaultMode = 'login' }: AuthFormsProps) 
     );
 }
 
-function LoginForm({ onSuccess, onError }: { onSuccess: (u: any) => void, onError: (e: string) => void }) {
+function LoginForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void, onError: (e: string) => void }) {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginCredentials>({
         resolver: zodResolver(loginSchema)
     });
@@ -104,7 +98,7 @@ function LoginForm({ onSuccess, onError }: { onSuccess: (u: any) => void, onErro
     );
 }
 
-function RegisterForm({ onSuccess, onError }: { onSuccess: (u: any) => void, onError: (e: string) => void }) {
+function RegisterForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void, onError: (e: string) => void }) {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterCredentials>({
         resolver: zodResolver(registerSchema)
     });

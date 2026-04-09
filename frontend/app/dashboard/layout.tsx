@@ -23,7 +23,7 @@ export default function DashboardLayout({
                 } else {
                     setIsLoading(false);
                 }
-            } catch (error) {
+            } catch {
                 router.push('/login');
             }
         };

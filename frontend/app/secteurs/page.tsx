@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { Section } from '@/components/ui/Section';
 import { SectorCard } from '@/components/business/SectorCard';
 import { businessService, Sector } from '@/services/business.service';

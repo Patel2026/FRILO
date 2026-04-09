@@ -1,19 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { businessService } from "@/services/business.service";
+import { businessService, Order } from "@/services/business.service";
 import { OrderCard } from "@/components/dashboard/OrderCard";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
-    const [orders, setOrders] = useState<any[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const data = await businessService.getOrders();
-                setOrders(data);
+                const response = await businessService.getOrders();
+                setOrders(response.data);
             } catch (error) {
                 console.error("Failed to fetch orders", error);
             } finally {
