@@ -1,7 +1,7 @@
 # API INTEGRATION LAYER — FRILO
 ## Contrat d'Interface Backend ↔ Frontend
 
-Version : 1.1
+Version : 1.3
 Statut : VALIDÉ
 
 ---
@@ -9,7 +9,9 @@ Statut : VALIDÉ
 ## 1. Principes
 
 - L'API est le seul point de communication entre Next.js et Laravel.
-- Base URL dev : `http://localhost:8000/api`
+- Base URL frontend via env : `NEXT_PUBLIC_API_URL`
+- Valeur dev locale (sans Docker) : `http://localhost:8000/api`
+- Valeur dev Docker : `http://localhost:8080/api`
 - Format : JSON (`Content-Type: application/json`, `Accept: application/json`)
 - Auth : token Bearer (`Authorization: Bearer {token}`)
 - Gestion des erreurs standardisée
@@ -28,6 +30,7 @@ Statut : VALIDÉ
 | 404  | Ressource introuvable |
 | 409  | Conflit d'état (transition invalide) |
 | 422  | Erreur de validation (avec détail `errors`) |
+| 429  | Limite de requêtes atteinte (rate limit) |
 | 500  | Erreur serveur interne |
 
 ---
@@ -67,7 +70,7 @@ Retourne les templates actifs, filtrés optionnellement par secteur.
     "price": 50000,
     "features": ["Menu digital", "Réservation", "Galerie photos"],
     "thumbnail": "templates/le-gourmet.jpg",
-    "full_thumbnail_url": "http://localhost:8000/storage/templates/le-gourmet.jpg",
+    "full_thumbnail_url": "<API_BASE_URL>/storage/templates/le-gourmet.jpg",
     "preview_url": null,
     "is_active": true,
     "sector_id": 1,
@@ -90,6 +93,38 @@ HTTP 404
 
 ---
 
+### `POST /api/contact`
+
+Endpoint public pour soumettre une demande de contact.
+
+Corps :
+```json
+{
+  "name": "Jean Dupont",
+  "email": "jean@example.com",
+  "phone": "+22990000000",
+  "company": "Entreprise Test",
+  "subject": "Question avant commande",
+  "message": "Bonjour, je souhaite être contacté pour choisir un template."
+}
+```
+
+Réponse 201 :
+```json
+{
+  "id": 12,
+  "status": "new",
+  "message": "Votre demande a été enregistrée. Notre équipe vous répond rapidement.",
+  "created_at": "2026-04-09T18:25:00Z"
+}
+```
+
+Erreurs :
+- `422` si validation invalide (`errors` détaillés)
+- `429` si limite de requêtes atteinte (`throttle:contact`)
+
+---
+
 ## 4. Endpoints Authentifiés
 
 ### `POST /api/register`
@@ -108,7 +143,7 @@ Réponse 201 :
 ```json
 {
   "token": "1|xxxxxxxxxxxxxxxx",
-  "user": { "id": 1, "name": "Jean Dupont", "email": "jean@example.com" }
+  "user": { "id": 1, "name": "Jean Dupont", "email": "jean@example.com", "role": "client" }
 }
 ```
 
@@ -125,7 +160,7 @@ Réponse 200 :
 ```json
 {
   "token": "1|xxxxxxxxxxxxxxxx",
-  "user": { "id": 1, "name": "Jean Dupont", "email": "jean@example.com" }
+  "user": { "id": 1, "name": "Jean Dupont", "email": "jean@example.com", "role": "client" }
 }
 ```
 
@@ -225,19 +260,21 @@ Retourne uniquement les commandes du client authentifié.
     "total": 1
   },
   "links": {
-    "first": "http://localhost:8000/api/orders?page=1",
-    "last": "http://localhost:8000/api/orders?page=1",
+    "first": "<API_BASE_URL>/orders?page=1",
+    "last": "<API_BASE_URL>/orders?page=1",
     "prev": null,
     "next": null
   }
 }
 ```
+Note : le contrat V1 canonique utilise `instruction`; `instructions` est maintenu pour compatibilité transitoire.
 
 ### `GET /api/orders/{id}`
 
 Header : `Authorization: Bearer {token}`
 
 Retourne le même shape métier qu'un item de `GET /api/orders`.
+Le contrat V1 canonique expose `instruction` et maintient `instructions` pour compatibilité transitoire frontend.
 
 ---
 

@@ -96,7 +96,7 @@ Tâches :
 - [ ] Routes
 - [ ] Tests feature
 
-### US-1.2.2 — Resource Filament Templates
+### US-1.2.2 — Backoffice Templates (Laravel custom)
 Acteur : Admin
 Priorité : HIGH
 
@@ -106,7 +106,8 @@ Critères :
 - Then CRUD complet disponible
 
 Tâches :
-- [ ] `TemplateResource` Filament
+- [ ] `Admin\TemplateController` (index/create/store/edit/update/destroy)
+- [ ] Vues Blade `admin/templates/*`
 - [ ] Upload thumbnail
 - [ ] Toggle is_active
 
@@ -204,7 +205,8 @@ Acteur : Admin
 Priorité : HIGH
 
 Tâches :
-- [ ] `OrderResource` Filament
+- [ ] `Admin\OrderController` (index/show/updateStatus)
+- [ ] Vues Blade `admin/orders/*`
 - [ ] Filtres statut + date
 - [ ] Action changement statut via `OrderService`
 - [ ] Affichage instructions client
@@ -233,7 +235,7 @@ Acteur : Admin
 Priorité : MEDIUM
 
 Tâches :
-- [ ] Widget Filament : nb commandes par statut
+- [ ] Dashboard admin custom : nb commandes par statut
 - [ ] Widget : CA commandes completed
 - [ ] Widget : dernières commandes
 

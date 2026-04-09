@@ -1,5 +1,13 @@
 # FRILO Backend (Laravel API + Admin Custom)
 
+## Démarrage Docker (depuis la racine du repo)
+
+```bash
+cp backend/.env.docker.example backend/.env
+docker compose up -d --build
+docker compose exec backend php artisan migrate --seed --force
+```
+
 ## Prérequis
 
 - PHP 8.2+

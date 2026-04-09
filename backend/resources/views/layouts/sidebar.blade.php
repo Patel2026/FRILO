@@ -84,6 +84,17 @@
                         <span>Clients</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.contact-requests*') ? 'active' : '' }}"
+                       href="{{ route('admin.contact-requests.index') }}">
+                        <i class="ri-mail-open-line"></i>
+                        <span>Contacts</span>
+                        @php $newContactCount = \App\Models\ContactRequest::where('status', 'new')->count(); @endphp
+                        @if($newContactCount > 0)
+                            <span class="badge bg-warning rounded-pill ms-auto">{{ $newContactCount }}</span>
+                        @endif
+                    </a>
+                </li>
 
             </ul>
         </div>

@@ -12,7 +12,7 @@ Statut : VALIDÉ
 ### Rôles
 - **Visiteur** (anonyme)
 - **Client** (authentifié, role: client)
-- **Admin** (authentifié, role: admin, accès Filament)
+- **Admin** (authentifié, role: admin, accès backoffice Laravel custom `/admin`)
 
 ### Statuts commande
 - `pending`

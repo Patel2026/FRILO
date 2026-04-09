@@ -1,92 +1,110 @@
-import { Section } from '@/components/ui/Section';
-import { Metadata } from 'next';
-import { Button } from '@/components/ui/Button';
+"use client"
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export const metadata: Metadata = {
-    title: 'FAQ - Questions Fréquentes - FRILO',
-};
-
-// Simple Accordion Component since I didn't install the full radix accordion for brevity, 
-// I'll implement a simple one here or use a Details/Summary HTML for now to be quick and clean defined in separate component is better but for this step
-// let's just do a simple map with details/summary for robust zero-js-dependency fallback
+const faqs = [
+  {
+    question: "Combien de temps faut-il pour recevoir mon site ?",
+    answer: "Nous nous engageons à livrer votre site en 48h ouvrées après réception de tous vos éléments (textes, logos, images). Si vous n'avez pas encore tous les éléments, nous pouvons commencer avec des contenus génériques.",
+  },
+  {
+    question: "Puis-je modifier mon site moi-même après la livraison ?",
+    answer: "Absolument. Nos sites sont construits sur des technologies standards. Nous pouvons vous donner un accès administrateur si vous souhaitez faire des modifications mineures, ou vous pouvez nous contacter pour toute mise à jour.",
+  },
+  {
+    question: "Le site m'appartient-il vraiment ?",
+    answer: "Oui, à 100%. Contrairement aux plateformes par abonnement, une fois payé, le site est entièrement à vous. Vous êtes libre de changer d'hébergeur quand vous le souhaitez.",
+  },
+  {
+    question: "Que se passe-t-il si je ne suis pas satisfait ?",
+    answer: "Nous fonctionnons avec une garantie satisfaction. Si le premier rendu ne vous convient pas, nous effectuons une passe de corrections incluse. Si cela ne vous convient toujours pas, nous vous remboursons intégralement.",
+  },
+  {
+    question: "L'hébergement est-il inclus dans le prix ?",
+    answer: "Oui. Le prix affiché inclut la création du site, la mise en ligne et l'hébergement pour la première année. À partir de la deuxième année, un forfait d'hébergement annuel vous sera proposé à tarif préférentiel.",
+  },
+  {
+    question: "Comment puis-je vous transmettre mes contenus ?",
+    answer: "Après votre commande, vous recevrez un formulaire détaillé pour nous transmettre tous vos éléments : textes, logo, couleurs, photos. Vous pouvez également nous envoyer tout par e-mail à contact@frilo.com.",
+  },
+  {
+    question: "Mon site sera-t-il visible sur mobile ?",
+    answer: "Tous nos modèles sont intégralement responsive. Votre site s'adapte automatiquement à tous les écrans : ordinateur, tablette et smartphone.",
+  },
+  {
+    question: "Puis-je commander un site personnalisé ?",
+    answer: "Nos modèles sont conçus pour être adaptés à votre identité (couleurs, logo, textes, photos). Pour une création sur mesure complète, contactez-nous afin que nous puissions établir un devis personnalisé.",
+  },
+];
 
 export default function FAQPage() {
-    const faqs = [
-        {
-            question: "Combien de temps faut-il pour recevoir mon site ?",
-            answer: "Nous nous engageons à livrer votre site en 48h ouvrées après réception de tous vos éléments (textes, logos, images). Si vous n'avez pas encore tous les éléments, nous pouvons commencer avec des contenus génériques."
-        },
-        {
-            question: "Puis-je modifier mon site moi-même après la livraison ?",
-            answer: "Absolument. Nos sites sont construits sur des technologies standards. Nous pouvons vous donner un accès administrateur si vous souhaitez faire des modifications mineures, ou vous pouvez souscrire à notre offre de maintenance pour que nous le fassions pour vous."
-        },
-        {
-            question: "Le site m'appartient-il vraiment ?",
-            answer: "Oui, à 100%. Contrairement aux plateformes par abonnement (Wix, Shopify...), une fois payé, le site est à vous. Vous êtes libre de changer d'hébergeur quand vous le souhaitez."
-        },
-        {
-            question: "Que se passe-t-il si je ne suis pas satisfait ?",
-            answer: "Nous fonctionnons avec une garantie 'Satisfait ou Remboursé'. Si le premier jet ne vous convient pas, nous faisons une passe de corrections. Si cela ne vous convient toujours pas, nous vous remboursons intégralement."
-        }
-    ];
+  const [open, setOpen] = useState<number | null>(null);
 
-    return (
-        <div className="pt-20">
-            <Section className="bg-slate-50 py-20 text-center">
-                <h1 className="text-4xl font-bold mb-4 text-gray-900">Questions Fréquentes</h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Tout ce que vous devez savoir sur FRILO.
-                </p>
-            </Section>
+  return (
+    <div className="min-h-screen bg-white">
 
-            <Section className="max-w-3xl mx-auto">
-                <div className="space-y-4">
-                    {faqs.map((faq, i) => (
-                        <details key={i} className="group bg-white border border-gray-200 rounded-lg p-6 [&_summary::-webkit-details-marker]:hidden open:ring-2 open:ring-frilo-blue/10 open:shadow-md transition-all">
-                            <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900 font-bold text-lg">
-                                <h2 className="text-lg font-medium">
-                                    {faq.question}
-                                </h2>
-                                <span className="relative size-5 shrink-0">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="absolute inset-0 size-5 opacity-100 group-open:opacity-0 transition-opacity"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="absolute inset-0 size-5 opacity-0 group-open:opacity-100 transition-opacity"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </span>
-                            </summary>
-                            <p className="mt-4 leading-relaxed text-gray-700">
-                                {faq.answer}
-                            </p>
-                        </details>
-                    ))}
-                </div>
-
-                <div className="mt-12 text-center p-8 bg-blue-50 rounded-2xl border border-blue-100">
-                    <h3 className="font-bold text-xl mb-2 text-frilo-blue">Vous ne trouvez pas votre réponse ?</h3>
-                    <p className="text-gray-600 mb-6">Notre équipe est disponible pour vous répondre directement.</p>
-                    <Button asChild>
-                        <Link href="/contact">Nous contacter</Link>
-                    </Button>
-                </div>
-            </Section>
+      {/* Hero */}
+      <div className="sq-section bg-black text-white">
+        <div className="sq-container text-center">
+          <p className="sq-label text-gray-500 mb-5">FAQ</p>
+          <h1 className="sq-display text-white mb-6">Questions<br />fréquentes.</h1>
+          <p className="text-gray-400 text-xl max-w-lg mx-auto">
+            Tout ce que vous devez savoir sur FRILO, nos modèles et notre processus.
+          </p>
         </div>
-    );
+      </div>
+
+      {/* FAQ list */}
+      <div className="sq-section">
+        <div className="sq-container max-w-3xl">
+          <div className="divide-y divide-gray-100">
+            {faqs.map((faq, i) => (
+              <div key={i}>
+                <button
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="w-full flex items-start justify-between gap-6 py-7 text-left group"
+                >
+                  <span className="text-base font-semibold text-black group-hover:text-gray-600 transition-colors leading-snug">
+                    {faq.question}
+                  </span>
+                  <Plus className={cn(
+                    "w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5 transition-transform duration-200",
+                    open === i && "rotate-45"
+                  )} />
+                </button>
+                <div className={cn(
+                  "overflow-hidden transition-all duration-300",
+                  open === i ? "max-h-96 pb-7" : "max-h-0"
+                )}>
+                  <p className="text-gray-500 text-sm leading-relaxed">{faq.answer}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="bg-black sq-section text-white">
+        <div className="sq-container text-center">
+          <p className="sq-label text-gray-500 mb-5">Encore des questions ?</p>
+          <h2 className="sq-heading text-white mb-6">On est là pour vous.</h2>
+          <p className="text-gray-400 text-lg mb-10 max-w-md mx-auto">
+            Notre équipe répond à toutes vos questions en moins de 24h.
+          </p>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <Link href="/contact" className="sq-btn sq-btn-white">
+              Nous contacter
+            </Link>
+            <Link href="/templates" className="sq-btn sq-btn-outline-white">
+              Voir les modèles
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

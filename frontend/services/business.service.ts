@@ -164,5 +164,10 @@ export const businessService = {
                 next: null,
             }
         };
+    },
+
+    async getOrder(orderId: number | string): Promise<Order> {
+        const response = await api.get(`/orders/${orderId}`);
+        return response.data as Order;
     }
 };

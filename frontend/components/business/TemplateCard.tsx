@@ -1,72 +1,64 @@
 import Link from 'next/link';
-import { Eye, Check } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
 
 interface TemplateCardProps {
-    id: string;
-    name: string;
-    sectorName?: string; // Optional if we are already in a sector page
-    price: number;
-    features: string[];
-    image: string; // URL
+  id: string;
+  name: string;
+  sectorName?: string;
+  price: number;
+  features: string[];
+  image: string;
 }
 
-export function TemplateCard({ id, name, sectorName, price, features, image }: TemplateCardProps) {
-    return (
-        <div className="group bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            {/* Thumbnail */}
-            <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden group">
-                {image ? (
-                    <img
-                        src={image}
-                        alt={name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                ) : (
-                    <div className="absolute inset-0 bg-slate-200 flex items-center justify-center text-gray-400">
-                        <span>Aperçu {name}</span>
-                    </div>
-                )}
-
-                {/* Overlay CTA */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                    <Button variant="secondary" size="sm" asChild>
-                        <Link href={`/templates/${id}`}>
-                            <Eye className="w-4 h-4 mr-2" /> Aperçu
-                        </Link>
-                    </Button>
-                </div>
+export function TemplateCard({ id, name, sectorName, price, image }: TemplateCardProps) {
+  return (
+    <Link href={`/templates/${id}`} className="group block">
+      {/* Image container — Squarespace style: image fills card, hover shows CTA */}
+      <div className="relative aspect-[3/2] bg-gray-100 overflow-hidden rounded-sm">
+        {image ? (
+          <Image
+            src={image}
+            alt={name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-gray-200 rounded mx-auto mb-2" />
+              <span className="text-xs text-gray-400">{name}</span>
             </div>
+          </div>
+        )}
 
-            <div className="p-5">
-                <div className="flex justify-between items-start mb-2">
-                    <div>
-                        {sectorName && (
-                            <span className="text-xs font-medium text-frilo-blue uppercase tracking-wide">
-                                {sectorName}
-                            </span>
-                        )}
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-frilo-purple transition-colors">
-                            {name}
-                        </h3>
-                    </div>
-                    <div className="text-right">
-                        <span className="block text-lg font-bold text-gray-900">{price.toLocaleString('fr-FR')} FCFA</span>
-                    </div>
-                </div>
-
-                <ul className="space-y-1 mb-5">
-                    {features.slice(0, 2).map((feature, i) => (
-                        <li key={i} className="text-xs text-gray-500 flex items-center">
-                            <Check className="w-3 h-3 mr-1 text-green-500" /> {feature}
-                        </li>
-                    ))}
-                </ul>
-
-                <Button className="w-full" variant="outline" asChild>
-                    <Link href={`/templates/${id}`}>Détails & Commande</Link>
-                </Button>
-            </div>
+        {/* Hover overlay — exactly like Squarespace */}
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <span className="bg-white text-black text-sm font-bold px-6 py-3 rounded-full flex items-center gap-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+            Voir ce modèle <ArrowRight className="w-4 h-4" />
+          </span>
         </div>
-    );
+      </div>
+
+      {/* Card info — minimal, like Squarespace */}
+      <div className="pt-4 pb-2">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            {sectorName && (
+              <p className="text-xs text-gray-400 uppercase tracking-wide font-medium mb-0.5">
+                {sectorName}
+              </p>
+            )}
+            <h3 className="font-bold text-black text-sm group-hover:text-gray-600 transition-colors">
+              {name}
+            </h3>
+          </div>
+          <span className="text-sm font-bold text-black whitespace-nowrap">
+            {price.toLocaleString('fr-FR')} <span className="text-gray-400 font-normal text-xs">FCFA</span>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
 }

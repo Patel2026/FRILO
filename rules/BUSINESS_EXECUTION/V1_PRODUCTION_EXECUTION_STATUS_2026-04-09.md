@@ -18,11 +18,13 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
   - Backend: `composer qa` (lint + tests).
   - Frontend: `npm run qa` (lint + typecheck + build).
 - Tests backend configurés en SQLite mémoire pour exécution locale reproductible.
+- Pipeline CI minimale ajoutée (`.github/workflows/qa.yml`) pour exécuter `composer qa` + `npm run qa` sur `push`/`pull_request`.
 
 ### Phase 2 — Stabilisation API métier V1
 - **Statut**: `IN PROGRESS (majoritairement couvert)`
 - Déjà aligné:
   - Throttling auth dédié.
+  - Endpoint public `POST /api/contact` avec validation stricte + rate limit (`throttle:contact`).
   - Validation `template actif` sur création commande.
   - Pagination `GET /api/orders`.
   - Contrat de réponse harmonisé (order + instruction).
@@ -36,18 +38,24 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
   - Statut commande validé via enum/couche service.
   - Contrôles d’accès/autorisations renforcés.
   - Logs opérationnels de changement de statut.
+  - Backoffice de suivi des demandes contact (`/admin/contact-requests`) avec statut minimal (`new/in_progress/done`).
 - Reste à finaliser:
   - Revue complète CRUD admin sur champs sensibles + test de non-régression backoffice.
 
 ### Phase 4 — Frontend V1 contract-first
-- **Statut**: `IN PROGRESS (avancé)`
+- **Statut**: `IN PROGRESS (stabilisé)`
 - Déjà aligné:
   - Typage renforcé (`Order`, `OrderInstruction`, pagination, `AuthUser`).
   - Correction format FCFA + adaptation dashboard au contrat paginé.
+  - Route détail commande client `/dashboard/orders/[id]`.
+  - États `empty` vs `error` sur dashboard et liste commandes.
+  - Sidebar dashboard responsive mobile (ouvrir/fermer).
+  - Auth UX public renforcée (redirection `/login`/`/register` si connecté, CTA dashboard cohérent).
+  - Pages légales publiées (`/mentions-legales`, `/cgu`).
+  - Formulaire `/contact` branché à l’API avec états loading/success/error.
   - Route dashboard profil non cassée.
-- Reste à finaliser:
-  - Nettoyage des warnings ESLint non bloquants.
-  - Revue UX complète des états vides/erreur sur toutes pages métier.
+  - Fallbacks mocks supprimés des pages catalogue critiques (`/`, `/secteurs`, `/secteurs/[slug]`, `/templates`) avec états `error/empty`.
+- Revue UX finale des états vides/erreur sur toutes pages métier : à clôturer.
 
 ### Phase 5 — Sécurité, qualité, observabilité
 - **Statut**: `IN PROGRESS`
@@ -64,14 +72,18 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
 - Déjà aligné:
   - Backend: `composer qa` vert.
   - Frontend: `npm run qa` vert.
+  - E2E métier critique automatisé (Playwright) et exécuté localement.
+  - Tests backend endpoint contact (`ContactApiTest`) ajoutés.
+  - Scénarios E2E expérience client (`client-experience.spec.ts`) ajoutés.
+  - Runbook release/rollback publié (`RUNBOOK_RELEASE_ROLLBACK_V1_FRILO.md`).
 - Reste à finaliser:
-  - Scénarios E2E métier automatisés.
+  - Exécuter le nouveau lot E2E expérience client sur environnement complet.
   - Recette fonctionnelle signée (PV).
-  - Runbook de release prod + rollback validé en préprod.
+  - Validation préprod du runbook release/rollback.
 
 ## Release Gates (V1)
 - **Gate A (technique)**: `PASS`  
-  Build/lint/typecheck/tests exécutables et verts localement.
+  Build/lint/typecheck/tests exécutables et verts localement (validation du 09/04/2026).
 - **Gate B (recette fonctionnelle)**: `PENDING`  
   À couvrir par campagne de recette métier complète.
 - **Gate C (préprod + smoke prod)**: `PENDING`  
@@ -85,7 +97,7 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
 - Ajouter tests backend ciblés transitions + policies admin.
 
 2. **Semaine N+2**
-- Mettre en place E2E parcours critique (commande + suivi + traitement admin).
+- Étendre E2E (notamment `processing -> completed` et cas d’échec).
 - Exécuter recette fonctionnelle complète et fermer P0/P1.
 - Préparer release candidate (migrations, variables, rollback, smoke tests).
 
@@ -96,4 +108,3 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
   - Mitigation: lot “cleanup lint warnings” avant RC.
 - **Périmètre V1 vs extensions futures**:
   - Mitigation: garder FRILO Suite explicitement hors scope release V1.
-

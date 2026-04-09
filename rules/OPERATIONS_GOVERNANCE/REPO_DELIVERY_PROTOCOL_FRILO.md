@@ -45,7 +45,7 @@ Format :
 Exemples :
 ```
 feature/order-status-workflow
-feature/filament-templates-resource
+feature/admin-templates-crud
 bugfix/fix-orders-cross-user-leak
 refactor/extract-order-service
 docs/update-api-contract
@@ -75,7 +75,7 @@ Scopes suggérés :
 - `templates` — templates
 - `sectors` — secteurs
 - `auth` — authentification
-- `filament` — backoffice admin
+- `admin` — backoffice Laravel custom
 - `frontend` — Next.js
 - `api` — routes API
 - `db` — migrations
@@ -111,7 +111,7 @@ docs(api): update API contract with orders endpoint
 - [ ] Catalogue (Secteurs/Templates)
 - [ ] Commandes (workflow)
 - [ ] Authentification
-- [ ] Backoffice Filament
+- [ ] Backoffice admin custom
 - [ ] Frontend Next.js
 
 ## Tests

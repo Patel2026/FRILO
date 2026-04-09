@@ -1,68 +1,100 @@
 "use client"
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { LayoutDashboard, ShoppingBag, LogOut, User } from "lucide-react";
-import { authService } from "@/services/auth.service";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { LayoutDashboard, ShoppingBag, User, LogOut, Globe, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { authService } from '@/services/auth.service';
 
-export function Sidebar() {
-    const pathname = usePathname();
-    const router = useRouter();
+const navItems = [
+  { href: '/dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, exact: true },
+  { href: '/dashboard/orders', label: 'Mes commandes', icon: ShoppingBag },
+  { href: '/dashboard/profile', label: 'Mon profil', icon: User },
+];
 
-    const handleLogout = async () => {
-        await authService.logout();
-        router.push('/login');
-    };
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onClose?: () => void;
+}
 
-    const links = [
-        { name: "Vue d'ensemble", href: "/dashboard", icon: LayoutDashboard },
-        { name: "Mes commandes", href: "/dashboard/orders", icon: ShoppingBag },
-        { name: "Mon profil", href: "/dashboard/profile", icon: User },
-    ];
+export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
+  const pathname = usePathname();
+  const router = useRouter();
 
-    return (
-        <aside className="w-64 bg-white border-r min-h-screen hidden md:flex flex-col">
-            <div className="p-6 border-b">
-                <Link href="/" className="text-2xl font-bold tracking-tighter">
-                    <span className="text-frilo-blue">FRI</span>
-                    <span className="text-frilo-purple">LO</span>
-                </Link>
-            </div>
+  const handleClose = () => {
+    onClose?.();
+  };
 
-            <nav className="flex-1 p-4 space-y-2">
-                {links.map((link) => {
-                    const Icon = link.icon;
-                    const isActive = pathname === link.href;
+  const handleLogout = async () => {
+    await authService.logout();
+    handleClose();
+    router.push('/login');
+  };
 
-                    return (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className={cn(
-                                "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors",
-                                isActive
-                                    ? "bg-blue-50 text-frilo-blue font-medium"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                            )}
-                        >
-                            <Icon size={20} />
-                            <span>{link.name}</span>
-                        </Link>
-                    );
-                })}
-            </nav>
+  return (
+    <aside className={cn(
+      "fixed inset-y-0 left-0 z-50 w-72 bg-black min-h-screen flex flex-col flex-shrink-0 transition-transform duration-200",
+      mobileOpen ? "translate-x-0" : "-translate-x-full",
+      "md:static md:w-64 md:translate-x-0"
+    )}>
 
-            <div className="p-4 border-t">
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center space-x-3 px-4 py-3 w-full text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                    <LogOut size={20} />
-                    <span>Déconnexion</span>
-                </button>
-            </div>
-        </aside>
-    );
+      {/* Logo */}
+      <div className="px-8 py-8 border-b border-white/10 relative">
+        <Link href="/" className="text-xl font-black text-white tracking-tight">
+          FRILO
+        </Link>
+        <p className="text-gray-600 text-xs mt-1 uppercase tracking-widest">Espace client</p>
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute top-6 right-6 p-1 text-gray-400 hover:text-white transition-colors md:hidden"
+          aria-label="Fermer le menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 px-4 py-6 space-y-1">
+        {navItems.map(({ href, label, icon: Icon, exact }) => {
+          const active = exact ? pathname === href : pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={handleClose}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                active
+                  ? "bg-white text-black"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Bottom actions */}
+      <div className="px-4 py-6 border-t border-white/10 space-y-1">
+        <Link
+          href="/templates"
+          onClick={handleClose}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+        >
+          <Globe className="w-4 h-4 flex-shrink-0" />
+          Voir les modèles
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+        >
+          <LogOut className="w-4 h-4 flex-shrink-0" />
+          Déconnexion
+        </button>
+      </div>
+    </aside>
+  );
 }

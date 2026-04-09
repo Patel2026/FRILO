@@ -41,13 +41,13 @@ Statut : OBLIGATOIRE
 
 ### Rôles
 - `client` : accès uniquement à ses propres commandes
-- `admin` : accès Filament complet
+- `admin` : accès backoffice admin Laravel custom (`/admin`)
 
 ### Règles
 - Tout endpoint API authentifié vérifie `auth:sanctum`
 - `GET /api/orders` retourne uniquement `where('user_id', auth()->id())`
 - `GET /api/orders/{id}` vérifie `OrderPolicy@view` → `order->user_id === auth()->id()`
-- Filament : vérification `role = 'admin'`
+- Backoffice admin : middleware `auth` + `admin` et vérification `role = 'admin'`
 
 ### Interdits
 - Pas de bypass Policy "pour aller plus vite"
@@ -123,7 +123,7 @@ SANCTUM_STATEFUL_DOMAINS
 
 ## 8. SÉCURITÉ DES FICHIERS (Thumbnails)
 
-- Upload des thumbnails via Filament admin uniquement (pas côté client public)
+- Upload des thumbnails via backoffice admin uniquement (pas côté client public)
 - Stockage dans `storage/app/public/templates/`
 - Validation : MIME types autorisés (image/jpeg, image/png, image/webp)
 - Taille max recommandée : 2MB

@@ -14,7 +14,7 @@ Statut : VALIDÉ
 | Commande | Enregistrer et piloter le cycle de vie d'une commande |
 | Authentification | Gérer l'identité et la session des clients |
 | Notification | Informer clients et admins des événements clés |
-| Administration | Gérer le backoffice Filament (templates, commandes, statuts) |
+| Administration | Gérer le backoffice Laravel custom (templates, commandes, statuts) |
 
 ---
 
@@ -74,7 +74,7 @@ Attributs :
 
 Règles :
 - un utilisateur client peut passer plusieurs commandes
-- un utilisateur admin accède au backoffice Filament
+- un utilisateur admin accède au backoffice `/admin`
 - le mot de passe est hashé, jamais stocké en clair
 - l'email est unique
 
@@ -111,7 +111,7 @@ Attributs :
 Règles :
 - une commande a exactement une instruction
 - les instructions sont saisies par le client lors du tunnel
-- les instructions sont visibles par l'admin dans Filament pour la production
+- les instructions sont visibles par l'admin dans le backoffice pour la production
 
 ---
 

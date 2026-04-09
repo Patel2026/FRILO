@@ -1,5 +1,5 @@
 # BACKOFFICE FRILO — CRUDs ET FONCTIONNALITÉS
-## Spécification des opérations Filament
+## Spécification des opérations du backoffice Laravel custom
 
 Version : 1.0
 Statut : VALIDÉ
@@ -29,7 +29,7 @@ Statut : VALIDÉ
 - Le prix, le client, le template sont non éditables après création
 - Toute modification de statut passe par `OrderService::updateStatus()`
 
-### Pas de création manuelle dans Filament
+### Pas de création manuelle dans le backoffice
 Les commandes sont créées par les clients via l'API. L'admin ne crée pas de commande.
 
 ### Pas de suppression physique
@@ -101,10 +101,10 @@ Toggle `is_active = false` — le secteur et ses templates sont masqués du cata
 - Informations profil
 - Liste des commandes associées
 
-### Pas de création dans Filament
+### Pas de création dans le backoffice
 Les clients s'inscrivent via l'API (`/api/register`).
 
-### Pas de modification de mot de passe dans Filament
+### Pas de modification de mot de passe dans le backoffice
 Reset via email.
 
 ---
@@ -119,9 +119,9 @@ KPIs affichés :
 
 ---
 
-## 6. Règles de Sécurité Filament
+## 6. Règles de Sécurité Backoffice
 
-- Seuls les utilisateurs avec `role = 'admin'` accèdent à Filament
+- Seuls les utilisateurs avec `role = 'admin'` accèdent au backoffice `/admin`
 - Les données client (email, instructions) sont visibles uniquement dans le contexte de la commande
 - Aucune donnée de paiement réel ne doit être stockée ou affichée (V1 : paiement simulé)
-- Les actions de changement de statut sont tracées (audit log Filament ou events Laravel)
+- Les actions de changement de statut sont tracées (logs Laravel structurés)

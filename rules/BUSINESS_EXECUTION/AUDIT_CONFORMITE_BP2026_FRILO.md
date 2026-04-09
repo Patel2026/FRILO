@@ -32,7 +32,7 @@ Owner : PMO
 
 ### Conflit C1 — Architecture d'exécution
 - Observation : le business plan mentionne WordPress comme moteur de production.
-- Référence technique actuelle : architecture Laravel + Next.js + Filament.
+- Référence technique actuelle : architecture Laravel + Next.js + backoffice admin Laravel custom.
 - Résolution : conservation de la stack technique comme vérité de gouvernance; WordPress n'est pas promu en invariant.
 - Traçage : ADR-010 dans `DECISIONS_FRILO.md`.
 

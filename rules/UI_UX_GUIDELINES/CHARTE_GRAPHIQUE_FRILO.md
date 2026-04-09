@@ -96,12 +96,14 @@ Composant layout pour toutes les sections de page :
 - Logo FRILO + liens : Templates, Secteurs, Expertises, FAQ, Contact
 - CTA "Commander" (bouton gradient)
 - Lien Dashboard si authentifié
+- Si session active, ne jamais afficher `Connexion`/`Inscription` dans l'espace public
 
 ### Sidebar Dashboard
 - Navigation dans l'espace client
+- Version mobile obligatoire (menu latéral ouvrable/fermable)
 
 ### Footer
-- Liens légaux, contact, réseaux sociaux
+- Liens légaux (`/mentions-legales`, `/cgu`), contact, réseaux sociaux
 
 ---
 
@@ -119,6 +121,7 @@ Composant layout pour toutes les sections de page :
 - Progress bar sticky en haut (5 étapes)
 - Card centrale blanche sur fond slate-50
 - Boutons navigation en bas de card
+- Si client déjà connecté : bypass étape auth et passage direct à l'étape détails
 
 ---
 

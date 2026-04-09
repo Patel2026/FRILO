@@ -1,6 +1,14 @@
 import api from './api';
 import { z } from 'zod';
 
+const AUTH_CHANGED_EVENT = 'frilo-auth-changed';
+
+function emitAuthChanged() {
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+    }
+}
+
 export const loginSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6),
@@ -27,6 +35,8 @@ export interface AuthUser {
 }
 
 export const authService = {
+    AUTH_CHANGED_EVENT,
+
     async getCsrfCookie() {
         // Not needed for Token Auth
         // await api.get('/sanctum/csrf-cookie');
@@ -36,6 +46,7 @@ export const authService = {
         const response = await api.post('/login', credentials);
         if (response.data.token) {
             localStorage.setItem('auth_token', response.data.token);
+            emitAuthChanged();
         }
         return response.data.user;
     },
@@ -44,13 +55,18 @@ export const authService = {
         const response = await api.post('/register', credentials);
         if (response.data.token) {
             localStorage.setItem('auth_token', response.data.token);
+            emitAuthChanged();
         }
         return response.data.user;
     },
 
     async logout() {
-        await api.post('/logout');
-        localStorage.removeItem('auth_token');
+        try {
+            await api.post('/logout');
+        } finally {
+            localStorage.removeItem('auth_token');
+            emitAuthChanged();
+        }
     },
 
     async getUser(): Promise<AuthUser | null> {

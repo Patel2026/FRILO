@@ -10,7 +10,7 @@ Statut : VALIDÉ
 
 Le tunnel de commande FRILO est un wizard 5 étapes côté client (Next.js), qui aboutit à la création d'une `Order` avec statut `pending` côté backend (Laravel).
 
-Après création, la commande suit un workflow de production géré par l'admin via Filament.
+Après création, la commande suit un workflow de production géré par l'admin via le backoffice Laravel custom (`/admin`).
 
 ---
 
@@ -87,7 +87,7 @@ Les horodatages SLA sont définis dans `06_BUSINESS_INTERFACE_CONTRACTS_FRILO.md
 
 | De | Vers | Acteur | Déclencheur |
 |----|------|--------|-------------|
-| `pending` | `processing` | Admin | Démarrage production dans Filament |
+| `pending` | `processing` | Admin | Démarrage production dans le backoffice |
 | `pending` | `cancelled` | Admin | Annulation avant traitement |
 | `processing` | `completed` | Admin | Livraison confirmée |
 | `processing` | `cancelled` | Admin | Annulation exceptionnelle |

@@ -10,8 +10,8 @@ Toute décision structurante doit être ajoutée ici. Aucun autre fichier ne doi
 
 **Statut** : VALIDÉ
 **Date** : 2026-04
-**Décision** : Laravel 11 (PHP 8.3+) est le framework backend.
-**Raison** : Ecosystème robuste, Filament pour admin, Sanctum pour auth, large communauté.
+**Décision** : Laravel 12 (PHP 8.2+) est le framework backend.
+**Raison** : Ecosystème robuste, Sanctum pour auth token, large communauté.
 **Conséquences** : Toute logique backend est en Laravel. Pas d'autre framework PHP.
 
 ---
@@ -20,7 +20,7 @@ Toute décision structurante doit être ajoutée ici. Aucun autre fichier ne doi
 
 **Statut** : VALIDÉ
 **Date** : 2026-04
-**Décision** : Next.js 15 (TypeScript) est le framework frontend client.
+**Décision** : Next.js 16 (TypeScript) est le framework frontend client.
 **Raison** : SSR/SSG pour SEO, App Router, composants React, Tailwind.
 **Conséquences** : Pas de Vue, Svelte ou autre framework. Tailwind CSS pour le style.
 
@@ -38,11 +38,11 @@ Toute décision structurante doit être ajoutée ici. Aucun autre fichier ne doi
 
 ## ADR-004 — Backoffice admin : Filament
 
-**Statut** : VALIDÉ
+**Statut** : SUPERSEDÉ (par ADR-012)
 **Date** : 2026-04
-**Décision** : Filament est utilisé comme backoffice admin FRILO.
+**Décision** : Décision initiale d'utiliser Filament comme backoffice admin FRILO.
 **Raison** : Génération automatique CRUD, interface moderne, intégration Laravel native.
-**Conséquences** : L'admin n'est pas dans Next.js. Les opérateurs FRILO accèdent à `/admin`.
+**Conséquences** : Non retenu pour le cycle V1 production. Voir ADR-012 (admin Laravel custom conservé).
 
 ---
 
@@ -90,7 +90,7 @@ Toute décision structurante doit être ajoutée ici. Aucun autre fichier ne doi
 
 **Statut** : VALIDÉ
 **Date** : 2026-04
-**Décision** : L'espace public (Next.js) et le backoffice (Filament `/admin`) sont deux applications distinctes.
+**Décision** : L'espace public (Next.js) et le backoffice admin Laravel custom (`/admin`) sont deux applications distinctes.
 **Raison** : Sécurité, séparation des concerns, déploiement indépendant.
 **Conséquences** : Aucun composant admin ne doit être exposé côté public. L'API REST est la seule interface entre les deux.
 

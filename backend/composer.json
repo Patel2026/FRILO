@@ -49,7 +49,7 @@
             "@php artisan key:generate --ansi"
         ],
         "lint": [
-            "vendor/bin/pint --test --dirty"
+            "@php -d \"error_reporting=E_ALL&~E_DEPRECATED&~E_USER_DEPRECATED\" vendor/bin/pint --test --dirty"
         ],
         "test": [
             "@php artisan test"

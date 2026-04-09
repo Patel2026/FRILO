@@ -17,6 +17,7 @@ Statut : VALIDÉ
 | GET | `/api/templates/{id}` | TemplateController | show |
 | POST | `/api/register` | AuthController | register |
 | POST | `/api/login` | AuthController | login |
+| POST | `/api/contact` | ContactController | store |
 
 ### Authentifiées (middleware `auth:sanctum`)
 
@@ -30,11 +31,25 @@ Statut : VALIDÉ
 
 ---
 
-## 2. Routes Admin (Filament — `routes/web.php`)
+## 2. Routes Admin (Laravel custom — `routes/web.php`)
 
-Filament gère ses propres routes sous `/admin`.
+Le backoffice admin Laravel custom est servi sous `/admin` (routes web protégées).
 
-Middleware Filament : vérification `role = 'admin'` via `FilamentGate` ou surcharge du panel.
+Middleware backoffice : `auth` + `admin` (rôle `admin` requis).
+
+### Routes admin métiers
+
+| Méthode | Route | Controller | Action |
+|---------|-------|-----------|--------|
+| GET | `/admin/dashboard` | DashboardController | index |
+| GET | `/admin/orders` | Admin\OrderController | index |
+| GET | `/admin/orders/{order}` | Admin\OrderController | show |
+| PATCH | `/admin/orders/{order}/status` | Admin\OrderController | updateStatus |
+| GET | `/admin/templates` | Admin\TemplateController | index |
+| GET | `/admin/sectors` | Admin\SectorController | index |
+| GET | `/admin/clients` | Admin\ClientController | index |
+| GET | `/admin/contact-requests` | Admin\ContactRequestController | index |
+| PATCH | `/admin/contact-requests/{contactRequest}/status` | Admin\ContactRequestController | updateStatus |
 
 ---
 
@@ -47,7 +62,7 @@ Middleware Filament : vérification `role = 'admin'` via `FilamentGate` ou surch
 | `viewAny` | Utilisateur authentifié peut lister ses propres commandes |
 | `view` | L'utilisateur est le propriétaire de la commande (`order->user_id === auth()->id()`) |
 | `create` | Tout utilisateur authentifié peut créer une commande |
-| `update` | Admin uniquement (via Filament) |
+| `update` | Admin uniquement (via backoffice admin) |
 | `delete` | Interdit (soft delete seulement, admin uniquement) |
 
 ---
@@ -59,7 +74,8 @@ Middleware Filament : vérification `role = 'admin'` via `FilamentGate` ou surch
 | `auth:sanctum` | routes API authentifiées | Vérification token Bearer |
 | CORS | toutes routes API | Restriction domaines autorisés |
 | `throttle:api` | routes API publiques | Rate limiting |
-| Filament auth | `/admin/*` | Vérification role admin |
+| `throttle:contact` | `POST /api/contact` | Limitation anti-spam formulaire contact |
+| `auth` + `admin` | `/admin/*` | Vérification session admin + rôle admin |
 
 ---
 
@@ -68,7 +84,7 @@ Middleware Filament : vérification `role = 'admin'` via `FilamentGate` ou surch
 - Toutes les routes API mutantes (POST, PUT, DELETE) requièrent `auth:sanctum`
 - Le listing `GET /api/orders` filtre automatiquement par `user_id` de l'utilisateur authentifié
 - Aucune route ne retourne des données d'autres utilisateurs
-- Les routes Filament ne sont accessibles qu'aux admin (role = 'admin')
+- Les routes backoffice `/admin` ne sont accessibles qu'aux admin (role = 'admin')
 - CORS configuré pour autoriser uniquement `http://localhost:3000` en dev et le domaine de production
 
 ---

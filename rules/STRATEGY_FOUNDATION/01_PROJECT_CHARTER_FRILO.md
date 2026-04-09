@@ -167,8 +167,8 @@ Les SLA sont pilotés dans `OPERATIONS_SOP_DELIVERY_SUPPORT_FRILO.md`.
 
 ## 11. Stack Technique
 
-- Backend : Laravel 11, PHP 8.3+, MySQL 8, Laravel Sanctum
-- Frontend : Next.js 15, TypeScript, Tailwind CSS, Axios
+- Backend : Laravel 12, PHP 8.2+, MySQL 8, Laravel Sanctum
+- Frontend : Next.js 16, TypeScript, Tailwind CSS, Axios
 - Déploiement cible : VPS ou plateforme cloud
 - Email : Laravel Mail (SMTP configurable)
 

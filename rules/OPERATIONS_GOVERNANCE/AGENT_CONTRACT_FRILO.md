@@ -41,9 +41,9 @@ En cas de doute, appliquer dans l'ordre :
 
 ## 3. INVARIANTS TECHNIQUES NON NÉGOCIABLES
 
-- Framework backend : Laravel 11, PHP 8.3+
+- Framework backend : Laravel 12, PHP 8.2+
 - Base de données : MySQL 8
-- Frontend client : Next.js 15, TypeScript
+- Frontend client : Next.js 16, TypeScript
 - Style : Tailwind CSS
 - Auth : Laravel Sanctum (token Bearer)
 - Admin backoffice : `/admin` (Laravel custom en V1)

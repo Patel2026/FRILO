@@ -1,12 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Admin\SectorController as AdminSectorController;
-use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Clients
     Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
     Route::get('clients/{user}', [ClientController::class, 'show'])->name('clients.show');
+
+    // Demandes de contact
+    Route::get('contact-requests', [AdminContactRequestController::class, 'index'])->name('contact-requests.index');
+    Route::patch('contact-requests/{contactRequest}/status', [AdminContactRequestController::class, 'updateStatus'])
+        ->name('contact-requests.status');
 });
 
 /*

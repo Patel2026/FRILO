@@ -4,7 +4,7 @@
 Définir les critères obligatoires pour considérer une fonctionnalité comme livrée, testée, sécurisée et conforme au projet FRILO.
 
 ## Portée
-Toutes les fonctionnalités du système (Frontend Next.js + Backend Laravel + Admin Filament).
+Toutes les fonctionnalités du système (Frontend Next.js + Backend Laravel + Admin Laravel custom).
 
 ---
 
@@ -95,9 +95,9 @@ php artisan test
 
 ## 8. BACKOFFICE
 
-- Resource Filament correctement configurée
+- Routes/controllers admin custom correctement configurés
 - Champs sensibles non éditables directement (ex: prix snapshot)
-- Permissions Filament cohérentes avec les rôles
+- Permissions backoffice cohérentes avec les rôles
 
 ---
 

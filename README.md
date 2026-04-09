@@ -1,6 +1,55 @@
 # FRILO - Startup Guide
 
-## Prerequisites
+## Option A (Recommended) — Start with Docker
+
+### Prerequisites
+- Docker Desktop (or Docker Engine + Docker Compose)
+
+### 1. Prepare env files
+
+```bash
+cp backend/.env.docker.example backend/.env
+cp frontend/.env.docker.example frontend/.env.local
+```
+
+### 2. Build and start containers
+
+```bash
+docker compose up -d --build
+```
+
+### 3. Run database migrations + seeders
+
+```bash
+docker compose exec backend php artisan migrate --seed --force
+```
+
+### 4. Access apps
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:8080/api`
+- Admin panel: `http://localhost:8080/admin`
+- MySQL (from host): `127.0.0.1:3307` (`frilo` / `frilo`)
+
+### Useful Docker commands
+
+```bash
+# Stop all containers
+docker compose down
+
+# Rebuild from scratch
+docker compose down -v
+docker compose up -d --build
+
+# Backend logs
+docker compose logs -f backend
+
+# Frontend logs
+docker compose logs -f frontend
+```
+
+## Option B — Start without Docker
+
+### Prerequisites
 - Node.js & npm
 - PHP & Composer
 - MySQL Database (`frilo`)
@@ -37,6 +86,7 @@ composer qa
 
 cd ../frontend
 npm run qa
+npm run e2e
 ```
 
 ## Default Credentials

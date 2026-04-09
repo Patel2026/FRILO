@@ -16,6 +16,8 @@ Statut : RÉFÉRENCE
 - [ ] Déconnexion → token révoqué, localStorage vidé
 - [ ] `GET /api/user` sans token → 401
 - [ ] `GET /api/user` avec token valide → données utilisateur
+- [ ] Utilisateur déjà connecté sur `/login` ou `/register` → redirection automatique vers `/dashboard`
+- [ ] Espace public (header/footer) avec session active → afficher `Dashboard` et ne pas afficher `Connexion`/`Inscription`
 
 ---
 
@@ -38,12 +40,14 @@ Statut : RÉFÉRENCE
 - [ ] `/commande?templateId=1` → récapitulatif template affiché
 - [ ] Étape 2 : formulaire login fonctionnel dans le tunnel
 - [ ] Étape 2 : formulaire register fonctionnel dans le tunnel
+- [ ] Client déjà connecté : bypass étape 2 (auth) et passage direct à l'étape 3
 - [ ] Étape 3 : détails projet stockés correctement
 - [ ] Étape 4 : création commande `POST /api/orders` → 201
 - [ ] Commande créée avec status = "pending"
 - [ ] OrderInstruction créée avec les bonnes données
 - [ ] Prix snapshotté depuis le template
 - [ ] Étape 5 : numéro de commande affiché
+- [ ] En cas d'échec étape paiement : message actionnable + reprise possible
 
 ---
 
@@ -54,6 +58,8 @@ Statut : RÉFÉRENCE
 - [ ] Client A ne voit pas les commandes de client B
 - [ ] Badge statut avec la bonne couleur
 - [ ] Commandes vides → message "Vous n'avez pas encore de commande"
+- [ ] Erreur API dashboard/orders : état d'erreur distinct avec action de retry
+- [ ] `/dashboard/orders/{id}` affiche le détail commande + instructions du client connecté
 
 ---
 
@@ -66,6 +72,7 @@ Statut : RÉFÉRENCE
 - [ ] `user_id` dans le body est ignoré (user depuis auth token)
 - [ ] `status` dans le body est ignoré (toujours `pending` à la création)
 - [ ] Template inactif → 422 si commandé
+- [ ] `POST /api/contact` : throttling anti-spam actif (429 après dépassement limite)
 
 ---
 
@@ -80,7 +87,7 @@ Statut : RÉFÉRENCE
 
 ---
 
-## 7. BACKOFFICE FILAMENT
+## 7. BACKOFFICE ADMIN CUSTOM
 
 - [ ] `admin@frilo.com` peut accéder à `/admin`
 - [ ] `client@frilo.com` ne peut pas accéder à `/admin`
@@ -89,6 +96,8 @@ Statut : RÉFÉRENCE
 - [ ] CRUD templates fonctionnel
 - [ ] CRUD secteurs fonctionnel
 - [ ] Liste clients accessible en lecture
+- [ ] Liste demandes contact accessible côté admin (`/admin/contact-requests`)
+- [ ] Mise à jour du statut de traitement d'une demande contact côté admin
 
 ---
 
@@ -105,22 +114,34 @@ Statut : RÉFÉRENCE
 - [ ] Homepage correcte sur mobile (375px)
 - [ ] Tunnel de commande utilisable sur mobile
 - [ ] Dashboard lisible sur mobile
+- [ ] Sidebar dashboard utilisable sur mobile (menu ouvrir/fermer)
 - [ ] Prix affichés en FCFA avec séparateur de milliers
 - [ ] Badge statuts avec bonnes couleurs
 
 ---
 
-## 10. TESTS AUTOMATISÉS
+## 10. PAGES LÉGALES & CONTACT
+
+- [ ] `/mentions-legales` accessible depuis le footer
+- [ ] `/cgu` accessible depuis le footer et le formulaire d'inscription
+- [ ] Formulaire `/contact` connecté à l'API (`POST /api/contact`) avec états loading/success/error
+
+---
+
+## 11. TESTS AUTOMATISÉS
 
 - [ ] `php artisan test` → tous les tests passent
+- [ ] `npm run e2e` → scénario critique Playwright vert
 - [ ] Couverture : OrderService (createOrder, updateStatus, canTransition)
 - [ ] Couverture : OrderPolicy (view, viewAny)
 - [ ] Couverture : AuthController (register, login, logout)
 - [ ] Couverture : endpoints publics (sectors, templates)
+- [ ] Couverture : endpoint public contact (`ContactApiTest`)
+- [ ] Couverture E2E : UX client public/dashboard (`client-experience.spec.ts`)
 
 ---
 
-## 11. CONFORMITÉ BUSINESS PLAN 2026
+## 12. CONFORMITÉ BUSINESS PLAN 2026
 
 - [ ] Test de couverture : chaque section majeure du Business Plan a au moins un document `rules/` de référence
 - [ ] Test de cohérence : prix, délais, phases, statuts et hypothèses sont cohérents entre charter, backlog, workflow et contrats business

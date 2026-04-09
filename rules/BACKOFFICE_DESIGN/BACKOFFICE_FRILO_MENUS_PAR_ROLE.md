@@ -10,13 +10,13 @@ Statut : VALIDÉ
 
 | Rôle | Espace | Description |
 |------|--------|-------------|
-| `admin` | `/admin` (Filament) | Opérateur FRILO — accès total backoffice |
+| `admin` | `/admin` (Laravel custom) | Opérateur FRILO — accès total backoffice |
 | `client` | `/dashboard` (Next.js) | Client — accès à ses commandes uniquement |
 | Visiteur | Public (Next.js) | Anonyme — catalogue + tunnel commande |
 
 ---
 
-## 2. Navigation Admin (Filament — `/admin`)
+## 2. Navigation Admin (Laravel custom — `/admin`)
 
 ### Menu principal
 
@@ -88,5 +88,5 @@ Le client ne peut pas :
 
 - `auth:sanctum` middleware sur toutes les routes API mutantes
 - `OrderPolicy` : un client ne peut lire que ses propres commandes
-- Admin Filament : vérification `role = 'admin'` (middleware Filament ou Gate)
+- Admin backoffice : vérification `role = 'admin'` (middlewares `auth` + `admin`)
 - Aucun rôle client ne peut accéder à `/admin`
