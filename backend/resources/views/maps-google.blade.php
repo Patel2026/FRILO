@@ -65,8 +65,11 @@
     <!-- end row -->
 @endsection
 @section('script')
+    @php($googleMapsApiKey = config('services.google.maps_api_key'))
     <script src="{{ URL::asset('build/libs/prismjs/prism.js') }}"></script>
-    <script src="https://maps.google.com/maps/api/js?key=AIzaSyCtSAR45TFgZjOs4nBFFZnII-6mMHLfSYI"></script>
+    @if ($googleMapsApiKey)
+        <script src="https://maps.google.com/maps/api/js?key={{ urlencode($googleMapsApiKey) }}"></script>
+    @endif
 
     <script src="{{ URL::asset('build/libs/gmaps/gmaps.min.js') }}"></script>
     <script src="{{ URL::asset('build/js/pages/gmaps.init.js') }}"></script>
