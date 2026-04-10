@@ -24,7 +24,7 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
 - **Statut**: `IN PROGRESS (majoritairement couvert)`
 - Déjà aligné:
   - Throttling auth dédié.
-  - Endpoint public `POST /api/contact` avec validation stricte + rate limit (`throttle:contact`).
+  - Endpoint public `POST /api/contact` avec validation stricte + rate limit (`throttle:contact`), incluant référence commande optionnelle.
   - Validation `template actif` sur création commande.
   - Pagination `GET /api/orders`.
   - Contrat de réponse harmonisé (order + instruction).
@@ -38,7 +38,7 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
   - Statut commande validé via enum/couche service.
   - Contrôles d’accès/autorisations renforcés.
   - Logs opérationnels de changement de statut.
-  - Backoffice de suivi des demandes contact (`/admin/contact-requests`) avec statut minimal (`new/in_progress/done`).
+  - Backoffice de suivi des demandes contact (`/admin/contact-requests`) avec statut minimal (`new/in_progress/done`) + référence commande filtrable.
 - Reste à finaliser:
   - Revue complète CRUD admin sur champs sensibles + test de non-régression backoffice.
 
@@ -63,12 +63,15 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
   - Auth UX public renforcée (redirection `/login`/`/register` si connecté, CTA dashboard cohérent).
   - Pages légales V1 publiées sans placeholders bloquants (`/mentions-legales`, `/cgu`) avec marquage de validation juridique finale.
   - Formulaire `/contact` branché à l’API avec états loading/success/error.
+  - Tunnel commande renforcé côté réassurance (lien support contextuel + reprise brouillon local).
+  - Notification email client envoyée sur changement de statut commande (pending/processing/completed/cancelled).
   - Route dashboard profil non cassée.
   - Fallbacks mocks supprimés des pages catalogue critiques (`/`, `/secteurs`, `/secteurs/[slug]`, `/templates`) avec états `error/empty`.
   - Scénario E2E dédié preview immersive (`tests/e2e/immersive-preview.spec.ts`) ajouté et validé en exécution locale.
   - Scénario E2E détail template enrichi (preuves + FAQ + CTA mobile) ajouté et validé.
   - Scénarios E2E P2 ajoutés et validés (favoris/comparaison + instrumentation funnel).
 - Roadmap de fermeture frontend priorisée publiée (`FRONTEND_V1_REMAINING_ROADMAP_2026-04-10.md`).
+- Matrice Lot A parcours client publiée (`LOT_A_PARCOURS_CLIENT_MATRIX_2026-04-10.md`).
 - Revue UX finale des états vides/erreur sur toutes pages métier : à clôturer.
 
 ### Phase 5 — Sécurité, qualité, observabilité

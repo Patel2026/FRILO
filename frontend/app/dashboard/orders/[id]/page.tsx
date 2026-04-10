@@ -4,14 +4,24 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
-import { businessService, Order } from '@/services/business.service';
+import { businessService, Order, PaymentStatus } from '@/services/business.service';
 import { cn } from '@/lib/utils';
+import axios from 'axios';
 
 const statusConfig = {
   pending:    { label: 'En attente', classes: 'bg-amber-50 text-amber-700', dot: 'bg-amber-400' },
   processing: { label: 'En cours', classes: 'bg-blue-50 text-blue-700', dot: 'bg-blue-400' },
   completed:  { label: 'Livré', classes: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-400' },
   cancelled:  { label: 'Annulé', classes: 'bg-red-50 text-red-700', dot: 'bg-red-400' },
+};
+
+const paymentStatusConfig: Record<PaymentStatus, { label: string; classes: string }> = {
+  awaiting_payment: { label: 'En attente de paiement', classes: 'bg-amber-50 text-amber-700' },
+  paid: { label: 'Payée', classes: 'bg-emerald-50 text-emerald-700' },
+  failed: { label: 'Échouée', classes: 'bg-red-50 text-red-700' },
+  cancelled: { label: 'Annulée', classes: 'bg-gray-100 text-gray-700' },
+  refunded: { label: 'Remboursée', classes: 'bg-blue-50 text-blue-700' },
+  expired: { label: 'Expirée', classes: 'bg-slate-100 text-slate-700' },
 };
 
 export default function OrderDetailPage() {
@@ -21,6 +31,8 @@ export default function OrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [isStartingPayment, setIsStartingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -53,6 +65,39 @@ export default function OrderDetailPage() {
       dot: 'bg-gray-400',
     };
   }, [order]);
+
+  const paymentStatus = useMemo(() => {
+    if (!order) return null;
+    const rawStatus = (order.payment_status || 'awaiting_payment') as PaymentStatus;
+    return paymentStatusConfig[rawStatus] || paymentStatusConfig.awaiting_payment;
+  }, [order]);
+
+  const paymentStatusValue = (order?.payment_status || 'awaiting_payment') as PaymentStatus;
+
+  const handleStartPayment = async () => {
+    if (!order) return;
+
+    setIsStartingPayment(true);
+    setPaymentError(null);
+
+    try {
+      const response = await businessService.initiateOrderPayment(order.id, { mode: 'checkout' });
+      const checkoutUrl = response.payment?.checkout_url;
+      if (checkoutUrl) {
+        window.location.assign(checkoutUrl);
+        return;
+      }
+      setReloadKey(v => v + 1);
+    } catch (requestError) {
+      if (axios.isAxiosError(requestError) && typeof requestError.response?.data?.message === 'string') {
+        setPaymentError(requestError.response.data.message);
+      } else {
+        setPaymentError('Impossible de relancer le paiement pour le moment.');
+      }
+    } finally {
+      setIsStartingPayment(false);
+    }
+  };
 
   return (
     <div className="p-4 md:p-8 max-w-4xl">
@@ -125,6 +170,34 @@ export default function OrderDetailPage() {
                 <p className="text-sm font-semibold text-black">
                   {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
+              </div>
+              <div className="border border-gray-100 rounded-xl p-4 md:col-span-2">
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Paiement</p>
+                {paymentStatus && (
+                  <span className={cn("inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-full", paymentStatus.classes)}>
+                    {paymentStatus.label}
+                  </span>
+                )}
+                {order.paid_at && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    Confirmé le {new Date(order.paid_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                )}
+                {paymentStatusValue !== 'paid' && (
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={handleStartPayment}
+                      disabled={isStartingPayment}
+                      className="sq-btn sq-btn-black text-sm py-2.5 px-4 disabled:opacity-50"
+                    >
+                      {isStartingPayment ? 'Redirection…' : 'Payer maintenant'}
+                    </button>
+                    {paymentError && (
+                      <p className="text-xs text-red-600 mt-2">{paymentError}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

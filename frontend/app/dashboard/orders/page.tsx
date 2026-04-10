@@ -48,7 +48,7 @@ export default function OrdersPage() {
   const meta = result?.meta;
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-4 md:p-8 w-full">
 
       {/* Header */}
       <div className="mb-10">
@@ -174,11 +174,13 @@ export default function OrdersPage() {
         )}
       </div>
 
-      <div className="mt-6">
-        <Link href="/templates" className="sq-btn sq-btn-black text-sm py-3 px-6">
-          Commander un nouveau modèle
-        </Link>
-      </div>
+      {!loading && !error && orders.length > 0 && (
+        <div className="mt-6">
+          <Link href="/templates" className="sq-btn sq-btn-black text-sm py-3 px-6">
+            Commander un nouveau modèle
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

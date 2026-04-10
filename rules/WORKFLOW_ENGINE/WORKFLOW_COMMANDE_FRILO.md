@@ -47,13 +47,13 @@ Après création, la commande suit un workflow de production géré par l'admin 
 
 ### Étape 4 — Paiement
 - Affiche le récapitulatif du prix
-- En V1 : bouton "Simuler le paiement validé"
-- En V2 : intégration Stripe / Mobile Money (Orange Money, MTN, Wave)
 - Déclenche `businessService.createOrder(payload)` → `POST /api/orders`
-- Succès → avance à l'étape 5
+- Puis initialise FedaPay via `POST /api/orders/{id}/payment-link`
+- Redirige vers checkout FedaPay (Mobile Money, carte bancaire, moyens activés)
+- Retour client via callback `/commande/paiement/retour` + sync `GET /api/orders/{id}/payment-status`
 
 ### Étape 5 — Confirmation
-- Affiche la référence commande (`#ORD-{id paddé}`)
+- Affiche la référence commande (`#ORD-{id paddé}`) après confirmation de paiement
 - Message de confirmation
 - Lien retour accueil
 
@@ -106,6 +106,7 @@ Les horodatages SLA sont définis dans `06_BUSINESS_INTERFACE_CONTRACTS_FRILO.md
 ## 4. Règles Métier Strictes
 
 - **Toute transition passe par `OrderService`**, jamais par `Order::update()` direct.
+- **`pending` → `processing/completed` interdit tant que `payment_status != paid`**.
 - **Une commande `completed` est immuable** — aucun champ modifiable.
 - **Une commande `cancelled` est immuable** — aucun champ modifiable.
 - **Le prix est figé à la création** — le snapshot ne change jamais, même si le template est modifié ensuite.

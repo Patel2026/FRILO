@@ -131,8 +131,8 @@ export default function LoginPage() {
                 <label className="text-xs font-bold text-black uppercase tracking-widest">
                   Mot de passe
                 </label>
-                <Link href="/contact" className="text-xs text-gray-400 hover:text-black transition-colors">
-                  Mot de passe oublié ? (support)
+                <Link href="/forgot-password" className="text-xs text-gray-400 hover:text-black transition-colors">
+                  Mot de passe oublié ?
                 </Link>
               </div>
               <input

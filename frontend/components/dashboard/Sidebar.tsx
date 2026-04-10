@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 import { authService } from '@/services/auth.service';
 
 const navItems = [
-  { href: '/dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, exact: true },
-  { href: '/dashboard/orders', label: 'Mes commandes', icon: ShoppingBag },
-  { href: '/dashboard/profile', label: 'Mon profil', icon: User },
+  { href: '/dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard, match: 'exact' },
+  { href: '/dashboard/orders', label: 'Mes commandes', icon: ShoppingBag, match: 'prefix' },
+  { href: '/templates', label: 'Explorer les modèles', icon: Globe, match: 'prefix' },
+  { href: '/dashboard/profile', label: 'Mon profil', icon: User, match: 'prefix' },
 ];
 
 interface SidebarProps {
@@ -33,7 +34,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
 
   return (
     <aside className={cn(
-      "fixed inset-y-0 left-0 z-50 w-72 bg-black min-h-screen flex flex-col flex-shrink-0 transition-transform duration-200",
+      "fixed inset-y-0 left-0 z-50 w-72 bg-black min-h-screen flex flex-col flex-shrink-0 overflow-y-auto transition-transform duration-200",
       mobileOpen ? "translate-x-0" : "-translate-x-full",
       "md:static md:w-64 md:translate-x-0"
     )}>
@@ -55,9 +56,11 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-4 py-6 space-y-1">
-        {navItems.map(({ href, label, icon: Icon, exact }) => {
-          const active = exact ? pathname === href : pathname.startsWith(href);
+      <nav className="flex-1 px-4 py-6">
+        <p className="px-4 mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-600">Navigation</p>
+        <div className="space-y-1">
+        {navItems.map(({ href, label, icon: Icon, match }) => {
+          const active = match === 'exact' ? pathname === href : pathname.startsWith(href);
           return (
             <Link
               key={href}
@@ -75,18 +78,11 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
             </Link>
           );
         })}
+        </div>
       </nav>
 
       {/* Bottom actions */}
-      <div className="px-4 py-6 border-t border-white/10 space-y-1">
-        <Link
-          href="/templates"
-          onClick={handleClose}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"
-        >
-          <Globe className="w-4 h-4 flex-shrink-0" />
-          Voir les modèles
-        </Link>
+      <div className="px-4 py-6 border-t border-white/10">
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all"

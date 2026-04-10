@@ -72,6 +72,23 @@
                 <p class="mb-0 fw-semibold text-primary">{{ number_format($order->price, 0, ',', ' ') }} FCFA <small class="text-muted fw-normal">(prix au moment de la commande)</small></p>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0">Paiement</h5></div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <span class="badge {{ $order->payment_status->badgeClass() }}">
+                        {{ $order->payment_status->label() }}
+                    </span>
+                </p>
+                @if($order->paid_at)
+                    <p class="mb-2 text-muted"><i class="ri-time-line me-1"></i>Payée le {{ $order->paid_at->format('d/m/Y H:i') }}</p>
+                @endif
+                <p class="mb-1"><strong>Mode:</strong> {{ $order->latestPayment?->mode ?? '—' }}</p>
+                <p class="mb-1"><strong>Référence:</strong> {{ $order->latestPayment?->fedapay_reference ?? '—' }}</p>
+                <p class="mb-0"><strong>Statut transaction:</strong> {{ $order->latestPayment?->status ?? '—' }}</p>
+            </div>
+        </div>
     </div>
 
     {{-- Client + Instructions --}}

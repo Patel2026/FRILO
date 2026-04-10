@@ -42,8 +42,7 @@ export default function MentionsLegalesPage() {
         <div className="mt-10 pt-6 border-t border-gray-100 text-sm text-gray-500">
           <p>Version V1 opérationnelle publiée le 10 avril 2026.</p>
           <p>
-            Ce document est publié pour exploitation V1 et sera remplacé par la version juridique contractuelle
-            définitive après validation légale complète.
+            Ce document est en vigueur pour l’exploitation de la plateforme FRILO en version V1.
           </p>
           <p className="mt-3">
             Voir aussi les <Link href="/cgu" className="underline underline-offset-2 text-black">CGU / CGV</Link>.

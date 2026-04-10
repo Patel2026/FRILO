@@ -7,6 +7,7 @@ async function registerClient(page: Page, baseURL: string, suffix: string) {
 
   await page.locator('input[placeholder="Jean Dupont"]').fill(`Client ${suffix}`);
   await page.locator('input[placeholder="vous@exemple.com"]').fill(`client-${suffix}@frilo.test`);
+  await page.locator('select').first().selectOption({ index: 1 });
 
   const passwordInputs = page.locator('input[placeholder="••••••••"]');
   await passwordInputs.first().fill('password1234');
@@ -64,6 +65,7 @@ test('contact: soumission réelle du formulaire', async ({ page, baseURL }) => {
   await page.locator('input[placeholder="vous@exemple.com"]').fill(`prospect-${suffix}@frilo.test`);
   await page.locator('input[placeholder="+229 00 00 00 00"]').fill('+22997112233');
   await page.locator('input[placeholder="Mon entreprise"]').fill('Entreprise Prospect');
+  await page.locator('input[placeholder="#ORD-00042"]').fill('#ORD-00042');
   await page.locator('input[placeholder="J\'ai une question sur…"]').fill('Question avant commande');
   await page.locator('textarea[placeholder="Dites-nous en plus sur votre projet…"]').fill(
     'Bonjour, je souhaite être rappelé pour choisir le template le plus adapté.'

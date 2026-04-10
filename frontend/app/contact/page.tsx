@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Mail, MapPin, Phone, Send } from 'lucide-react';
 import axios from 'axios';
@@ -15,6 +15,7 @@ type ContactFormState = {
   email: string;
   phone: string;
   company: string;
+  order_reference: string;
   subject: string;
   message: string;
 };
@@ -29,9 +30,28 @@ export default function ContactPage() {
     email: '',
     phone: '',
     company: '',
+    order_reference: '',
     subject: '',
     message: '',
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const subject = params.get('subject') ?? '';
+    const message = params.get('message') ?? '';
+    const orderReference = params.get('order_reference') ?? '';
+
+    if (!subject && !message && !orderReference) {
+      return;
+    }
+
+    setForm(prev => ({
+      ...prev,
+      subject: prev.subject || subject,
+      message: prev.message || message,
+      order_reference: prev.order_reference || orderReference,
+    }));
+  }, []);
 
   const handleChange = (field: keyof ContactFormState, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -51,6 +71,7 @@ export default function ContactPage() {
       message: form.message.trim(),
       phone: form.phone.trim() || undefined,
       company: form.company.trim() || undefined,
+      order_reference: form.order_reference.trim() || undefined,
     };
 
     try {
@@ -196,6 +217,17 @@ export default function ContactPage() {
                       />
                       {fieldErrors.company?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.company[0]}</p>}
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">Référence commande (optionnel)</label>
+                    <input
+                      type="text"
+                      placeholder="#ORD-00042"
+                      value={form.order_reference}
+                      onChange={(e) => handleChange('order_reference', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
+                    />
+                    {fieldErrors.order_reference?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.order_reference[0]}</p>}
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">Sujet</label>

@@ -19,6 +19,11 @@ class UpdateProfileRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
+            'sector_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('sectors', 'id')->where(fn ($query) => $query->where('is_active', true)),
+            ],
         ];
     }
 }

@@ -69,5 +69,15 @@ class RouteServiceProvider extends ServiceProvider
 
             return Limit::perMinute(5)->by($key);
         });
+
+        RateLimiter::for('payments', function (Request $request) {
+            $key = optional($request->user())->id ?: $request->ip();
+
+            return Limit::perMinute(10)->by('pay|'.$key);
+        });
+
+        RateLimiter::for('fedapay-webhook', function (Request $request) {
+            return Limit::perMinute(120)->by('fedapay|'.$request->ip());
+        });
     }
 }

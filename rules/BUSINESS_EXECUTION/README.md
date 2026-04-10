@@ -32,6 +32,7 @@ Il n'annule pas les invariants techniques existants.
 - `FRILO_SUITE_TRAJECTOIRE_FRILO.md`
 - `OPERATING_RHYTHM_FRILO.md`
 - `ROADMAP_MAITRE_2026_2028_FRILO.md`
+- `LOT_A_PARCOURS_CLIENT_MATRIX_2026-04-10.md`
 
 ---
 

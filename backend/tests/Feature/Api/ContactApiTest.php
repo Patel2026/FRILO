@@ -16,6 +16,7 @@ class ContactApiTest extends TestCase
             'email' => 'client@example.com',
             'phone' => '+22900000000',
             'company' => 'Entreprise Test',
+            'order_reference' => 'ord-42',
             'subject' => 'Question sur un template',
             'message' => 'Bonjour, je souhaite des précisions avant de passer commande.',
         ]);
@@ -23,11 +24,13 @@ class ContactApiTest extends TestCase
         $response
             ->assertCreated()
             ->assertJsonPath('status', 'new')
+            ->assertJsonPath('order_reference', '#ORD-42')
             ->assertJsonStructure(['id', 'status', 'message', 'created_at']);
 
         $this->assertDatabaseHas('contact_requests', [
             'email' => 'client@example.com',
             'subject' => 'Question sur un template',
+            'order_reference' => '#ORD-42',
             'status' => 'new',
         ]);
     }
@@ -37,13 +40,14 @@ class ContactApiTest extends TestCase
         $response = $this->postJson('/api/contact', [
             'name' => '',
             'email' => 'not-an-email',
+            'order_reference' => 'BADREF-001',
             'subject' => '',
             'message' => 'court',
         ]);
 
         $response
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'email', 'subject', 'message']);
+            ->assertJsonValidationErrors(['name', 'email', 'order_reference', 'subject', 'message']);
     }
 
     public function test_contact_endpoint_is_rate_limited(): void

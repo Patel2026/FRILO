@@ -23,6 +23,7 @@ class ContactRequest extends Model
         'email',
         'phone',
         'company',
+        'order_reference',
         'subject',
         'message',
         'status',

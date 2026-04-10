@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\Template;
 use App\Models\User;
+use App\Notifications\OrderCreatedNotification;
+use App\Notifications\OrderStatusUpdatedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -20,18 +23,19 @@ class OrderService
     {
         $template = Template::active()->findOrFail($data['template_id']);
 
-        return DB::transaction(function () use ($data, $user, $template) {
+        $order = DB::transaction(function () use ($data, $user, $template) {
             $order = Order::create([
-                'user_id'     => $user->id,
+                'user_id' => $user->id,
                 'template_id' => $template->id,
-                'status'      => OrderStatus::Pending,
-                'price'       => $template->price, // snapshot
+                'status' => OrderStatus::Pending,
+                'payment_status' => PaymentStatus::AwaitingPayment,
+                'price' => $template->price, // snapshot
             ]);
 
             $order->instruction()->create([
-                'enterprise_name'       => $data['enterprise_name'] ?? null,
-                'activity_description'  => $data['activity_description'] ?? null,
-                'colors'                => $data['colors'] ?? [],
+                'enterprise_name' => $data['enterprise_name'] ?? null,
+                'activity_description' => $data['activity_description'] ?? null,
+                'colors' => $data['colors'] ?? [],
                 'specific_instructions' => $data['specific_instructions'] ?? null,
             ]);
 
@@ -44,6 +48,12 @@ class OrderService
 
             return $order->load(['template.sector', 'instruction']);
         });
+
+        if ($user->isClient()) {
+            $user->notify(new OrderCreatedNotification($order));
+        }
+
+        return $order;
     }
 
     /**
@@ -62,6 +72,17 @@ class OrderService
             ));
         }
 
+        $paymentStatus = $order->payment_status instanceof PaymentStatus
+            ? $order->payment_status
+            : PaymentStatus::tryFrom((string) $order->payment_status);
+
+        if (
+            in_array($newStatus, [OrderStatus::Processing, OrderStatus::Completed], true)
+            && $paymentStatus !== PaymentStatus::Paid
+        ) {
+            throw new HttpException(409, 'Paiement non confirmé: impossible de traiter ou livrer cette commande.');
+        }
+
         $order->update(['status' => $newStatus]);
 
         Log::info('order.status.changed', [
@@ -69,6 +90,13 @@ class OrderService
             'from' => $previousStatus->value,
             'to' => $newStatus->value,
         ]);
+
+        $order->loadMissing('user');
+        if ($order->user && $order->user->isClient()) {
+            $order->user->notify(
+                new OrderStatusUpdatedNotification($order, $previousStatus, $newStatus)
+            );
+        }
 
         return $order->fresh();
     }

@@ -17,6 +17,10 @@ class ContactRequestController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('reference')) {
+            $query->where('order_reference', 'like', '%'.$request->string('reference')->trim().'%');
+        }
+
         $contactRequests = $query->paginate(20);
 
         return view('admin.contact-requests.index', [

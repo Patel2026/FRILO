@@ -21,6 +21,17 @@ const STEPS = [
   { id: 5, name: 'Confirmation' },
 ];
 
+const ORDER_DRAFT_STORAGE_KEY = 'frilo.order.draft.v1';
+
+type OrderDraft = {
+  templateId: string;
+  domainName?: string;
+  description?: string;
+  colors?: string;
+  specific_instructions?: string;
+  updatedAt: string;
+};
+
 function OrderTunnelContent() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get('templateId');
@@ -37,9 +48,12 @@ function OrderTunnelContent() {
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [redirectingToPayment, setRedirectingToPayment] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
   const [orderRef, setOrderRef] = useState('');
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentErrorType, setPaymentErrorType] = useState<'auth' | 'generic' | null>(null);
+  const [draftRestored, setDraftRestored] = useState(false);
 
   useEffect(() => {
     if (!templateId) return;
@@ -49,6 +63,77 @@ function OrderTunnelContent() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [templateId]);
+
+  useEffect(() => {
+    if (!templateId) {
+      return;
+    }
+
+    try {
+      const rawDraft = localStorage.getItem(ORDER_DRAFT_STORAGE_KEY);
+      if (!rawDraft) {
+        return;
+      }
+
+      const draft = JSON.parse(rawDraft) as Partial<OrderDraft>;
+      const sameTemplate = draft.templateId === templateId;
+      const hasData = Boolean(
+        draft.domainName?.trim() ||
+        draft.description?.trim() ||
+        draft.colors?.trim() ||
+        draft.specific_instructions?.trim()
+      );
+
+      if (sameTemplate && hasData) {
+        setFormData(prev => ({
+          ...prev,
+          templateId,
+          domainName: draft.domainName ?? '',
+          description: draft.description ?? '',
+          colors: draft.colors ?? '',
+          specific_instructions: draft.specific_instructions ?? '',
+        }));
+        setDraftRestored(true);
+      }
+    } catch {
+      localStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+    }
+  }, [templateId]);
+
+  useEffect(() => {
+    if (!templateId) {
+      return;
+    }
+
+    const hasDraftData = Boolean(
+      formData.domainName?.trim() ||
+      formData.description?.trim() ||
+      formData.colors?.trim() ||
+      formData.specific_instructions?.trim()
+    );
+
+    if (!hasDraftData) {
+      localStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+      return;
+    }
+
+    const draft: OrderDraft = {
+      templateId,
+      domainName: formData.domainName,
+      description: formData.description,
+      colors: formData.colors,
+      specific_instructions: formData.specific_instructions,
+      updatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(ORDER_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+  }, [
+    templateId,
+    formData.domainName,
+    formData.description,
+    formData.colors,
+    formData.specific_instructions,
+  ]);
 
   const nextStep = () => setCurrentStep(p => Math.min(p + 1, STEPS.length));
 
@@ -60,34 +145,75 @@ function OrderTunnelContent() {
 
   const handlePayment = async () => {
     setIsSubmitting(true);
+    setRedirectingToPayment(false);
     setPaymentError(null);
     setPaymentErrorType(null);
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      const order = await businessService.createOrder({
-        template_id: templateId,
-        enterprise_name: formData.domainName,
-        activity_description: formData.description,
-        colors: formData.colors ? formData.colors.split(',').map(c => c.trim()) : [],
-        specific_instructions: formData.specific_instructions,
+      let orderIdToPay = createdOrderId;
+      let orderAmount = price;
+
+      if (!orderIdToPay) {
+        const order = await businessService.createOrder({
+          template_id: templateId,
+          enterprise_name: formData.domainName,
+          activity_description: formData.description,
+          colors: formData.colors ? formData.colors.split(',').map(c => c.trim()) : [],
+          specific_instructions: formData.specific_instructions,
+        });
+
+        orderIdToPay = order.id;
+        orderAmount = order.price;
+        setCreatedOrderId(order.id);
+        setOrderRef(String(order.id).padStart(5, '0'));
+        localStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
+        trackFunnelEvent('submit_order', {
+          template_id: templateId ? Number(templateId) : null,
+          order_id: order.id,
+          amount: order.price,
+        });
+      }
+
+      if (!orderIdToPay) {
+        throw new Error('Commande introuvable pour initialiser le paiement.');
+      }
+
+      const payment = await businessService.initiateOrderPayment(orderIdToPay, {
+        mode: 'checkout',
       });
-      trackFunnelEvent('submit_order', {
+
+      if (payment.order.payment_status === 'paid') {
+        nextStep();
+        return;
+      }
+
+      const checkoutUrl = payment.payment?.checkout_url;
+      if (!checkoutUrl) {
+        throw new Error('Lien de paiement indisponible.');
+      }
+
+      trackFunnelEvent('start_payment', {
         template_id: templateId ? Number(templateId) : null,
-        order_id: order.id,
-        amount: order.price,
+        order_id: orderIdToPay,
+        amount: orderAmount,
       });
-      setOrderRef(String(order.id).padStart(5, '0'));
-      nextStep();
+
+      setRedirectingToPayment(true);
+      window.location.assign(checkoutUrl);
     } catch (err) {
       if (axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)) {
         setPaymentErrorType('auth');
         setPaymentError('Votre session a expiré. Reconnectez-vous pour finaliser la commande.');
+      } else if (axios.isAxiosError(err) && typeof err.response?.data?.message === 'string') {
+        setPaymentErrorType('generic');
+        setPaymentError(err.response.data.message);
       } else {
         setPaymentErrorType('generic');
-        setPaymentError('Nous n’avons pas pu finaliser votre commande. Veuillez réessayer.');
+        setPaymentError('Nous n’avons pas pu lancer le paiement. Veuillez réessayer.');
       }
     } finally {
       setIsSubmitting(false);
+      setRedirectingToPayment(false);
     }
   };
 
@@ -105,6 +231,24 @@ function OrderTunnelContent() {
 
     setCurrentStep(2);
   };
+
+  const supportHref = (() => {
+    const params = new URLSearchParams();
+    const stepLabel = STEPS.find(step => step.id === currentStep)?.name ?? `Étape ${currentStep}`;
+    const templateLabel = template?.name ?? 'Template non chargé';
+
+    params.set('subject', 'Aide commande FRILO');
+    params.set(
+      'message',
+      `Bonjour,\nJe souhaite de l'aide sur ma commande.\nÉtape actuelle: ${stepLabel}\nTemplate: ${templateLabel}`
+    );
+
+    if (orderRef) {
+      params.set('order_reference', `#ORD-${orderRef}`);
+    }
+
+    return `/contact?${params.toString()}`;
+  })();
 
   if (loading) {
     return (
@@ -225,10 +369,40 @@ function OrderTunnelContent() {
           {currentStep === 3 && (
             <div className="p-8">
               <p className="sq-label mb-6">Détails de votre projet</p>
-              <ProjectDetailsForm onSuccess={(data) => {
-                setFormData(prev => ({ ...prev, ...data }));
-                nextStep();
-              }} />
+              {draftRestored && (
+                <div className="mb-5 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+                  <p className="text-sm text-emerald-700">
+                    Un brouillon de votre commande a été restauré automatiquement.
+                  </p>
+                </div>
+              )}
+              <ProjectDetailsForm
+                initialValues={{
+                  domainName: formData.domainName ?? '',
+                  description: formData.description ?? '',
+                  colors: formData.colors ?? '',
+                  specific_instructions: formData.specific_instructions ?? '',
+                }}
+                onChange={(data) =>
+                  setFormData(prev => {
+                    const next = { ...prev, ...data };
+                    if (
+                      prev.domainName === next.domainName &&
+                      prev.description === next.description &&
+                      prev.colors === next.colors &&
+                      prev.specific_instructions === next.specific_instructions
+                    ) {
+                      return prev;
+                    }
+
+                    return next;
+                  })
+                }
+                onSuccess={(data) => {
+                  setFormData(prev => ({ ...prev, ...data }));
+                  nextStep();
+                }}
+              />
             </div>
           )}
 
@@ -249,8 +423,16 @@ function OrderTunnelContent() {
               </div>
 
               <div className="bg-[#f7f7f7] rounded-xl p-5 mb-8 text-center">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Intégration paiement</p>
-                <p className="text-sm text-gray-500">Mobile Money & Carte bancaire disponibles prochainement.</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Paiement FedaPay</p>
+                <p className="text-sm text-gray-500">
+                  Vous allez être redirigé vers la page de paiement sécurisée FedaPay
+                  (Mobile Money, carte bancaire et moyens activés sur votre compte).
+                </p>
+                {createdOrderId && (
+                  <p className="text-xs text-gray-400 mt-3">
+                    Commande préparée: #{String(createdOrderId).padStart(5, '0')}
+                  </p>
+                )}
               </div>
 
               {paymentError && (
@@ -274,15 +456,22 @@ function OrderTunnelContent() {
                       Réessayer maintenant
                     </button>
                   )}
+                  <div className="mt-3">
+                    <Link href={supportHref} className="text-sm font-semibold text-black underline underline-offset-2">
+                      Contacter le support
+                    </Link>
+                  </div>
                 </div>
               )}
 
               <button
                 onClick={handlePayment}
-                disabled={isSubmitting}
+                disabled={isSubmitting || redirectingToPayment}
                 className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50"
               >
-                {isSubmitting ? 'Traitement…' : `Valider la commande — ${price.toLocaleString('fr-FR')} FCFA`}
+                {isSubmitting || redirectingToPayment
+                  ? 'Redirection vers FedaPay…'
+                  : `Payer avec FedaPay — ${price.toLocaleString('fr-FR')} FCFA`}
               </button>
             </div>
           )}
@@ -312,6 +501,23 @@ function OrderTunnelContent() {
               </div>
             </div>
           )}
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-5">
+          <p className="sq-label mb-2">Assistance FRILO</p>
+          <p className="text-sm text-gray-500 mb-4">
+            Besoin d&apos;aide pendant votre commande ? Notre équipe vous accompagne et reprend votre demande rapidement.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href={supportHref} className="sq-btn sq-btn-outline-black text-sm py-2.5 px-4">
+              Contacter le support
+            </Link>
+            {isAuthenticated && (
+              <Link href="/dashboard/orders" className="text-sm font-semibold text-gray-500 hover:text-black transition-colors">
+                Voir mes commandes en cours
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>

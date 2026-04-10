@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { NotificationsBell } from "@/components/dashboard/NotificationsBell";
 import { authService } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -42,20 +43,25 @@ export default function DashboardLayout({
           className="fixed inset-0 z-40 bg-black/40 md:hidden"
         />
       )}
-      <main className="flex-1 overflow-y-auto min-w-0">
-        <div className="md:hidden sticky top-0 z-30 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setMobileNavOpen(true)}
-            className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:text-black"
-            aria-label="Ouvrir le menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <Link href="/" className="text-sm font-black tracking-tight text-black">
-            FRILO
-          </Link>
-          <div className="w-9" />
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100">
+          <div className="px-4 md:px-8 py-3 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(true)}
+                className="md:hidden p-2 rounded-lg border border-gray-200 text-gray-600 hover:text-black"
+                aria-label="Ouvrir le menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <Link href="/" className="text-sm font-black tracking-tight text-black md:hidden">
+                FRILO
+              </Link>
+              <p className="hidden md:block text-sm font-semibold text-black">Espace client</p>
+            </div>
+            <NotificationsBell />
+          </div>
         </div>
         {children}
       </main>

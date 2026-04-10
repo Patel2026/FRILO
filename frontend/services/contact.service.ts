@@ -5,6 +5,7 @@ export interface ContactRequestPayload {
   email: string;
   phone?: string;
   company?: string;
+  order_reference?: string;
   subject: string;
   message: string;
 }
@@ -14,6 +15,7 @@ export type ContactRequestStatus = 'new' | 'in_progress' | 'done';
 export interface ContactRequestResponse {
   id: number;
   status: ContactRequestStatus;
+  order_reference?: string | null;
   message: string;
   created_at: string;
 }

@@ -27,6 +27,17 @@
                 </select>
             </div>
             <div class="col-auto">
+                <label class="form-label">Paiement</label>
+                <select name="payment_status" class="form-select">
+                    <option value="">Tous</option>
+                    @foreach($paymentStatuses as $paymentStatus)
+                        <option value="{{ $paymentStatus->value }}" {{ request('payment_status') === $paymentStatus->value ? 'selected' : '' }}>
+                            {{ $paymentStatus->label() }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Filtrer</button>
                 <a href="{{ route('admin.orders.index') }}" class="btn btn-soft-secondary ms-1">Réinitialiser</a>
             </div>
@@ -49,6 +60,7 @@
                         <th>Secteur</th>
                         <th>Prix</th>
                         <th>Statut</th>
+                        <th>Paiement</th>
                         <th>Date</th>
                         <th></th>
                     </tr>
@@ -75,6 +87,11 @@
                                 {{ $order->status->label() }}
                             </span>
                         </td>
+                        <td>
+                            <span class="badge {{ $order->payment_status->badgeClass() }}">
+                                {{ $order->payment_status->label() }}
+                            </span>
+                        </td>
                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                         <td>
                             <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-primary">
@@ -83,7 +100,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="8" class="text-center text-muted py-4">Aucune commande.</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted py-4">Aucune commande.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -1,4 +1,4 @@
-export type FunnelEventName = 'view_template' | 'open_preview' | 'start_order' | 'submit_order';
+export type FunnelEventName = 'view_template' | 'open_preview' | 'start_order' | 'submit_order' | 'start_payment';
 
 export interface FunnelEventRecord {
   name: FunnelEventName;

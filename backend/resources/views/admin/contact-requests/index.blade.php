@@ -35,6 +35,16 @@
                 </select>
             </div>
             <div class="col-auto">
+                <label class="form-label">Réf. commande</label>
+                <input
+                    type="text"
+                    name="reference"
+                    value="{{ request('reference') }}"
+                    class="form-control"
+                    placeholder="#ORD-00042"
+                >
+            </div>
+            <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Filtrer</button>
                 <a href="{{ route('admin.contact-requests.index') }}" class="btn btn-soft-secondary ms-1">Réinitialiser</a>
             </div>
@@ -53,6 +63,7 @@
                     <tr>
                         <th>#</th>
                         <th>Contact</th>
+                        <th>Réf. commande</th>
                         <th>Sujet</th>
                         <th>Message</th>
                         <th>Statut</th>
@@ -71,6 +82,13 @@
                                 @endif
                                 @if($contactRequest->company)
                                     <small class="text-muted d-block">{{ $contactRequest->company }}</small>
+                                @endif
+                            </td>
+                            <td>
+                                @if($contactRequest->order_reference)
+                                    <span class="badge badge-soft-info">{{ $contactRequest->order_reference }}</span>
+                                @else
+                                    <span class="text-muted">—</span>
                                 @endif
                             </td>
                             <td>{{ $contactRequest->subject }}</td>
@@ -100,7 +118,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Aucune demande de contact.</td>
+                            <td colspan="7" class="text-center text-muted py-4">Aucune demande de contact.</td>
                         </tr>
                     @endforelse
                 </tbody>

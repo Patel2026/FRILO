@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\Sector;
 use App\Models\Template;
@@ -38,12 +39,14 @@ class OrderApiTest extends TestCase
 
         $response->assertCreated();
         $response->assertJsonPath('status', OrderStatus::Pending->value);
+        $response->assertJsonPath('payment_status', PaymentStatus::AwaitingPayment->value);
         $response->assertJsonPath('price', 50000);
 
         $this->assertDatabaseHas('orders', [
             'user_id' => $user->id,
             'template_id' => $template->id,
             'status' => OrderStatus::Pending->value,
+            'payment_status' => PaymentStatus::AwaitingPayment->value,
             'price' => 50000,
         ]);
 

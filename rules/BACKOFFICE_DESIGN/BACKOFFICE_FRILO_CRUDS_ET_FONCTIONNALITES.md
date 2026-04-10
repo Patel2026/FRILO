@@ -123,5 +123,5 @@ KPIs affichés :
 
 - Seuls les utilisateurs avec `role = 'admin'` accèdent au backoffice `/admin`
 - Les données client (email, instructions) sont visibles uniquement dans le contexte de la commande
-- Aucune donnée de paiement réel ne doit être stockée ou affichée (V1 : paiement simulé)
+- Les statuts et références de paiement (FedaPay) sont visibles en lecture pour pilotage opérationnel
 - Les actions de changement de statut sont tracées (logs Laravel structurés)

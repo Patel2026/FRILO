@@ -51,7 +51,7 @@ Ce document :
 
 ---
 
-## 3. Contrat de Paiement (V2 cible)
+## 3. Contrat de Paiement (V1.1 actif)
 
 ### 3.1 États paiement
 
@@ -63,11 +63,11 @@ Ce document :
 | `refunded` | remboursement exécuté |
 | `cancelled` | paiement annulé avant confirmation |
 
-### 3.2 Règle métier cible
+### 3.2 Règle métier
 
 - Politique commerciale : démarrage production uniquement après statut `paid`.
-- En V1, la simulation actuelle est conservée (`paiement simulé`), sans transaction réelle.
-- En V2, `Order.status = pending` n'est autorisé qu'après confirmation paiement.
+- En V1.1, paiement réel FedaPay activé (checkout + webhook de synchronisation).
+- `Order.status = pending` peut être créé au moment de la commande, mais passage `processing/completed` interdit tant que `payment_status != paid`.
 
 ### 3.3 Cas d'échec/remboursement (cible)
 

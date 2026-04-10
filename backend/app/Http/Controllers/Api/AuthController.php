@@ -3,17 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ForgotPasswordRequest;
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\ResetPasswordRequest;
 use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    private const FORGOT_PASSWORD_MESSAGE = 'Si un compte existe avec cette adresse, un lien de réinitialisation a été envoyé.';
+
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
@@ -21,7 +28,9 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'client',
+            'sector_id' => (int) $request->sector_id,
         ]);
+        $user->load('sector');
 
         $token = $user->createToken('frilo-client')->plainTextToken;
 
@@ -33,13 +42,13 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => $user->only('id', 'name', 'email', 'role'),
+            'user' => $this->transformUser($user),
         ], 201);
     }
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('sector')->where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             Log::warning('auth.login.failed', [
@@ -60,8 +69,78 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => $user->only('id', 'name', 'email', 'role'),
+            'user' => $this->transformUser($user),
         ]);
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $status = Password::sendResetLink($request->only('email'));
+
+        Log::info('auth.password_reset_link.requested', [
+            'email' => $request->email,
+            'status' => $status,
+            'ip' => $request->ip(),
+        ]);
+
+        if ($status === Password::RESET_THROTTLED) {
+            return response()->json([
+                'message' => 'Une demande a déjà été faite récemment. Veuillez patienter avant de réessayer.',
+            ], 429);
+        }
+
+        return response()->json([
+            'message' => self::FORGOT_PASSWORD_MESSAGE,
+        ]);
+    }
+
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password): void {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                $user->tokens()->delete();
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            Log::info('auth.password_reset.success', [
+                'email' => $request->email,
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'message' => 'Votre mot de passe a été réinitialisé avec succès.',
+            ]);
+        }
+
+        if ($status === Password::INVALID_TOKEN) {
+            return response()->json([
+                'message' => 'Le lien de réinitialisation est invalide ou expiré.',
+                'errors' => [
+                    'token' => ['Le lien de réinitialisation est invalide ou expiré.'],
+                ],
+            ], 422);
+        }
+
+        if ($status === Password::INVALID_USER) {
+            return response()->json([
+                'message' => 'Aucun compte ne correspond à cette adresse e-mail.',
+                'errors' => [
+                    'email' => ['Aucun compte ne correspond à cette adresse e-mail.'],
+                ],
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Impossible de réinitialiser le mot de passe pour le moment.',
+        ], 422);
     }
 
     public function logout(Request $request): JsonResponse
@@ -78,7 +157,10 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        return response()->json($request->user()->only('id', 'name', 'email', 'role'));
+        $user = $request->user();
+        $user->loadMissing('sector');
+
+        return response()->json($this->transformUser($user));
     }
 
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
@@ -100,6 +182,26 @@ class AuthController extends Controller
             'ip' => $request->ip(),
         ]);
 
-        return response()->json($user->only('id', 'name', 'email', 'role'));
+        $user->loadMissing('sector');
+
+        return response()->json($this->transformUser($user));
+    }
+
+    private function transformUser(User $user): array
+    {
+        $sector = $user->sector;
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'sector_id' => $user->sector_id,
+            'sector' => $sector ? [
+                'id' => $sector->id,
+                'name' => $sector->name,
+                'slug' => $sector->slug,
+            ] : null,
+        ];
     }
 }

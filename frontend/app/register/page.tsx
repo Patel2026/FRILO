@@ -8,11 +8,14 @@ import { AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { authService, registerSchema, RegisterCredentials } from '@/services/auth.service';
+import { businessService, Sector } from '@/services/business.service';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [loadingSectors, setLoadingSectors] = useState(true);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterCredentials>({
     resolver: zodResolver(registerSchema),
   });
@@ -48,6 +51,28 @@ export default function RegisterPage() {
       isMounted = false;
     };
   }, [router]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    businessService.getSectors()
+      .then((data) => {
+        if (!isMounted) return;
+        setSectors(data);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setSectors([]);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setLoadingSectors(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const onSubmit = async (data: RegisterCredentials) => {
     setError(null);
@@ -142,6 +167,32 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
+                Domaine d&apos;activité
+              </label>
+              <select
+                {...register('sector_id', { valueAsNumber: true })}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors bg-white"
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  {loadingSectors ? 'Chargement des domaines…' : 'Sélectionnez votre domaine'}
+                </option>
+                {sectors.map((sector) => (
+                  <option key={sector.id} value={sector.id}>
+                    {sector.name}
+                  </option>
+                ))}
+              </select>
+              {errors.sector_id && <p className="text-red-500 text-xs mt-1.5">{errors.sector_id.message}</p>}
+              {!loadingSectors && sectors.length === 0 && (
+                <p className="text-amber-600 text-xs mt-1.5">
+                  Impossible de charger les domaines pour le moment. Réessayez dans quelques instants.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
                 Mot de passe
               </label>
               <input
@@ -170,7 +221,7 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || loadingSectors || sectors.length === 0}
               className="sq-btn sq-btn-black w-full justify-center mt-2 disabled:opacity-50"
             >
               {isSubmitting ? 'Création…' : 'Créer mon compte'}

@@ -29,6 +29,7 @@
                         <th>Nom</th>
                         <th>Secteur</th>
                         <th>Prix (FCFA)</th>
+                        <th>Aperçu</th>
                         <th>Actif</th>
                         <th>Commandes</th>
                         <th></th>
@@ -51,6 +52,22 @@
                         <td><?php echo e($template->sector->name ?? '—'); ?></td>
                         <td><?php echo e(number_format($template->price, 0, ',', ' ')); ?></td>
                         <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <?php if($template->preview_url): ?>
+                                    <span class="badge badge-soft-success">Démo live</span>
+                                <?php endif; ?>
+                                <?php if(!empty($template->preview_pages)): ?>
+                                    <span class="badge badge-soft-info"><?php echo e(count($template->preview_pages)); ?> page(s)</span>
+                                <?php endif; ?>
+                                <?php if(!empty($template->preview_gallery)): ?>
+                                    <span class="badge badge-soft-primary"><?php echo e(count($template->preview_gallery)); ?> capture(s)</span>
+                                <?php endif; ?>
+                                <?php if(!$template->preview_url && empty($template->preview_pages) && empty($template->preview_gallery)): ?>
+                                    <span class="text-muted">—</span>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+                        <td>
                             <span class="badge badge-soft-<?php echo e($template->is_active ? 'success' : 'danger'); ?>">
                                 <?php echo e($template->is_active ? 'Actif' : 'Inactif'); ?>
 
@@ -69,7 +86,7 @@
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr><td colspan="6" class="text-center text-muted py-4">Aucun template.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Aucun template.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

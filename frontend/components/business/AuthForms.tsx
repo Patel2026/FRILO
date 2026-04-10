@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle } from 'lucide-react';
@@ -10,6 +11,7 @@ import {
   loginSchema, registerSchema,
   LoginCredentials, RegisterCredentials, AuthUser,
 } from '@/services/auth.service';
+import { businessService, Sector } from '@/services/business.service';
 
 interface AuthFormsProps {
   onSuccess: (user: AuthUser) => void;
@@ -80,7 +82,14 @@ function LoginForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void; o
         {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
       </div>
       <div>
-        <label className={labelClass}>Mot de passe</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-bold text-black uppercase tracking-widest">
+            Mot de passe
+          </label>
+          <Link href="/forgot-password" className="text-xs text-gray-400 hover:text-black transition-colors">
+            Mot de passe oublié ?
+          </Link>
+        </div>
         <input {...register('password')} type="password" placeholder="••••••••" className={inputClass} />
         {errors.password && <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>}
       </div>
@@ -95,6 +104,30 @@ function RegisterForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterCredentials>({
     resolver: zodResolver(registerSchema),
   });
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [loadingSectors, setLoadingSectors] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    businessService.getSectors()
+      .then((data) => {
+        if (!isMounted) return;
+        setSectors(data);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setSectors([]);
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setLoadingSectors(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const onSubmit = async (data: RegisterCredentials) => {
     try {
@@ -117,6 +150,29 @@ function RegisterForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void
         <input {...register('email')} type="email" placeholder="vous@exemple.com" className={inputClass} />
         {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
       </div>
+      <div>
+        <label className={labelClass}>Domaine d&apos;activité</label>
+        <select
+          {...register('sector_id', { valueAsNumber: true })}
+          defaultValue=""
+          className={inputClass}
+        >
+          <option value="" disabled>
+            {loadingSectors ? 'Chargement des domaines…' : 'Sélectionnez votre domaine'}
+          </option>
+          {sectors.map((sector) => (
+            <option key={sector.id} value={sector.id}>
+              {sector.name}
+            </option>
+          ))}
+        </select>
+        {errors.sector_id && <p className="text-red-500 text-xs mt-1.5">{errors.sector_id.message}</p>}
+        {!loadingSectors && sectors.length === 0 && (
+          <p className="text-amber-600 text-xs mt-1.5">
+            Les domaines ne sont pas disponibles actuellement. Réessayez dans quelques instants.
+          </p>
+        )}
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelClass}>Mot de passe</label>
@@ -129,7 +185,7 @@ function RegisterForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void
           {errors.password_confirmation && <p className="text-red-500 text-xs mt-1.5">{errors.password_confirmation.message}</p>}
         </div>
       </div>
-      <button type="submit" disabled={isSubmitting} className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50">
+      <button type="submit" disabled={isSubmitting || loadingSectors || sectors.length === 0} className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50">
         {isSubmitting ? 'Création…' : 'Créer mon compte'}
       </button>
     </form>

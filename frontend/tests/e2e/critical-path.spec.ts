@@ -23,6 +23,7 @@ test('critical path: visiteur -> commande -> admin -> suivi client (jusqu’à l
 
   await page.locator('input[placeholder="Jean Dupont"]').fill('Client E2E');
   await page.locator('input[placeholder="vous@exemple.com"]').fill(clientEmail);
+  await page.locator('select').first().selectOption({ index: 1 });
 
   const registerPasswordInputs = page.locator('input[placeholder="••••••••"]');
   await registerPasswordInputs.first().fill(clientPassword);

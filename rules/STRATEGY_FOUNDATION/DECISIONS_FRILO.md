@@ -68,7 +68,7 @@ Toute décision structurante doit être ajoutée ici. Aucun autre fichier ne doi
 
 ## ADR-007 — Paiement : simulé en V1
 
-**Statut** : VALIDÉ
+**Statut** : SUPERSEDÉ (par ADR-013)
 **Date** : 2026-04
 **Décision** : Le paiement est simulé en V1 (bouton "Simuler le paiement validé").
 **Raison** : Intégration Stripe/Mobile Money non finalisée.
@@ -123,6 +123,19 @@ Toute décision structurante doit être ajoutée ici. Aucun autre fichier ne doi
 **Décision** : Pour la livraison V1 production, le backoffice reste implémenté en admin Laravel custom sous `/admin`.
 **Raison** : Le code admin custom est déjà avancé et opérationnel; migrer vers Filament dans ce cycle augmente le risque et retarde le go-live.
 **Conséquences** : L'alignement documentaire V1 doit considérer l'admin custom comme référence d'exécution. Une éventuelle migration Filament devient un chantier post-V1 sous ADR dédié.
+
+---
+
+## ADR-013 — Paiement V1.1 : FedaPay (checkout + webhook)
+
+**Statut** : VALIDÉ  
+**Date** : 2026-04
+**Décision** : FRILO intègre FedaPay en V1.1 via :
+- création de transaction côté backend,
+- génération d’un lien de paiement sécurisé (checkout),
+- synchronisation d’état par webhook signé (`X-FEDAPAY-SIGNATURE`).
+**Raison** : Passer du paiement simulé au paiement réel en conservant l’architecture actuelle.
+**Conséquences** : `payment_status` devient une contrainte métier active. Le passage admin vers `processing/completed` est bloqué tant que la commande n’est pas payée.
 
 ---
 

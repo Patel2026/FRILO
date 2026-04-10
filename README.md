@@ -12,6 +12,17 @@ cp backend/.env.docker.example backend/.env
 cp frontend/.env.docker.example frontend/.env.local
 ```
 
+Add your FedaPay credentials in `backend/.env`:
+
+```env
+FEDAPAY_ENVIRONMENT=sandbox
+FEDAPAY_SECRET_KEY=sk_sandbox_xxx
+FEDAPAY_BASE_URL=https://sandbox-api.fedapay.com/v1
+FEDAPAY_CURRENCY=XOF
+FEDAPAY_CALLBACK_URL=http://localhost:3000/commande/paiement/retour
+FEDAPAY_WEBHOOK_SECRET=wh_sandbox_xxx
+```
+
 ### 2. Build and start containers
 
 ```bash
@@ -29,6 +40,11 @@ docker compose exec backend php artisan migrate --seed --force
 - Backend API: `http://localhost:8080/api`
 - Admin panel: `http://localhost:8080/admin`
 - MySQL (from host): `127.0.0.1:3307` (`frilo` / `frilo`)
+
+### 5. Configure FedaPay webhook
+- URL: `http://localhost:8080/api/payments/fedapay/webhook` (use your public URL in production)
+- Header/signature: `X-FEDAPAY-SIGNATURE`
+- Events minimum: `transaction.approved`, `transaction.declined`, `transaction.canceled`, `transaction.updated`
 
 ### Useful Docker commands
 

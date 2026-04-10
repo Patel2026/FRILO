@@ -1,4 +1,17 @@
-<?php $template = $template ?? null; ?>
+<?php
+    $template = $template ?? null;
+    $previewPagesRaw = old('preview_pages_raw',
+        collect($template?->preview_pages ?? [])
+            ->map(function ($page) {
+                $label = is_array($page) ? ($page['label'] ?? '') : '';
+                $path = is_array($page) ? ($page['path'] ?? '/') : '/';
+                return trim($label) !== '' ? trim($label) . '|' . ($path !== '' ? $path : '/') : null;
+            })
+            ->filter()
+            ->implode("\n")
+    );
+    $previewGalleryRaw = old('preview_gallery_raw', implode("\n", $template?->preview_gallery ?? []));
+?>
 
 <div class="mb-3">
     <label class="form-label">Secteur <span class="text-danger">*</span></label>
@@ -97,6 +110,51 @@ unset($__errorArgs, $__bag); ?>
     <label class="form-label">URL de prévisualisation</label>
     <input type="url" name="preview_url" class="form-control"
            value="<?php echo e(old('preview_url', $template?->preview_url)); ?>" placeholder="https://...">
+    <div class="form-text">Lien vers la démo live (site interactif affiché dans l'espace client).</div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Pages de prévisualisation (une page par ligne)</label>
+    <textarea name="preview_pages_raw" class="form-control <?php $__errorArgs = ['preview_pages_raw'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" rows="4"
+              placeholder="Accueil|/&#10;Services|/services&#10;Contact|/contact"><?php echo e($previewPagesRaw); ?></textarea>
+    <?php $__errorArgs = ['preview_pages_raw'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+    <div class="form-text">Format: <code>Titre|/chemin</code>. Exemple: <code>Tarifs|/tarifs</code>.</div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Galerie d'aperçu (une URL d'image par ligne)</label>
+    <textarea name="preview_gallery_raw" class="form-control <?php $__errorArgs = ['preview_gallery_raw'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" rows="4"
+              placeholder="https://.../home.jpg&#10;https://.../about.jpg"><?php echo e($previewGalleryRaw); ?></textarea>
+    <?php $__errorArgs = ['preview_gallery_raw'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?><div class="invalid-feedback"><?php echo e($message); ?></div><?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+    <div class="form-text">Utilisée en fallback si la démo live n'est pas disponible.</div>
 </div>
 
 <div class="form-check form-switch mb-0">

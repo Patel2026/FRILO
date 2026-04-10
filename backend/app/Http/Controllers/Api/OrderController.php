@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CreateOrderRequest;
 use App\Models\Order;
@@ -22,7 +23,7 @@ class OrderController extends Controller
         $perPage = (int) $request->integer('per_page', 10);
         $perPage = max(1, min($perPage, 100));
 
-        $orders = Order::with(['template.sector', 'instruction'])
+        $orders = Order::with(['template.sector', 'instruction', 'latestPayment'])
             ->forUser($request->user()->id)
             ->latest()
             ->paginate($perPage);
@@ -88,7 +89,7 @@ class OrderController extends Controller
 
     public function show(Request $request, int $id): JsonResponse
     {
-        $order = Order::with(['template.sector', 'instruction'])
+        $order = Order::with(['template.sector', 'instruction', 'latestPayment'])
             ->findOrFail($id);
 
         $this->authorize('view', $order);
@@ -110,9 +111,15 @@ class OrderController extends Controller
             ? $order->status->value
             : (string) $order->status;
 
+        $paymentStatus = $order->payment_status instanceof PaymentStatus
+            ? $order->payment_status->value
+            : (string) $order->payment_status;
+
         return [
             'id' => $order->id,
             'status' => $status,
+            'payment_status' => $paymentStatus,
+            'paid_at' => optional($order->paid_at)?->toISOString(),
             'price' => (int) $order->price,
             'created_at' => optional($order->created_at)?->toISOString(),
             'template' => $order->template ? [
@@ -128,6 +135,15 @@ class OrderController extends Controller
             'instruction' => $instruction,
             // Backward compatibility for existing front implementations
             'instructions' => $instruction ? [$instruction] : [],
+            'payment' => $order->latestPayment ? [
+                'id' => $order->latestPayment->id,
+                'provider' => $order->latestPayment->provider,
+                'status' => $order->latestPayment->status,
+                'mode' => $order->latestPayment->mode,
+                'reference' => $order->latestPayment->fedapay_reference,
+                'checkout_url' => $order->latestPayment->checkout_url,
+                'fedapay_transaction_id' => $order->latestPayment->fedapay_transaction_id,
+            ] : null,
         ];
     }
 }

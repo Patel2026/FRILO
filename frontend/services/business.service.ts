@@ -27,6 +27,19 @@ export interface Template {
 }
 
 export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
+export type PaymentStatus = 'awaiting_payment' | 'paid' | 'failed' | 'cancelled' | 'refunded' | 'expired';
+
+export interface PaymentInfo {
+    id: number;
+    provider: string;
+    status: string;
+    mode: string | null;
+    reference: string | null;
+    checkout_url: string | null;
+    fedapay_transaction_id: number | null;
+    initiated_at?: string | null;
+    completed_at?: string | null;
+}
 
 export interface OrderInstruction {
     id?: number;
@@ -39,6 +52,8 @@ export interface OrderInstruction {
 export interface Order {
     id: number;
     status: OrderStatus;
+    payment_status: PaymentStatus;
+    paid_at?: string | null;
     price: number;
     created_at: string;
     template: {
@@ -51,6 +66,7 @@ export interface Order {
         } | null;
     } | null;
     instruction: OrderInstruction | null;
+    payment?: PaymentInfo | null;
     // Backward compatibility with older payloads
     instructions?: OrderInstruction[];
 }
@@ -89,6 +105,26 @@ export interface CreateOrderPayload {
     activity_description?: string;
     colors?: string[];
     specific_instructions?: string;
+}
+
+export interface InitiateOrderPaymentPayload {
+    mode?: string;
+    phone_number?: {
+        number: string;
+        country: string;
+    };
+}
+
+export interface OrderPaymentResponse {
+    order: {
+        id: number;
+        status: OrderStatus;
+        payment_status: PaymentStatus;
+        paid_at: string | null;
+        price: number;
+    };
+    payment: PaymentInfo | null;
+    already_paid?: boolean;
 }
 
 export const businessService = {
@@ -179,6 +215,18 @@ export const businessService = {
     async getOrder(orderId: number | string): Promise<Order> {
         const response = await api.get(`/orders/${orderId}`);
         return response.data as Order;
+    },
+
+    async initiateOrderPayment(orderId: number | string, payload: InitiateOrderPaymentPayload = {}): Promise<OrderPaymentResponse> {
+        const response = await api.post(`/orders/${orderId}/payment-link`, payload);
+        return response.data as OrderPaymentResponse;
+    },
+
+    async getOrderPaymentStatus(orderId: number | string, refresh = false): Promise<OrderPaymentResponse> {
+        const response = await api.get(`/orders/${orderId}/payment-status`, {
+            params: { refresh: refresh ? 1 : 0 },
+        });
+        return response.data as OrderPaymentResponse;
     },
 
     async getOrderSummary(): Promise<OrderSummary> {

@@ -30,4 +30,15 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'fedapay' => [
+        'secret_key' => env('FEDAPAY_SECRET_KEY'),
+        'base_url' => env('FEDAPAY_BASE_URL', env('FEDAPAY_ENVIRONMENT', 'sandbox') === 'live'
+            ? 'https://api.fedapay.com/v1'
+            : 'https://sandbox-api.fedapay.com/v1'),
+        'currency' => env('FEDAPAY_CURRENCY', 'XOF'),
+        'callback_url' => env('FEDAPAY_CALLBACK_URL'),
+        'webhook_secret' => env('FEDAPAY_WEBHOOK_SECRET'),
+        'webhook_tolerance' => (int) env('FEDAPAY_WEBHOOK_TOLERANCE', 300),
+    ],
+
 ];

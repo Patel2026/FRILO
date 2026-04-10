@@ -104,6 +104,7 @@ Corps :
   "email": "jean@example.com",
   "phone": "+22990000000",
   "company": "Entreprise Test",
+  "order_reference": "#ORD-00042",
   "subject": "Question avant commande",
   "message": "Bonjour, je souhaite être contacté pour choisir un template."
 }
@@ -114,6 +115,7 @@ Réponse 201 :
 {
   "id": 12,
   "status": "new",
+  "order_reference": "#ORD-00042",
   "message": "Votre demande a été enregistrée. Notre équipe vous répond rapidement.",
   "created_at": "2026-04-09T18:25:00Z"
 }
@@ -135,7 +137,8 @@ Corps :
   "name": "Jean Dupont",
   "email": "jean@example.com",
   "password": "motdepasse123",
-  "password_confirmation": "motdepasse123"
+  "password_confirmation": "motdepasse123",
+  "sector_id": 1
 }
 ```
 
@@ -143,7 +146,14 @@ Réponse 201 :
 ```json
 {
   "token": "1|xxxxxxxxxxxxxxxx",
-  "user": { "id": 1, "name": "Jean Dupont", "email": "jean@example.com", "role": "client" }
+  "user": {
+    "id": 1,
+    "name": "Jean Dupont",
+    "email": "jean@example.com",
+    "role": "client",
+    "sector_id": 1,
+    "sector": { "id": 1, "name": "Restaurants & Traiteurs", "slug": "restaurants" }
+  }
 }
 ```
 
@@ -160,7 +170,14 @@ Réponse 200 :
 ```json
 {
   "token": "1|xxxxxxxxxxxxxxxx",
-  "user": { "id": 1, "name": "Jean Dupont", "email": "jean@example.com", "role": "client" }
+  "user": {
+    "id": 1,
+    "name": "Jean Dupont",
+    "email": "jean@example.com",
+    "role": "client",
+    "sector_id": 1,
+    "sector": { "id": 1, "name": "Restaurants & Traiteurs", "slug": "restaurants" }
+  }
 }
 ```
 
@@ -180,7 +197,14 @@ Header : `Authorization: Bearer {token}`
 
 Réponse 200 :
 ```json
-{ "id": 1, "name": "Jean Dupont", "email": "jean@example.com", "role": "client" }
+{
+  "id": 1,
+  "name": "Jean Dupont",
+  "email": "jean@example.com",
+  "role": "client",
+  "sector_id": 1,
+  "sector": { "id": 1, "name": "Restaurants & Traiteurs", "slug": "restaurants" }
+}
 ```
 
 ---
@@ -193,17 +217,25 @@ Corps :
 ```json
 {
   "name": "Jean Dupont",
-  "email": "jean@example.com"
+  "email": "jean@example.com",
+  "sector_id": 1
 }
 ```
 
 Réponse 200 :
 ```json
-{ "id": 1, "name": "Jean Dupont", "email": "jean@example.com", "role": "client" }
+{
+  "id": 1,
+  "name": "Jean Dupont",
+  "email": "jean@example.com",
+  "role": "client",
+  "sector_id": 1,
+  "sector": { "id": 1, "name": "Restaurants & Traiteurs", "slug": "restaurants" }
+}
 ```
 
 Erreurs :
-- `422` si validation invalide (`name` < 2 caractères, email invalide ou déjà pris)
+- `422` si validation invalide (`name` < 2 caractères, email invalide ou déjà pris, `sector_id` invalide)
 
 ---
 
@@ -227,6 +259,8 @@ Réponse 201 :
 {
   "id": 42,
   "status": "pending",
+  "payment_status": "awaiting_payment",
+  "paid_at": null,
   "price": 50000,
   "created_at": "2026-04-09T10:00:00Z",
   "template": {
@@ -242,6 +276,86 @@ Réponse 201 :
   }
 }
 ```
+
+Notes :
+- la commande est créée en `status=pending` et `payment_status=awaiting_payment`.
+- le passage en traitement/livraison est bloqué tant que `payment_status != paid`.
+
+---
+
+### `POST /api/orders/{id}/payment-link`
+
+Initialise une transaction FedaPay pour une commande du client connecté.
+
+Corps (optionnel) :
+```json
+{
+  "mode": "checkout"
+}
+```
+
+Réponse 201 :
+```json
+{
+  "order": {
+    "id": 42,
+    "status": "pending",
+    "payment_status": "awaiting_payment",
+    "paid_at": null,
+    "price": 50000
+  },
+  "payment": {
+    "id": 12,
+    "provider": "fedapay",
+    "status": "pending",
+    "mode": "checkout",
+    "reference": "tr_xxx",
+    "checkout_url": "https://...",
+    "fedapay_transaction_id": 777
+  },
+  "already_paid": false
+}
+```
+
+---
+
+### `GET /api/orders/{id}/payment-status?refresh=1`
+
+Retourne le dernier état paiement de la commande.
+
+- `refresh=1` force une synchronisation avec FedaPay.
+- `refresh=0` lit l’état local.
+
+Réponse 200 :
+```json
+{
+  "order": {
+    "id": 42,
+    "status": "pending",
+    "payment_status": "paid",
+    "paid_at": "2026-04-10T09:30:00Z",
+    "price": 50000
+  },
+  "payment": {
+    "id": 12,
+    "provider": "fedapay",
+    "status": "approved",
+    "mode": "checkout",
+    "reference": "tr_xxx",
+    "checkout_url": "https://...",
+    "fedapay_transaction_id": 777
+  }
+}
+```
+
+---
+
+### `POST /api/payments/fedapay/webhook`
+
+Endpoint webhook FedaPay (public) pour synchroniser les statuts.
+
+- signature attendue via header `X-FEDAPAY-SIGNATURE`.
+- réponse attendue côté FedaPay: code `2xx`.
 
 ---
 

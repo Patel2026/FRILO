@@ -20,7 +20,8 @@ export default function CguPage() {
             <h2 className="text-lg font-bold text-black mb-3">Parcours de commande</h2>
             <p>
               La commande est effectuée via le tunnel FRILO, avec création d’un compte client et validation finale du
-              panier. En V1, le paiement est simulé conformément au cadrage produit.
+              panier. Le paiement est traité via FedaPay (checkout sécurisé) et la prise en charge démarre après
+              confirmation du règlement.
             </p>
           </section>
 
@@ -43,8 +44,8 @@ export default function CguPage() {
           <section>
             <h2 className="text-lg font-bold text-black mb-3">Support et réclamations</h2>
             <p>
-              Les demandes de support passent par le formulaire de contact. Le lien “Mot de passe oublié” est traité
-              en mode support temporaire durant la phase V1.
+              Les demandes de support passent par le formulaire de contact. Le lien “Mot de passe oublié” permet
+              désormais une réinitialisation technique sécurisée.
             </p>
           </section>
         </div>
@@ -52,8 +53,7 @@ export default function CguPage() {
         <div className="mt-10 pt-6 border-t border-gray-100 text-sm text-gray-500">
           <p>Version V1 opérationnelle publiée le 10 avril 2026.</p>
           <p>
-            Ce document est une base opérationnelle. Validation juridique finale requise avant diffusion contractuelle
-            définitive.
+            Ce document définit le cadre d’utilisation et de vente appliqué à la plateforme FRILO en version V1.
           </p>
           <p className="mt-3">
             Retour aux <Link href="/mentions-legales" className="underline underline-offset-2 text-black">mentions légales</Link>.

@@ -7,13 +7,17 @@ use App\Http\Requests\Api\SubmitContactRequest;
 use App\Models\ContactRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ContactController extends Controller
 {
     public function store(SubmitContactRequest $request): JsonResponse
     {
+        $payload = $request->validated();
+        $payload['order_reference'] = $this->normalizeOrderReference($payload['order_reference'] ?? null);
+
         $contactRequest = ContactRequest::create([
-            ...$request->validated(),
+            ...$payload,
             'status' => ContactRequest::STATUS_NEW,
         ]);
 
@@ -25,8 +29,25 @@ class ContactController extends Controller
         return response()->json([
             'id' => $contactRequest->id,
             'status' => $contactRequest->status,
+            'order_reference' => $contactRequest->order_reference,
             'message' => 'Votre demande a été enregistrée. Notre équipe vous répond rapidement.',
             'created_at' => optional($contactRequest->created_at)?->toISOString(),
         ], 201);
+    }
+
+    private function normalizeOrderReference(?string $reference): ?string
+    {
+        if ($reference === null) {
+            return null;
+        }
+
+        $trimmed = trim($reference);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $normalized = strtoupper($trimmed);
+
+        return Str::startsWith($normalized, '#') ? $normalized : "#{$normalized}";
     }
 }
