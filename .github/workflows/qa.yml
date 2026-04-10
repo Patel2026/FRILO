@@ -7,6 +7,9 @@ on:
       - develop
   pull_request:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   backend:
     name: Backend QA
@@ -22,7 +25,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: "8.2"
           extensions: mbstring, pdo_mysql, pdo_sqlite
 
       - name: Install dependencies
