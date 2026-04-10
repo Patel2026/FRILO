@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { TemplateCard } from '@/components/business/TemplateCard';
 import { businessService, Template, Sector } from '@/services/business.service';
 import { parseFeatures } from '@/lib/utils';
+import { hasLivePreview, parsePreviewGallery } from '@/lib/templatePreview';
 
 export default function SectorPage() {
   const { slug } = useParams() as { slug: string };
@@ -88,6 +89,8 @@ export default function SectorPage() {
                   price={typeof t.price === 'string' ? parseInt(t.price) : t.price}
                   features={parseFeatures(t.features)}
                   image={t.full_thumbnail_url}
+                  hasLivePreview={hasLivePreview(t.preview_url)}
+                  previewScreens={parsePreviewGallery(t.preview_gallery).length}
                 />
               ))}
             </div>

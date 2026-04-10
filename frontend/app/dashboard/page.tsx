@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, Clock, CheckCircle, ArrowRight, Plus, AlertTriangle } from 'lucide-react';
-import { businessService, Order } from '@/services/business.service';
+import { businessService, Order, OrderSummary } from '@/services/business.service';
 import { authService, AuthUser } from '@/services/auth.service';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,7 @@ const statusConfig = {
 export default function DashboardPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [summary, setSummary] = useState<OrderSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -27,10 +28,12 @@ export default function DashboardPage() {
     Promise.all([
       authService.getUser(),
       businessService.getOrders(1, 5),
-    ]).then(([u, ordersRes]) => {
+      businessService.getOrderSummary(),
+    ]).then(([u, ordersRes, summaryRes]) => {
       if (!isMounted) return;
       setUser(u);
       setOrders(ordersRes.data);
+      setSummary(summaryRes);
     }).catch(() => {
       if (!isMounted) return;
       setError('Impossible de charger votre tableau de bord pour le moment.');
@@ -44,9 +47,9 @@ export default function DashboardPage() {
     };
   }, [reloadKey]);
 
-  const total = orders.length;
-  const inProgress = orders.filter(o => o.status === 'processing').length;
-  const delivered = orders.filter(o => o.status === 'completed').length;
+  const total = summary?.total ?? 0;
+  const inProgress = summary?.processing ?? 0;
+  const delivered = summary?.completed ?? 0;
 
   return (
     <div className="p-8 max-w-4xl">

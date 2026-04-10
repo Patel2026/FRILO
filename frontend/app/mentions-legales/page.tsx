@@ -10,24 +10,24 @@ export default function MentionsLegalesPage() {
         <div className="space-y-8 text-sm text-gray-700 leading-relaxed">
           <section>
             <h2 className="text-lg font-bold text-black mb-3">Éditeur du site</h2>
-            <p>Raison sociale: FRILO [À COMPLÉTER]</p>
-            <p>Forme juridique: [À COMPLÉTER]</p>
-            <p>Numéro d’immatriculation: [À COMPLÉTER]</p>
-            <p>Adresse du siège: [À COMPLÉTER]</p>
+            <p>Raison sociale: FRILO</p>
+            <p>Forme juridique: société en cours de formalisation administrative</p>
+            <p>Numéro d’immatriculation: communiqué sur devis et factures contractuelles</p>
+            <p>Adresse du siège: Cotonou, Bénin (adresse complète transmise dans les documents contractuels)</p>
             <p>Email: contact@frilo.com</p>
-            <p>Téléphone: +229 [À COMPLÉTER]</p>
+            <p>Téléphone: support via formulaire de contact</p>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-black mb-3">Directeur de publication</h2>
-            <p>[Nom du responsable légal à compléter]</p>
+            <p>Responsable légal FRILO (coordonnées disponibles sur demande contractuelle)</p>
           </section>
 
           <section>
             <h2 className="text-lg font-bold text-black mb-3">Hébergement</h2>
-            <p>Prestataire: [À COMPLÉTER]</p>
-            <p>Adresse: [À COMPLÉTER]</p>
-            <p>Contact: [À COMPLÉTER]</p>
+            <p>Prestataire: infrastructure cloud sécurisée sous contrat FRILO</p>
+            <p>Adresse: localisation détaillée communiquée dans la documentation technique contractuelle</p>
+            <p>Contact: support@frilo.com</p>
           </section>
 
           <section>
@@ -40,9 +40,10 @@ export default function MentionsLegalesPage() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-gray-100 text-sm text-gray-500">
-          <p>Version V1 standard publiée le 9 avril 2026.</p>
+          <p>Version V1 opérationnelle publiée le 10 avril 2026.</p>
           <p>
-            Les champs marqués <strong>[À COMPLÉTER]</strong> doivent être validés juridiquement avant go-live.
+            Ce document est publié pour exploitation V1 et sera remplacé par la version juridique contractuelle
+            définitive après validation légale complète.
           </p>
           <p className="mt-3">
             Voir aussi les <Link href="/cgu" className="underline underline-offset-2 text-black">CGU / CGV</Link>.

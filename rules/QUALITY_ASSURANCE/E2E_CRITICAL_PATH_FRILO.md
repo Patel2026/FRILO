@@ -1,7 +1,7 @@
 # E2E CRITICAL PATH — FRILO V1
 ## Parcours métier automatisé (Playwright)
 
-Version : 1.1  
+Version : 1.2  
 Statut : ACTIF  
 Owner : QA Lead
 
@@ -58,6 +58,7 @@ Le test critique couvre :
 6. Vérification commande côté dashboard client (`En attente`).
 7. Connexion admin `/admin` et passage en `processing` (`En cours`).
 8. Vérification côté dashboard client du statut mis à jour (`En cours`).
+9. Passage admin `processing -> completed` et vérification client (`Livré`).
 
 Le lot UX client couvre aussi :
 
@@ -66,6 +67,8 @@ Le lot UX client couvre aussi :
 3. Bypass étape auth du tunnel pour client déjà connecté.
 4. Soumission formulaire contact réel (`POST /api/contact`).
 5. Accès client au détail commande `/dashboard/orders/{id}`.
+6. Variante d’échec auth dans le tunnel (message explicite).
+7. Variante template inactif : non visible dans le catalogue public et inaccessible en détail public.
 
 ---
 
@@ -78,6 +81,4 @@ Le lot UX client couvre aussi :
 
 ## 6. Gaps restants
 
-- Ajouter un scénario `processing -> completed`.
-- Ajouter une variante d’échec auth et template inactif.
 - Intégrer l’exécution E2E en préprod avant Gate C.

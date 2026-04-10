@@ -47,12 +47,12 @@ class AuthApiTest extends TestCase
         $login->assertOk()->assertJsonStructure(['token', 'user']);
         $token = $login->json('token');
 
-        $this->withHeader('Authorization', 'Bearer ' . $token)
+        $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/user')
             ->assertOk()
             ->assertJsonPath('id', $user->id);
 
-        $this->withHeader('Authorization', 'Bearer ' . $token)
+        $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/logout')
             ->assertNoContent();
     }
@@ -67,5 +67,56 @@ class AuthApiTest extends TestCase
             'email' => $user->email,
             'password' => 'wrong-password',
         ])->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_can_update_profile_name_and_email(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Client Initial',
+            'email' => 'client.initial@example.com',
+        ]);
+
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this
+            ->withHeader('Authorization', 'Bearer '.$token)
+            ->putJson('/api/user', [
+                'name' => 'Client Final',
+                'email' => 'client.final@example.com',
+            ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('name', 'Client Final')
+            ->assertJsonPath('email', 'client.final@example.com');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Client Final',
+            'email' => 'client.final@example.com',
+        ]);
+    }
+
+    public function test_profile_update_rejects_email_already_used_by_another_user(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'owner@example.com',
+        ]);
+        $existing = User::factory()->create([
+            'email' => 'existing@example.com',
+        ]);
+
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $response = $this
+            ->withHeader('Authorization', 'Bearer '.$token)
+            ->putJson('/api/user', [
+                'name' => 'Owner Updated',
+                'email' => $existing->email,
+            ]);
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class Template extends Model
@@ -21,13 +21,17 @@ class Template extends Model
         'features',
         'thumbnail',
         'preview_url',
+        'preview_pages',
+        'preview_gallery',
         'is_active',
     ];
 
     protected $casts = [
-        'features'  => 'array',
+        'features' => 'array',
+        'preview_pages' => 'array',
+        'preview_gallery' => 'array',
         'is_active' => 'boolean',
-        'price'     => 'integer',
+        'price' => 'integer',
     ];
 
     protected $appends = ['full_thumbnail_url'];

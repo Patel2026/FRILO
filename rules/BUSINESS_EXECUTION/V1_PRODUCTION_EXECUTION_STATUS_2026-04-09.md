@@ -47,14 +47,28 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
 - Déjà aligné:
   - Typage renforcé (`Order`, `OrderInstruction`, pagination, `AuthUser`).
   - Correction format FCFA + adaptation dashboard au contrat paginé.
+  - KPI dashboard fiabilisés via endpoint dédié `GET /api/orders/summary` (plus de calcul sur les 5 dernières commandes uniquement).
+  - Gestion session/auth centralisée sur erreurs API `401/403` (interceptor frontend + redirection claire depuis zones protégées).
+  - Profil client self-service activé (`/dashboard/profile`) avec édition `name/email`, validation et persistance API.
+  - Endpoint API `PUT /api/user` ajouté (validation + unicité email + tests backend).
+  - Catalogue templates orienté conversion renforcé (`/templates`) avec recherche, tri, filtre budget, filtres persistants et état vide guidé.
+  - Détail template rendu plus persuasif (`/templates/[id]`) avec engagements V1, révisions incluses, FAQ rapide et CTA mobile sticky.
+  - Baseline accessibilité UX appliquée (focus clavier visibles, ARIA principaux sur contrôles critiques, réduction des animations si préférence utilisateur).
+  - Favoris et comparaison templates activés en local (`/templates` + `/templates/compare`) avec sélection rapide depuis les cartes et le détail template.
+  - Instrumentation funnel frontend activée (`view_template`, `open_preview`, `start_order`, `submit_order`) avec stockage local et compatibilité `dataLayer`.
+  - Démos immersives enrichies par secteur (`/demo/[slug]/[[...page]]`) avec contenus différenciés (home/services/pricing/contact) pour meilleure immersion commerciale.
   - Route détail commande client `/dashboard/orders/[id]`.
   - États `empty` vs `error` sur dashboard et liste commandes.
   - Sidebar dashboard responsive mobile (ouvrir/fermer).
   - Auth UX public renforcée (redirection `/login`/`/register` si connecté, CTA dashboard cohérent).
-  - Pages légales publiées (`/mentions-legales`, `/cgu`).
+  - Pages légales V1 publiées sans placeholders bloquants (`/mentions-legales`, `/cgu`) avec marquage de validation juridique finale.
   - Formulaire `/contact` branché à l’API avec états loading/success/error.
   - Route dashboard profil non cassée.
   - Fallbacks mocks supprimés des pages catalogue critiques (`/`, `/secteurs`, `/secteurs/[slug]`, `/templates`) avec états `error/empty`.
+  - Scénario E2E dédié preview immersive (`tests/e2e/immersive-preview.spec.ts`) ajouté et validé en exécution locale.
+  - Scénario E2E détail template enrichi (preuves + FAQ + CTA mobile) ajouté et validé.
+  - Scénarios E2E P2 ajoutés et validés (favoris/comparaison + instrumentation funnel).
+- Roadmap de fermeture frontend priorisée publiée (`FRONTEND_V1_REMAINING_ROADMAP_2026-04-10.md`).
 - Revue UX finale des états vides/erreur sur toutes pages métier : à clôturer.
 
 ### Phase 5 — Sécurité, qualité, observabilité
@@ -75,9 +89,10 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
   - E2E métier critique automatisé (Playwright) et exécuté localement.
   - Tests backend endpoint contact (`ContactApiTest`) ajoutés.
   - Scénarios E2E expérience client (`client-experience.spec.ts`) ajoutés.
+  - Scénario E2E critique étendu jusqu’au statut final `completed` (`processing -> completed`) et vérification côté client (`Livré`).
+  - Variantes E2E ajoutées: échec auth dans le tunnel + template inactif non visible/inaccessible côté public.
   - Runbook release/rollback publié (`RUNBOOK_RELEASE_ROLLBACK_V1_FRILO.md`).
 - Reste à finaliser:
-  - Exécuter le nouveau lot E2E expérience client sur environnement complet.
   - Recette fonctionnelle signée (PV).
   - Validation préprod du runbook release/rollback.
 
@@ -95,11 +110,25 @@ Livrer la V1 production déployable (admin Laravel custom conservé), avec un pa
 - Finaliser contrat API V1 documenté (payloads + erreurs + compat UI).
 - Revue backoffice sur permissions/champs sensibles.
 - Ajouter tests backend ciblés transitions + policies admin.
+- Frontend Lot A (P0) selon `FRONTEND_V1_REMAINING_ROADMAP_2026-04-10.md` :
+  - fiabilisation métriques dashboard (`DONE`),
+  - gestion session expirée centralisée (`DONE`),
+  - finalisation pages légales (`DONE`),
+  - E2E preview immersive (`DONE`).
 
 2. **Semaine N+2**
-- Étendre E2E (notamment `processing -> completed` et cas d’échec).
+- Étendre E2E (notamment `processing -> completed` et cas d’échec) (`DONE`).
 - Exécuter recette fonctionnelle complète et fermer P0/P1.
 - Préparer release candidate (migrations, variables, rollback, smoke tests).
+- Frontend Lot B (P1) :
+  - profil self-service minimal (`DONE`),
+  - catalogue templates orienté conversion (`DONE`),
+  - détail template plus persuasif (`DONE`),
+  - accessibilité UX de base (`DONE`).
+- Frontend Lot C (P2) :
+  - favoris/comparaison templates (`DONE`),
+  - instrumentation produit funnel (`DONE`),
+  - variantes immersives enrichies (`DONE`).
 
 ## Risques ouverts et mitigation
 - **Version PHP locale 8.5**: warnings de dépréciation outils tiers.

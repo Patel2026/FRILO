@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Heart, Scale } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TemplateCardProps {
   id: string;
@@ -9,13 +10,96 @@ interface TemplateCardProps {
   price: number;
   features: string[];
   image: string;
+  hasLivePreview?: boolean;
+  previewScreens?: number;
+  isFavorite?: boolean;
+  isCompared?: boolean;
+  compareDisabled?: boolean;
+  onToggleFavorite?: (templateId: number) => void;
+  onToggleCompare?: (templateId: number) => void;
 }
 
-export function TemplateCard({ id, name, sectorName, price, image }: TemplateCardProps) {
+export function TemplateCard({
+  id,
+  name,
+  sectorName,
+  price,
+  image,
+  hasLivePreview = false,
+  previewScreens = 0,
+  isFavorite = false,
+  isCompared = false,
+  compareDisabled = false,
+  onToggleFavorite,
+  onToggleCompare,
+}: TemplateCardProps) {
+  const numericId = Number(id);
+
   return (
-    <Link href={`/templates/${id}`} className="group block">
-      {/* Image container — Squarespace style: image fills card, hover shows CTA */}
+    <article className="group block">
       <div className="relative aspect-[3/2] bg-gray-100 overflow-hidden rounded-sm">
+        <Link
+          href={`/templates/${id}`}
+          className="absolute inset-0 z-10 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-black focus-visible:outline-offset-4"
+          aria-label={`Voir le modèle ${name}`}
+        />
+
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
+          {hasLivePreview && (
+            <span className="rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-black">
+              Démo live
+            </span>
+          )}
+          {!hasLivePreview && previewScreens > 0 && (
+            <span className="rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-black">
+              {previewScreens} captures
+            </span>
+          )}
+        </div>
+
+        <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
+          <button
+            type="button"
+            aria-label={isFavorite ? `Retirer ${name} des favoris` : `Ajouter ${name} aux favoris`}
+            aria-pressed={isFavorite}
+            data-testid={`template-favorite-${id}`}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              if (Number.isFinite(numericId) && onToggleFavorite) {
+                onToggleFavorite(numericId);
+              }
+            }}
+            className={cn(
+              'inline-flex h-8 w-8 items-center justify-center rounded-full border bg-white/95 transition-colors',
+              isFavorite ? 'border-black text-black' : 'border-gray-200 text-gray-500 hover:text-black hover:border-black'
+            )}
+          >
+            <Heart className={cn('h-4 w-4', isFavorite ? 'fill-black' : '')} />
+          </button>
+
+          <button
+            type="button"
+            aria-label={isCompared ? `Retirer ${name} de la comparaison` : `Ajouter ${name} à la comparaison`}
+            aria-pressed={isCompared}
+            disabled={compareDisabled && !isCompared}
+            data-testid={`template-compare-${id}`}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              if (Number.isFinite(numericId) && onToggleCompare) {
+                onToggleCompare(numericId);
+              }
+            }}
+            className={cn(
+              'inline-flex h-8 w-8 items-center justify-center rounded-full border bg-white/95 transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+              isCompared ? 'border-black text-black' : 'border-gray-200 text-gray-500 hover:text-black hover:border-black'
+            )}
+          >
+            <Scale className="h-4 w-4" />
+          </button>
+        </div>
+
         {image ? (
           <Image
             src={image}
@@ -33,15 +117,13 @@ export function TemplateCard({ id, name, sectorName, price, image }: TemplateCar
           </div>
         )}
 
-        {/* Hover overlay — exactly like Squarespace */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+        <div className="absolute inset-0 z-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
           <span className="bg-white text-black text-sm font-bold px-6 py-3 rounded-full flex items-center gap-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-            Voir ce modèle <ArrowRight className="w-4 h-4" />
+            {hasLivePreview ? 'Tester la démo' : 'Voir ce modèle'} <ArrowRight className="w-4 h-4" />
           </span>
         </div>
       </div>
 
-      {/* Card info — minimal, like Squarespace */}
       <div className="pt-4 pb-2">
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -50,15 +132,15 @@ export function TemplateCard({ id, name, sectorName, price, image }: TemplateCar
                 {sectorName}
               </p>
             )}
-            <h3 className="font-bold text-black text-sm group-hover:text-gray-600 transition-colors">
+            <Link href={`/templates/${id}`} className="relative z-10 font-bold text-black text-sm group-hover:text-gray-600 transition-colors">
               {name}
-            </h3>
+            </Link>
           </div>
           <span className="text-sm font-bold text-black whitespace-nowrap">
             {price.toLocaleString('fr-FR')} <span className="text-gray-400 font-normal text-xs">FCFA</span>
           </span>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

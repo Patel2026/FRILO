@@ -50,7 +50,7 @@ export default function CguPage() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-gray-100 text-sm text-gray-500">
-          <p>Version V1 standard publiée le 9 avril 2026.</p>
+          <p>Version V1 opérationnelle publiée le 10 avril 2026.</p>
           <p>
             Ce document est une base opérationnelle. Validation juridique finale requise avant diffusion contractuelle
             définitive.

@@ -185,6 +185,28 @@ Réponse 200 :
 
 ---
 
+### `PUT /api/user`
+
+Header : `Authorization: Bearer {token}`
+
+Corps :
+```json
+{
+  "name": "Jean Dupont",
+  "email": "jean@example.com"
+}
+```
+
+Réponse 200 :
+```json
+{ "id": 1, "name": "Jean Dupont", "email": "jean@example.com", "role": "client" }
+```
+
+Erreurs :
+- `422` si validation invalide (`name` < 2 caractères, email invalide ou déjà pris)
+
+---
+
 ### `POST /api/orders`
 
 Header : `Authorization: Bearer {token}`
@@ -269,6 +291,24 @@ Retourne uniquement les commandes du client authentifié.
 ```
 Note : le contrat V1 canonique utilise `instruction`; `instructions` est maintenu pour compatibilité transitoire.
 
+### `GET /api/orders/summary`
+
+Header : `Authorization: Bearer {token}`
+
+Retourne les compteurs globaux du client authentifié :
+
+```json
+{
+  "total": 3,
+  "pending": 1,
+  "processing": 1,
+  "completed": 1,
+  "cancelled": 0
+}
+```
+
+---
+
 ### `GET /api/orders/{id}`
 
 Header : `Authorization: Bearer {token}`
@@ -291,6 +331,28 @@ Toutes les erreurs de validation (422) retournent :
   }
 }
 ```
+
+Erreurs HTTP usuelles :
+
+```json
+{ "message": "Unauthenticated." }
+```
+HTTP 401
+
+```json
+{ "message": "Forbidden." }
+```
+HTTP 403
+
+```json
+{ "message": "Not Found." }
+```
+HTTP 404
+
+```json
+{ "message": "Transition \"completed\" → \"processing\" non autorisée." }
+```
+HTTP 409
 
 ---
 

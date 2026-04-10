@@ -24,8 +24,14 @@ export const registerSchema = z.object({
     path: ["password_confirmation"],
 });
 
+export const updateProfileSchema = z.object({
+    name: z.string().min(2).max(255),
+    email: z.string().email(),
+});
+
 export type LoginCredentials = z.infer<typeof loginSchema>;
 export type RegisterCredentials = z.infer<typeof registerSchema>;
+export type UpdateProfilePayload = z.infer<typeof updateProfileSchema>;
 
 export interface AuthUser {
     id: number;
@@ -76,5 +82,12 @@ export const authService = {
         } catch {
             return null;
         }
-    }
+    },
+
+    async updateProfile(payload: UpdateProfilePayload): Promise<AuthUser> {
+        const validatedPayload = updateProfileSchema.parse(payload);
+        const response = await api.put('/user', validatedPayload);
+        emitAuthChanged();
+        return response.data as AuthUser;
+    },
 };

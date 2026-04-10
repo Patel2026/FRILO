@@ -1,4 +1,17 @@
-@php $template = $template ?? null; @endphp
+@php
+    $template = $template ?? null;
+    $previewPagesRaw = old('preview_pages_raw',
+        collect($template?->preview_pages ?? [])
+            ->map(function ($page) {
+                $label = is_array($page) ? ($page['label'] ?? '') : '';
+                $path = is_array($page) ? ($page['path'] ?? '/') : '/';
+                return trim($label) !== '' ? trim($label) . '|' . ($path !== '' ? $path : '/') : null;
+            })
+            ->filter()
+            ->implode("\n")
+    );
+    $previewGalleryRaw = old('preview_gallery_raw', implode("\n", $template?->preview_gallery ?? []));
+@endphp
 
 <div class="mb-3">
     <label class="form-label">Secteur <span class="text-danger">*</span></label>
@@ -54,6 +67,23 @@
     <label class="form-label">URL de prévisualisation</label>
     <input type="url" name="preview_url" class="form-control"
            value="{{ old('preview_url', $template?->preview_url) }}" placeholder="https://...">
+    <div class="form-text">Lien vers la démo live (site interactif affiché dans l'espace client).</div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Pages de prévisualisation (une page par ligne)</label>
+    <textarea name="preview_pages_raw" class="form-control @error('preview_pages_raw') is-invalid @enderror" rows="4"
+              placeholder="Accueil|/&#10;Services|/services&#10;Contact|/contact">{{ $previewPagesRaw }}</textarea>
+    @error('preview_pages_raw')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    <div class="form-text">Format: <code>Titre|/chemin</code>. Exemple: <code>Tarifs|/tarifs</code>.</div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Galerie d'aperçu (une URL d'image par ligne)</label>
+    <textarea name="preview_gallery_raw" class="form-control @error('preview_gallery_raw') is-invalid @enderror" rows="4"
+              placeholder="https://.../home.jpg&#10;https://.../about.jpg">{{ $previewGalleryRaw }}</textarea>
+    @error('preview_gallery_raw')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    <div class="form-text">Utilisée en fallback si la démo live n'est pas disponible.</div>
 </div>
 
 <div class="form-check form-switch mb-0">

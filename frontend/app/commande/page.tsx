@@ -11,6 +11,7 @@ import { businessService, Template } from '@/services/business.service';
 import Link from 'next/link';
 import { useAuthState } from '@/hooks/useAuthState';
 import axios from 'axios';
+import { trackFunnelEvent } from '@/lib/analytics';
 
 const STEPS = [
   { id: 1, name: 'Récapitulatif' },
@@ -70,6 +71,11 @@ function OrderTunnelContent() {
         colors: formData.colors ? formData.colors.split(',').map(c => c.trim()) : [],
         specific_instructions: formData.specific_instructions,
       });
+      trackFunnelEvent('submit_order', {
+        template_id: templateId ? Number(templateId) : null,
+        order_id: order.id,
+        amount: order.price,
+      });
       setOrderRef(String(order.id).padStart(5, '0'));
       nextStep();
     } catch (err) {
@@ -86,6 +92,12 @@ function OrderTunnelContent() {
   };
 
   const handleContinueFromSummary = () => {
+    trackFunnelEvent('start_order', {
+      template_id: templateId ? Number(templateId) : null,
+      source: 'order_tunnel_summary',
+      authenticated: isAuthenticated,
+    });
+
     if (isAuthenticated) {
       setCurrentStep(3);
       return;

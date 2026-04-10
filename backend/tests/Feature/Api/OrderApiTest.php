@@ -107,6 +107,54 @@ class OrderApiTest extends TestCase
         $this->assertCount(1, $response->json('data'));
     }
 
+    public function test_orders_summary_returns_status_counts_for_authenticated_user_only(): void
+    {
+        $userA = User::factory()->create();
+        $userB = User::factory()->create();
+        $template = $this->createTemplate();
+
+        Order::create([
+            'user_id' => $userA->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Pending->value,
+            'price' => 50000,
+        ]);
+
+        Order::create([
+            'user_id' => $userA->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Processing->value,
+            'price' => 50000,
+        ]);
+
+        Order::create([
+            'user_id' => $userA->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Completed->value,
+            'price' => 50000,
+        ]);
+
+        Order::create([
+            'user_id' => $userB->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Cancelled->value,
+            'price' => 50000,
+        ]);
+
+        Sanctum::actingAs($userA);
+
+        $response = $this->getJson('/api/orders/summary');
+
+        $response->assertOk();
+        $response->assertExactJson([
+            'total' => 3,
+            'pending' => 1,
+            'processing' => 1,
+            'completed' => 1,
+            'cancelled' => 0,
+        ]);
+    }
+
     public function test_user_cannot_view_other_user_order(): void
     {
         $userA = User::factory()->create();
@@ -122,7 +170,7 @@ class OrderApiTest extends TestCase
 
         Sanctum::actingAs($userA);
 
-        $this->getJson('/api/orders/' . $order->id)
+        $this->getJson('/api/orders/'.$order->id)
             ->assertForbidden();
     }
 
@@ -140,7 +188,7 @@ class OrderApiTest extends TestCase
         return Template::create([
             'sector_id' => $sector->id,
             'name' => 'Template Test',
-            'slug' => 'template-test-' . uniqid(),
+            'slug' => 'template-test-'.uniqid(),
             'description' => 'Description',
             'price' => $price,
             'features' => ['A', 'B'],

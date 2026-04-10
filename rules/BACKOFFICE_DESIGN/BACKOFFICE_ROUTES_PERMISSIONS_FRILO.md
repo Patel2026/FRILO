@@ -25,8 +25,10 @@ Statut : VALIDÉ
 |---------|-------|-----------|--------|--------|
 | POST | `/api/logout` | AuthController | logout | — |
 | GET | `/api/user` | AuthController | user | — |
+| PUT | `/api/user` | AuthController | updateProfile | — |
 | POST | `/api/orders` | OrderController | store | — |
 | GET | `/api/orders` | OrderController | index | OrderPolicy@viewAny |
+| GET | `/api/orders/summary` | OrderController | summary | OrderPolicy@viewAny |
 | GET | `/api/orders/{id}` | OrderController | show | OrderPolicy@view |
 
 ---

@@ -19,6 +19,8 @@ export interface Template {
     thumbnail: string;
     full_thumbnail_url: string;
     preview_url?: string;
+    preview_pages?: Array<{ label?: string; path?: string }> | string | null;
+    preview_gallery?: string[] | string | null;
     is_active: boolean;
     sector_id: number;
     sector?: Sector;
@@ -51,6 +53,14 @@ export interface Order {
     instruction: OrderInstruction | null;
     // Backward compatibility with older payloads
     instructions?: OrderInstruction[];
+}
+
+export interface OrderSummary {
+    total: number;
+    pending: number;
+    processing: number;
+    completed: number;
+    cancelled: number;
 }
 
 export interface PaginationMeta {
@@ -169,5 +179,10 @@ export const businessService = {
     async getOrder(orderId: number | string): Promise<Order> {
         const response = await api.get(`/orders/${orderId}`);
         return response.data as Order;
-    }
+    },
+
+    async getOrderSummary(): Promise<OrderSummary> {
+        const response = await api.get('/orders/summary');
+        return response.data as OrderSummary;
+    },
 };

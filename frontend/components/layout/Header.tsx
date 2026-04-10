@@ -110,7 +110,9 @@ export function Header() {
         <button
           className={cn("md:hidden p-2 transition-colors", dark ? "text-white" : "text-black")}
           onClick={() => setMobileOpen(v => !v)}
-          aria-label="Menu"
+          aria-label={mobileOpen ? 'Fermer le menu principal' : 'Ouvrir le menu principal'}
+          aria-expanded={mobileOpen}
+          aria-controls="main-mobile-nav"
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -120,7 +122,7 @@ export function Header() {
       <div className={cn(
         "md:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-100 overflow-hidden transition-all duration-200",
         mobileOpen ? "max-h-screen shadow-lg" : "max-h-0"
-      )}>
+      )} id="main-mobile-nav">
         <div className="max-w-6xl mx-auto px-6 py-2">
           {navLinks.map(link => (
             <Link

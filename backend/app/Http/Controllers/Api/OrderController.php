@@ -46,6 +46,29 @@ class OrderController extends Controller
         ]);
     }
 
+    public function summary(Request $request): JsonResponse
+    {
+        $this->authorize('viewAny', Order::class);
+
+        $counts = Order::query()
+            ->forUser($request->user()->id)
+            ->selectRaw('status, COUNT(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+
+        $statusCounts = [
+            OrderStatus::Pending->value => (int) ($counts[OrderStatus::Pending->value] ?? 0),
+            OrderStatus::Processing->value => (int) ($counts[OrderStatus::Processing->value] ?? 0),
+            OrderStatus::Completed->value => (int) ($counts[OrderStatus::Completed->value] ?? 0),
+            OrderStatus::Cancelled->value => (int) ($counts[OrderStatus::Cancelled->value] ?? 0),
+        ];
+
+        return response()->json([
+            'total' => array_sum($statusCounts),
+            ...$statusCounts,
+        ]);
+    }
+
     public function store(CreateOrderRequest $request): JsonResponse
     {
         $this->authorize('create', Order::class);

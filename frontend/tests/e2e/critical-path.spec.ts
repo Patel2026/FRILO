@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 const BACKEND_URL = process.env.E2E_BACKEND_URL || 'http://localhost:8080';
 
-test('critical path: visiteur -> commande -> admin -> suivi client', async ({ browser, page, baseURL }) => {
+test('critical path: visiteur -> commande -> admin -> suivi client (jusqu’à livré)', async ({ browser, page, baseURL }) => {
   const runId = Date.now();
   const clientEmail = `e2e-${runId}@frilo.test`;
   const clientPassword = 'password1234';
@@ -73,4 +73,12 @@ test('critical path: visiteur -> commande -> admin -> suivi client', async ({ br
   await page.reload();
   await expect(page.getByText(new RegExp(`#${orderIdClientDisplay}`))).toBeVisible();
   await expect(page.getByText('En cours')).toBeVisible();
+
+  await adminPage.getByRole('button', { name: /Livré/ }).click();
+  await expect(adminPage.getByText('Statut mis à jour')).toBeVisible();
+  await expect(adminPage.getByText('Statut final — aucune transition possible.')).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText(new RegExp(`#${orderIdClientDisplay}`))).toBeVisible();
+  await expect(page.getByText('Livré')).toBeVisible();
 });

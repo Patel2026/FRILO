@@ -1,5 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
+const BACKEND_URL = process.env.E2E_BACKEND_URL || 'http://localhost:8080';
+
 async function registerClient(page: Page, baseURL: string, suffix: string) {
   await page.goto(`${baseURL}/register`);
 
@@ -114,4 +116,192 @@ test('dashboard: navigation vers détail commande client', async ({ page, baseUR
   await expect(page).toHaveURL(new RegExp(`/dashboard/orders/${orderId}$`));
   await expect(page.getByRole('heading', { level: 1, name: new RegExp(`#${String(Number(orderId)).padStart(4, '0')}`) })).toBeVisible();
   await expect(page.getByText('Instructions client')).toBeVisible();
+});
+
+test('profil client: mise à jour name/email self-service', async ({ page, baseURL }) => {
+  const appBaseURL = baseURL || 'http://localhost:3000';
+  const suffix = (Date.now() + 4).toString();
+  const updatedSuffix = (Date.now() + 5).toString();
+
+  await registerClient(page, appBaseURL, suffix);
+
+  await page.goto(`${appBaseURL}/dashboard/profile`);
+  await expect(page.getByRole('heading', { name: 'Mon profil' })).toBeVisible();
+
+  const nameInput = page.locator('#profile-name');
+  const emailInput = page.locator('#profile-email');
+
+  await nameInput.fill(`Client Modifié ${updatedSuffix}`);
+  await emailInput.fill(`client-modifie-${updatedSuffix}@frilo.test`);
+
+  await page.getByRole('button', { name: 'Enregistrer les modifications' }).click();
+  await expect(page.getByText('Profil mis à jour avec succès.')).toBeVisible();
+  await expect(nameInput).toHaveValue(`Client Modifié ${updatedSuffix}`);
+  await expect(emailInput).toHaveValue(`client-modifie-${updatedSuffix}@frilo.test`);
+});
+
+test('catalogue templates: recherche + état vide guidé + reset filtres', async ({ page, baseURL }) => {
+  const appBaseURL = baseURL || 'http://localhost:3000';
+
+  await page.goto(`${appBaseURL}/templates`);
+  await expect(page.getByRole('heading', { name: 'Nos modèles.' })).toBeVisible();
+
+  const searchInput = page.locator('#templates-search');
+
+  await searchInput.fill('ImmoPrestige');
+  await expect(page.getByRole('link', { name: /ImmoPrestige/ }).first()).toBeVisible();
+
+  await searchInput.fill('zzzz-template-introuvable');
+  await expect(page.getByText('Aucun modèle ne correspond à vos filtres.')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Réinitialiser les filtres' }).first().click();
+  await expect(page.getByRole('link', { name: /Le Gourmet/ }).first()).toBeVisible();
+});
+
+test('détail template: preuves métier + FAQ interactive + CTA mobile', async ({ page, baseURL }) => {
+  const appBaseURL = baseURL || 'http://localhost:3000';
+
+  await page.goto(`${appBaseURL}/templates`);
+  const firstTemplateLink = page.locator('a[href^="/templates/"]').first();
+  await expect(firstTemplateLink).toBeVisible();
+  await firstTemplateLink.click();
+  await expect(page).toHaveURL(/\/templates\/\d+$/);
+
+  await expect(page.getByText('Engagements FRILO V1')).toBeVisible();
+  await expect(page.getByText('2 cycles de révision inclus')).toBeVisible();
+
+  const faqTrigger = page.getByRole('button', { name: 'Comment se passent les révisions ?' });
+  await faqTrigger.click();
+  await expect(page.getByText('Vous disposez de 2 cycles de retours inclus.')).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('link', { name: /^Commander$/ })).toBeVisible();
+});
+
+test('P2 templates: favoris et comparaison locale', async ({ page, baseURL }) => {
+  const appBaseURL = baseURL || 'http://localhost:3000';
+
+  await page.goto(`${appBaseURL}/templates`);
+  await expect(page.getByRole('heading', { name: 'Nos modèles.' })).toBeVisible();
+
+  const favoriteButtons = page.locator('[data-testid^="template-favorite-"]');
+  await expect(favoriteButtons.first()).toBeVisible();
+  await favoriteButtons.first().click();
+
+  await page.getByRole('button', { name: /Favoris/ }).click();
+  await expect(page.locator('[data-testid^="template-favorite-"]')).toHaveCount(1);
+  await expect(page.locator('[data-testid^="template-favorite-"][aria-pressed="true"]')).toHaveCount(1);
+
+  await page.getByRole('button', { name: /Favoris/ }).click();
+
+  const compareButtons = page.locator('[data-testid^="template-compare-"]');
+  await expect(compareButtons.nth(1)).toBeVisible();
+  await compareButtons.first().click();
+  await compareButtons.nth(1).click();
+
+  const compareLink = page.getByRole('link', { name: /Comparer \(2\)/ });
+  await expect(compareLink).toBeVisible();
+  await compareLink.click();
+
+  await expect(page).toHaveURL(/\/templates\/compare/);
+  await expect(page.getByRole('heading', { name: 'Comparez vos modèles.' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Commander' }).first()).toBeVisible();
+});
+
+test('P2 analytics funnel: événements view_template et start_order stockés localement', async ({ page, baseURL }) => {
+  const appBaseURL = baseURL || 'http://localhost:3000';
+
+  await page.goto(`${appBaseURL}/templates`);
+  await page.evaluate(() => localStorage.removeItem('frilo.analytics.funnel.v1'));
+
+  const firstTemplateLink = page.locator('a[href^="/templates/"]').first();
+  await expect(firstTemplateLink).toBeVisible();
+  await firstTemplateLink.click();
+  await expect(page).toHaveURL(/\/templates\/\d+$/);
+
+  await expect.poll(async () => {
+    return page.evaluate(() => {
+      const raw = localStorage.getItem('frilo.analytics.funnel.v1');
+      const events = raw ? JSON.parse(raw) : [];
+      return events.some((event: { name?: string }) => event?.name === 'view_template');
+    });
+  }).toBe(true);
+
+  await page.getByRole('link', { name: /Commander/ }).first().click();
+  await expect(page).toHaveURL(/\/commande\?templateId=\d+/);
+
+  await expect.poll(async () => {
+    return page.evaluate(() => {
+      const raw = localStorage.getItem('frilo.analytics.funnel.v1');
+      const events = raw ? JSON.parse(raw) : [];
+      return events.some((event: { name?: string }) => event?.name === 'start_order');
+    });
+  }).toBe(true);
+});
+
+test('tunnel commande: échec auth affiche un message explicite', async ({ page, baseURL }) => {
+  const appBaseURL = baseURL || 'http://localhost:3000';
+
+  await page.goto(`${appBaseURL}/templates`);
+  const firstTemplateLink = page.locator('a[href^="/templates/"]').first();
+  await expect(firstTemplateLink).toBeVisible();
+  await firstTemplateLink.click();
+  await expect(page).toHaveURL(/\/templates\/\d+$/);
+
+  await page.getByRole('link', { name: /Commander/ }).first().click();
+  await expect(page).toHaveURL(/\/commande\?templateId=\d+/);
+
+  await page.getByRole('button', { name: 'Continuer' }).click();
+  await expect(page.getByText('Connexion ou inscription')).toBeVisible();
+
+  await page.locator('input[placeholder="vous@exemple.com"]').fill(`invalide-${Date.now()}@frilo.test`);
+  await page.locator('input[placeholder="••••••••"]').first().fill('motdepasse-invalide');
+  await page.getByRole('button', { name: 'Se connecter' }).click();
+
+  await expect(page.getByText('Email ou mot de passe incorrect.')).toBeVisible();
+});
+
+test('catalogue public: template inactif non visible et inaccessible', async ({ page, browser, baseURL }) => {
+  const appBaseURL = baseURL || 'http://localhost:3000';
+  const suffix = Date.now();
+  const templateName = `Template Inactif ${suffix}`;
+
+  const adminPage = await browser.newPage();
+  await adminPage.goto(`${BACKEND_URL}/login`);
+  await adminPage.locator('#email').fill('admin@frilo.com');
+  await adminPage.locator('#password-input').fill('password');
+  await adminPage.getByRole('button', { name: 'Se connecter' }).click();
+
+  await adminPage.goto(`${BACKEND_URL}/admin/templates/create`);
+  await expect(adminPage.getByRole('heading', { name: 'Nouveau template' })).toBeVisible();
+  await adminPage.selectOption('select[name="sector_id"]', { index: 1 });
+  await adminPage.locator('input[name="name"]').fill(templateName);
+  await adminPage.locator('textarea[name="description"]').fill('Template E2E inactif pour validation du catalogue public.');
+  await adminPage.locator('input[name="price"]').fill('49000');
+  await adminPage.locator('textarea[name="features_raw"]').fill('Landing page\nFormulaire de contact');
+  await adminPage.locator('#is_active').uncheck();
+  await adminPage.getByRole('button', { name: 'Créer le template' }).click();
+
+  await expect(adminPage.getByText('Template créé.')).toBeVisible();
+  const createdRow = adminPage.locator('tr', { hasText: templateName }).first();
+  await expect(createdRow).toBeVisible();
+  await expect(createdRow.locator('span.badge-soft-danger', { hasText: 'Inactif' })).toBeVisible();
+
+  const editHref = await createdRow
+    .locator('a[href*="/admin/templates/"][href$="/edit"]')
+    .first()
+    .getAttribute('href');
+  expect(editHref).not.toBeNull();
+  const idMatch = editHref?.match(/\/admin\/templates\/(\d+)\/edit$/);
+  expect(idMatch).not.toBeNull();
+  const templateId = idMatch?.[1] || '0';
+  await adminPage.close();
+
+  await page.goto(`${appBaseURL}/templates`);
+  await page.locator('#templates-search').fill(templateName);
+  await expect(page.getByText('Aucun modèle ne correspond à vos filtres.')).toBeVisible();
+  await expect(page.locator(`a[href="/templates/${templateId}"]`)).toHaveCount(0);
+
+  await page.goto(`${appBaseURL}/templates/${templateId}`);
+  await expect(page.getByText('Modèle introuvable.')).toBeVisible();
 });
