@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Search, Star, X } from 'lucide-react';
 import { TemplateCard } from '@/components/business/TemplateCard';
+import { usePublicPricing } from '@/hooks/usePublicPricing';
+import { formatPublicPrice } from '@/lib/publicPricing';
 import { businessService, Sector, Template } from '@/services/business.service';
 import { cn, parseFeatures } from '@/lib/utils';
 import { hasLivePreview, parsePreviewGallery } from '@/lib/templatePreview';
@@ -27,6 +29,7 @@ function getTemplatePrice(template: Template): number {
 }
 
 export default function TemplatesPage() {
+  const { pricing } = usePublicPricing();
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
@@ -141,6 +144,8 @@ export default function TemplatesPage() {
   }, [compareNotice]);
 
   const normalizedSearch = searchTerm.trim().toLowerCase();
+  const budgetThreshold = pricing.starting_price;
+  const budgetThresholdLabel = formatPublicPrice(budgetThreshold, pricing.currency_label);
 
   const visibleTemplates = useMemo(() => {
     return templates
@@ -164,10 +169,10 @@ export default function TemplatesPage() {
 
         const price = getTemplatePrice(template);
         if (priceFilter === 'budget') {
-          return price <= 50000;
+          return price <= budgetThreshold;
         }
 
-        return price > 50000;
+        return price > budgetThreshold;
       })
       .filter((template) => {
         if (!normalizedSearch) {
@@ -200,7 +205,7 @@ export default function TemplatesPage() {
         }
         return 0;
       });
-  }, [activeSlug, favoriteIds, normalizedSearch, priceFilter, showFavoritesOnly, sortBy, templates]);
+  }, [activeSlug, budgetThreshold, favoriteIds, normalizedSearch, priceFilter, showFavoritesOnly, sortBy, templates]);
 
   const comparedTemplates = compareIds
     .map((id) => templates.find((template) => template.id === id))
@@ -307,8 +312,8 @@ export default function TemplatesPage() {
               className="w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-black outline-none focus:border-black"
             >
               <option value="all">Tous les budgets</option>
-              <option value="budget">Budget 50 000 FCFA</option>
-              <option value="premium">Premium &gt; 50 000 FCFA</option>
+              <option value="budget">Budget {budgetThresholdLabel}</option>
+              <option value="premium">Premium &gt; {budgetThresholdLabel}</option>
             </select>
           </label>
 
@@ -345,7 +350,7 @@ export default function TemplatesPage() {
         )}
       </div>
 
-      <div className="sq-section pt-2">
+      <div className="pt-4 pb-14 md:pb-16">
         <div className="sq-container">
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

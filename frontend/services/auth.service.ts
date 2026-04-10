@@ -57,7 +57,8 @@ export interface AuthUser {
     id: number;
     name: string;
     email: string;
-    role: 'client' | 'admin';
+    role: 'client' | 'super_admin';
+    is_active: boolean;
     sector_id: number | null;
     sector: {
         id: number;

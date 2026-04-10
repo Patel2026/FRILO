@@ -19,6 +19,7 @@ class ContactApiTest extends TestCase
             'order_reference' => 'ord-42',
             'subject' => 'Question sur un template',
             'message' => 'Bonjour, je souhaite des précisions avant de passer commande.',
+            'accepted_terms' => true,
         ]);
 
         $response
@@ -43,11 +44,12 @@ class ContactApiTest extends TestCase
             'order_reference' => 'BADREF-001',
             'subject' => '',
             'message' => 'court',
+            'accepted_terms' => false,
         ]);
 
         $response
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'email', 'order_reference', 'subject', 'message']);
+            ->assertJsonValidationErrors(['name', 'email', 'order_reference', 'subject', 'message', 'accepted_terms']);
     }
 
     public function test_contact_endpoint_is_rate_limited(): void
@@ -57,6 +59,7 @@ class ContactApiTest extends TestCase
             'email' => 'rate-limit@example.com',
             'subject' => 'Demande rapide',
             'message' => 'Message de test suffisamment long pour passer la validation.',
+            'accepted_terms' => true,
         ];
 
         for ($i = 0; $i < 5; $i++) {

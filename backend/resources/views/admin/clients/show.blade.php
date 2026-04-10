@@ -14,6 +14,13 @@
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
 <div class="row">
     <div class="col-lg-4">
         <div class="card">
@@ -25,7 +32,27 @@
                 </div>
                 <h5 class="mb-1">{{ $user->name }}</h5>
                 <p class="text-muted mb-0">{{ $user->email }}</p>
+                <p class="mt-2 mb-0">
+                    @if($user->is_active)
+                        <span class="badge badge-soft-success">Compte actif</span>
+                    @else
+                        <span class="badge badge-soft-danger">Compte désactivé</span>
+                    @endif
+                </p>
                 <p class="text-muted small mt-1">Inscrit le {{ $user->created_at->format('d/m/Y') }}</p>
+
+                <form method="POST" action="{{ route('admin.clients.toggle-active', $user) }}" class="mt-3">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="is_active" value="{{ $user->is_active ? 0 : 1 }}">
+                    <button class="btn {{ $user->is_active ? 'btn-soft-danger' : 'btn-soft-success' }} btn-sm" type="submit">
+                        @if($user->is_active)
+                            Désactiver le compte
+                        @else
+                            Réactiver le compte
+                        @endif
+                    </button>
+                </form>
             </div>
         </div>
     </div>

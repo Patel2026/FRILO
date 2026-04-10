@@ -1,7 +1,7 @@
 # CHANGE POLICY — FRILO
 ## Politique de Modification du Code et du Domaine
 
-Version : 1.0
+Version : 1.1
 Statut : OBLIGATOIRE
 
 ---
@@ -89,7 +89,7 @@ Interdit :
 Obligatoire :
 - toute action client protégée par `auth:sanctum`
 - toute lecture de commande filtrée par `user_id = auth()->id()`
-- toute action admin protégée par vérification `role = 'admin'`
+- toute action backoffice protégée par vérification `role = 'super_admin'`
 
 Interdit :
 - conditionner l'accès uniquement côté frontend (contrôle UI)

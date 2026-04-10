@@ -25,10 +25,10 @@ class OrderPolicy
         return true;
     }
 
-    /** Seul un admin peut modifier une commande. */
+    /** Seul un super-admin peut modifier une commande. */
     public function update(User $user, Order $order): bool
     {
-        return $user->isAdmin();
+        return $user->isSuperAdmin();
     }
 
     /** Suppression physique interdite. */

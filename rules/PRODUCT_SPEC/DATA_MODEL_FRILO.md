@@ -1,7 +1,7 @@
 # DATA MODEL — FRILO
 ## Modèle Logique de Données
 
-Version : 1.0
+Version : 1.1
 Statut : VALIDÉ
 
 ---
@@ -27,7 +27,7 @@ id            BIGINT UNSIGNED PK
 name          VARCHAR(255)
 email         VARCHAR(255) UNIQUE
 password      VARCHAR(255)           -- bcrypt
-role          ENUM('client','admin') DEFAULT 'client'
+role          ENUM('client','super_admin') DEFAULT 'client'
 email_verified_at TIMESTAMP NULL
 remember_token VARCHAR(100) NULL
 created_at    TIMESTAMP
@@ -90,7 +90,7 @@ deleted_at    TIMESTAMP NULL         -- soft delete (jamais supprimé physiqueme
 
 Index :
 - `INDEX (user_id, status)` — dashboard client
-- `INDEX (status, created_at)` — liste admin
+- `INDEX (status, created_at)` — liste super_admin
 
 ---
 
@@ -117,6 +117,29 @@ Générée automatiquement par Laravel Sanctum.
 
 ---
 
+### 2.7 `platform_setting_revisions`
+
+```sql
+id              BIGINT UNSIGNED PK
+status          VARCHAR(20)            -- draft | published | archived
+payload         JSON                   -- données non sensibles
+secret_payload  LONGTEXT NULL          -- JSON chiffré (cast encrypted:array)
+change_note     TEXT NULL
+created_by      BIGINT UNSIGNED NULL FK → users.id
+tested_by       BIGINT UNSIGNED NULL FK → users.id
+published_by    BIGINT UNSIGNED NULL FK → users.id
+tested_at       TIMESTAMP NULL
+published_at    TIMESTAMP NULL
+created_at      TIMESTAMP
+updated_at      TIMESTAMP
+```
+
+Index :
+- `INDEX (status)`
+- `INDEX (status, published_at)`
+
+---
+
 ## 3. Relations Eloquent
 
 ```
@@ -139,6 +162,7 @@ Sector       hasMany   Template
 4. `orders`
 5. `order_instructions`
 6. `personal_access_tokens` (Sanctum — géré automatiquement)
+7. `platform_setting_revisions`
 
 ---
 
@@ -162,5 +186,5 @@ Secteurs à créer : Restaurants, BTP & Artisanat, Santé & Bien-être, Avocats 
 Templates : au moins 1 template actif par secteur, avec prix, description et features.
 
 Utilisateurs de démo :
-- `admin@frilo.com` / `password` — role: admin
+- `admin@frilo.com` / `password` — role: super_admin
 - `client@frilo.com` / `password` — role: client

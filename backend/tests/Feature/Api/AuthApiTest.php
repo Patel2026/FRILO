@@ -77,6 +77,34 @@ class AuthApiTest extends TestCase
         ])->assertUnauthorized();
     }
 
+    public function test_inactive_user_cannot_login(): void
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('secret123'),
+            'is_active' => false,
+        ]);
+
+        $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'secret123',
+        ])
+            ->assertForbidden()
+            ->assertJsonPath('message', 'Votre compte est désactivé. Contactez le support FRILO.');
+    }
+
+    public function test_inactive_user_token_is_blocked_on_protected_api_routes(): void
+    {
+        $user = User::factory()->create([
+            'is_active' => false,
+        ]);
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/user')
+            ->assertForbidden()
+            ->assertJsonPath('message', 'Votre compte est désactivé. Contactez le support FRILO.');
+    }
+
     public function test_authenticated_user_can_update_profile_name_and_email(): void
     {
         $user = User::factory()->create([

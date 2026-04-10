@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             SectorSeeder::class,
             TemplateSeeder::class,
             TemplatePreviewSeeder::class,
+            FaqItemSeeder::class,
             DemoClientSeeder::class,
         ]);
     }

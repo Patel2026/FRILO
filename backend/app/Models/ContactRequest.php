@@ -26,11 +26,13 @@ class ContactRequest extends Model
         'order_reference',
         'subject',
         'message',
+        'accepted_terms_at',
         'status',
         'processed_at',
     ];
 
     protected $casts = [
+        'accepted_terms_at' => 'datetime',
         'processed_at' => 'datetime',
     ];
 }

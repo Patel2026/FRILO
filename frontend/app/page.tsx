@@ -4,21 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Check, ChevronRight, Globe, ImageIcon, LayoutTemplate, MessageSquare, Plus, Shield, Smartphone, Star, Zap } from 'lucide-react';
 import { SectorCard } from '@/components/business/SectorCard';
+import { TestimonialCard } from '@/components/business/TestimonialCard';
 import { TemplateCard } from '@/components/business/TemplateCard';
-import { businessService, Sector, Template } from '@/services/business.service';
-import { TESTIMONIALS } from '@/data/mocks';
+import { usePublicPricing } from '@/hooks/usePublicPricing';
+import { formatPublicPrice } from '@/lib/publicPricing';
+import { businessService, FaqItem, Sector, Template, TemplateReview } from '@/services/business.service';
 import { cn, parseFeatures } from '@/lib/utils';
 
 /* ── Data ──────────────────────────────────────────────────────────────── */
-
-const FAQS = [
-  { q: "Qu'est-ce qui est inclus dans le prix ?", a: "La création complète de votre site (intégration contenu, photos, textes), la mise en ligne sur votre domaine, et 30 jours de support. Paiement unique, pas d'abonnement." },
-  { q: "Combien de temps prend la livraison ?", a: "24 à 48 heures après réception de vos informations complètes. En cas de retard, vous êtes informé par email." },
-  { q: "Puis-je modifier mon site après livraison ?", a: "Oui. Vous recevez les accès complets. 2 révisions sont incluses dans le prix." },
-  { q: "Que se passe-t-il si le résultat ne me convient pas ?", a: "Si après révisions vous n'êtes pas satisfait, nous vous remboursons intégralement." },
-  { q: "Comment se passe le paiement ?", a: "Paiement sécurisé en ligne : Mobile Money ou carte bancaire. Facture envoyée par email." },
-  { q: "Mon domaine est-il inclus ?", a: "Non, mais nous pouvons vous aider à en acheter un (5 000 à 15 000 FCFA/an). Si vous en avez déjà un, nous l'utilisons gratuitement." },
-];
 
 // Squarespace "Tout sur une plateforme" equivalent
 const FEATURES = [
@@ -42,8 +35,11 @@ const SITE_PREVIEWS = [
 
 /* ── Page ──────────────────────────────────────────────────────────────── */
 export default function Home() {
+  const { pricing } = usePublicPricing();
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [featuredTemplates, setFeaturedTemplates] = useState<Template[]>([]);
+  const [testimonials, setTestimonials] = useState<TemplateReview[]>([]);
+  const [homeFaqs, setHomeFaqs] = useState<FaqItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -51,6 +47,14 @@ export default function Home() {
 
   useEffect(() => {
     async function loadData() {
+      const [testimonialsData, faqsData] = await Promise.all([
+        businessService.getFeaturedTestimonials(3).catch(() => []),
+        businessService.getFaqs(6).catch(() => []),
+      ]);
+
+      setTestimonials(testimonialsData);
+      setHomeFaqs(faqsData);
+
       try {
         setCatalogError(null);
         const sectorsData = await businessService.getSectors();
@@ -78,6 +82,7 @@ export default function Home() {
   }, []);
 
   const preview = SITE_PREVIEWS[activePreview];
+  const startingPriceLabel = formatPublicPrice(pricing.starting_price, pricing.currency_label);
 
   return (
     <div className="flex flex-col">
@@ -86,13 +91,13 @@ export default function Home() {
           1. HERO — Squarespace : fond sombre, titre géant, carousel
       ══════════════════════════════════════════════════════════════════ */}
       <section className="relative bg-[#0d0d0d] text-white overflow-hidden">
-        <div className="sq-container pt-32 pb-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center pb-20">
+        <div className="sq-container pt-28 md:pt-32 pb-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 items-center pb-14 md:pb-16">
 
             {/* Copy */}
             <div>
               <p className="sq-label mb-6 text-gray-400">
-                Livraison 48h · Dès 50 000 FCFA
+                Livraison 48h · Dès {startingPriceLabel}
               </p>
               <h1 className="sq-display text-white mb-8">
                 Votre<br />
@@ -172,18 +177,18 @@ export default function Home() {
         </div>
 
         {/* Fade to white */}
-        <div className="h-20 bg-gradient-to-b from-transparent to-white" />
+        <div className="h-12 md:h-14 bg-gradient-to-b from-transparent to-white" />
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
           2. STATS — Squarespace : grands chiffres, fond blanc, séparation sobre
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-14 bg-white border-b border-gray-100">
+      <section className="py-10 md:py-12 bg-white border-b border-gray-100">
         <div className="sq-container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
             {[
               { value: '48h', label: 'Délai de livraison garanti' },
-              { value: '50 000', label: 'FCFA — prix de départ' },
+              { value: pricing.starting_price.toLocaleString('fr-FR'), label: `${pricing.currency_label} — prix de départ` },
               { value: '6', label: 'Secteurs professionnels' },
               { value: '100%', label: 'Satisfait ou remboursé' },
             ].map((s, i) => (
@@ -199,9 +204,9 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           3. SECTEURS — Squarespace "Développez votre activité" : cartes scrollables
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="sq-section bg-white">
+      <section className="py-16 md:py-20 bg-white">
         <div className="sq-container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-5">
             <div>
               <p className="sq-label mb-4">Catalogue</p>
               <h2 className="sq-heading text-black">
@@ -238,9 +243,9 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           4. FEATURES GRID — Squarespace "Tout sur une plateforme" : grille 3×3
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="sq-section bg-[#f7f7f7]">
+      <section className="py-16 md:py-20 bg-[#f7f7f7]">
         <div className="sq-container">
-          <div className="mb-14">
+          <div className="mb-10 md:mb-12">
             <p className="sq-label mb-4">Inclus dans chaque commande</p>
             <h2 className="sq-heading text-black max-w-xl">
               Tout sur<br />une plateforme.
@@ -265,9 +270,9 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           5. HOW IT WORKS — Squarespace "Lancez-vous" : fond sombre, numéros géants
       ══════════════════════════════════════════════════════════════════ */}
-      <section id="how-it-works" className="sq-section bg-black text-white">
+      <section id="how-it-works" className="py-16 md:py-20 bg-black text-white">
         <div className="sq-container">
-          <div className="mb-16">
+          <div className="mb-10 md:mb-12">
             <p className="sq-label mb-4 text-gray-500">Processus</p>
             <h2 className="sq-heading text-white">
               3 étapes,<br />c'est tout.
@@ -293,7 +298,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-14">
+          <div className="mt-10 md:mt-12">
             <Link href="/templates" className="sq-btn sq-btn-white">
               Choisir mon modèle <ArrowRight className="w-4 h-4" />
             </Link>
@@ -304,9 +309,9 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           6. FEATURE SPLIT — Squarespace : visuel + texte côte à côte
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="sq-section bg-white overflow-hidden">
+      <section className="py-16 md:py-20 bg-white overflow-hidden">
         <div className="sq-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
               <p className="sq-label mb-6">Notre promesse</p>
               <h2 className="sq-heading text-black mb-8">
@@ -384,9 +389,9 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           7. TEMPLATES — Squarespace : grille des modèles
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="sq-section bg-[#f7f7f7]">
+      <section className="py-16 md:py-20 bg-[#f7f7f7]">
         <div className="sq-container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-5">
             <div>
               <p className="sq-label mb-4">Modèles</p>
               <h2 className="sq-heading text-black">
@@ -427,61 +432,68 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           8. PRICING — Fond blanc, cartes épurées Squarespace-style
       ══════════════════════════════════════════════════════════════════ */}
-      <section id="pricing" className="sq-section bg-white">
+      <section id="pricing" className="py-16 md:py-20 bg-white">
         <div className="sq-container">
-          <div className="mb-14">
+          <div className="mb-10 md:mb-12">
             <p className="sq-label mb-4">Tarifs</p>
             <h2 className="sq-heading text-black mb-4">
-              Simple<br />et transparent.
+              {pricing.section_title.split('\n').map((line, index) => (
+                <span key={`${line}-${index}`}>
+                  {line}
+                  {index < pricing.section_title.split('\n').length - 1 && <br />}
+                </span>
+              ))}
             </h2>
-            <p className="text-gray-500 text-lg max-w-md">Un prix unique, tout inclus. Pas d'abonnement.</p>
+            <p className="text-gray-500 text-lg max-w-md">{pricing.section_description}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
             {/* Standard */}
             <div className="rounded-2xl border border-gray-200 p-8">
-              <p className="sq-label text-gray-400 mb-5">Standard</p>
+              <p className="sq-label text-gray-400 mb-5">{pricing.standard.name}</p>
               <div className="flex items-baseline gap-1.5 mb-1">
-                <span className="text-5xl font-black text-black tracking-tight">50 000</span>
-                <span className="text-gray-400 text-sm font-medium">FCFA</span>
+                <span className="text-5xl font-black text-black tracking-tight">{pricing.standard.price.toLocaleString('fr-FR')}</span>
+                <span className="text-gray-400 text-sm font-medium">{pricing.currency_label}</span>
               </div>
-              <p className="text-gray-400 text-xs mb-8">Paiement unique</p>
+              <p className="text-gray-400 text-xs mb-8">{pricing.standard.billing_label}</p>
               <ul className="space-y-3 mb-8">
-                {['Modèle professionnel', 'Intégration contenu', 'Mise en ligne', 'Responsive mobile', '1 révision', '30j de support'].map(f => (
+                {pricing.standard.features.map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-gray-600">
                     <Check className="w-4 h-4 text-black flex-shrink-0" /> {f}
                   </li>
                 ))}
               </ul>
               <Link href="/templates" className="sq-btn sq-btn-outline-black w-full justify-center text-sm">
-                Choisir
+                {pricing.standard.cta_label}
               </Link>
             </div>
 
             {/* Premium */}
             <div className="rounded-2xl bg-black text-white p-8 relative overflow-hidden">
-              <span className="absolute top-5 right-5 text-xs font-bold bg-white text-black px-3 py-1 rounded-full">Populaire</span>
-              <p className="sq-label text-gray-500 mb-5">Premium</p>
+              {pricing.premium.badge_label && (
+                <span className="absolute top-5 right-5 text-xs font-bold bg-white text-black px-3 py-1 rounded-full">{pricing.premium.badge_label}</span>
+              )}
+              <p className="sq-label text-gray-500 mb-5">{pricing.premium.name}</p>
               <div className="flex items-baseline gap-1.5 mb-1">
-                <span className="text-5xl font-black text-white tracking-tight">75 000</span>
-                <span className="text-gray-500 text-sm font-medium">FCFA</span>
+                <span className="text-5xl font-black text-white tracking-tight">{pricing.premium.price.toLocaleString('fr-FR')}</span>
+                <span className="text-gray-500 text-sm font-medium">{pricing.currency_label}</span>
               </div>
-              <p className="text-gray-500 text-xs mb-8">Paiement unique</p>
+              <p className="text-gray-500 text-xs mb-8">{pricing.premium.billing_label}</p>
               <ul className="space-y-3 mb-8">
-                {['Tout dans Standard', 'Design avancé', 'Formulaire sécurisé', 'Galerie optimisée', '2 révisions', '60j de support', 'Formation incluse'].map(f => (
+                {pricing.premium.features.map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-gray-300">
                     <Check className="w-4 h-4 text-white flex-shrink-0" /> {f}
                   </li>
                 ))}
               </ul>
               <Link href="/templates" className="sq-btn sq-btn-white w-full justify-center text-sm">
-                Choisir
+                {pricing.premium.cta_label}
               </Link>
             </div>
           </div>
 
           <p className="text-gray-400 text-sm mt-8">
-            Projet spécifique ?{' '}
+            {pricing.custom_note || 'Projet spécifique ?'}{' '}
             <Link href="/contact" className="text-black font-semibold underline underline-offset-2">Contactez-nous.</Link>
           </p>
         </div>
@@ -490,62 +502,79 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           9. TÉMOIGNAGES — Squarespace : cartes blanches sur fond clair
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="sq-section bg-[#f7f7f7]">
+      <section className="py-16 md:py-20 bg-[#f7f7f7]">
         <div className="sq-container">
-          <div className="mb-14">
+          <div className="mb-10 md:mb-12">
             <p className="sq-label mb-4">Avis clients</p>
             <h2 className="sq-heading text-black">Ils nous font<br />confiance.</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 flex flex-col card-hover">
-                <div className="flex gap-1 mb-5">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className={cn("w-4 h-4", j < t.rating ? "text-black fill-black" : "text-gray-200 fill-gray-200")} />
-                  ))}
-                </div>
-                <p className="text-gray-700 text-sm leading-relaxed flex-grow mb-6">"{t.content}"</p>
-                <div className="flex items-center gap-3 pt-5 border-t border-gray-100">
-                  <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="font-bold text-sm text-black">{t.name}</div>
-                    <div className="text-xs text-gray-400">{t.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="h-72 rounded-2xl bg-white border border-gray-100 animate-pulse" />
+              ))}
+            </div>
+          ) : testimonials.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {testimonials.map((testimonial) => (
+                <TestimonialCard
+                  key={testimonial.id}
+                  rating={testimonial.rating}
+                  content={testimonial.content}
+                  reviewerName={testimonial.reviewer_name}
+                  reviewerRole={testimonial.reviewer_role}
+                  templateName={testimonial.template?.name ?? null}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-10 text-center">
+              <p className="text-sm text-gray-500">
+                Les premiers avis verifies apparaitront ici apres validation par notre equipe.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
           10. FAQ — Squarespace : fond blanc, accordéon sobre
       ══════════════════════════════════════════════════════════════════ */}
-      <section id="faq" className="sq-section bg-white">
+      <section id="faq" className="py-16 md:py-20 bg-white">
         <div className="sq-container max-w-3xl">
-          <div className="mb-14">
+          <div className="mb-10 md:mb-12">
             <p className="sq-label mb-4">FAQ</p>
             <h2 className="sq-heading text-black">Questions<br />fréquentes.</h2>
           </div>
-          <div className="divide-y divide-gray-100">
-            {FAQS.map((faq, i) => (
-              <div key={i} className="py-6">
-                <button
-                  className="w-full text-left flex items-center justify-between gap-4 group"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <span className="font-semibold text-black text-sm group-hover:text-gray-600 transition-colors">{faq.q}</span>
-                  <Plus className={cn("w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200", openFaq === i && "rotate-45")} />
-                </button>
-                {openFaq === i && (
-                  <p className="text-gray-500 text-sm leading-relaxed mt-4 pr-8">{faq.a}</p>
-                )}
-              </div>
-            ))}
-          </div>
-          <p className="text-gray-400 text-sm mt-12">
+          {loading ? (
+            <div className="space-y-4">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="h-16 rounded-2xl bg-gray-100 animate-pulse" />
+              ))}
+            </div>
+          ) : homeFaqs.length > 0 ? (
+            <div className="divide-y divide-gray-100">
+              {homeFaqs.map((faq) => (
+                <div key={faq.id} className="py-6">
+                  <button
+                    className="w-full text-left flex items-center justify-between gap-4 group"
+                    onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                  >
+                    <span className="font-semibold text-black text-sm group-hover:text-gray-600 transition-colors">{faq.question}</span>
+                    <Plus className={cn("w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200", openFaq === faq.id && "rotate-45")} />
+                  </button>
+                  {openFaq === faq.id && (
+                    <p className="text-gray-500 text-sm leading-relaxed mt-4 pr-8 whitespace-pre-line">{faq.answer}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-10 text-center">
+              <p className="text-sm text-gray-500">La FAQ publique sera publiée ici dès qu'elle sera configurée dans le backoffice.</p>
+            </div>
+          )}
+          <p className="text-gray-400 text-sm mt-10">
             Une autre question ?{' '}
             <Link href="/contact" className="text-black font-semibold underline underline-offset-2">Écrivez-nous.</Link>
           </p>
@@ -555,12 +584,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════════════════════
           11. CTA FINAL — Squarespace : fond noir, titre géant, minimaliste
       ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-40 bg-black text-white text-center">
+      <section className="py-24 md:py-28 bg-black text-white text-center">
         <div className="sq-container">
           <h2 className="sq-display text-white mb-8">
             Prêt à lancer<br />votre site ?
           </h2>
-          <p className="text-gray-400 text-xl mb-12 max-w-lg mx-auto leading-relaxed">
+          <p className="text-gray-400 text-xl mb-10 max-w-lg mx-auto leading-relaxed">
             Des centaines d'entrepreneurs ont déjà confié leur présence en ligne à FRILO.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -571,8 +600,8 @@ export default function Home() {
               Parler à un expert
             </Link>
           </div>
-          <p className="text-gray-600 text-sm mt-12">
-            Dès 50 000 FCFA · Paiement unique · Satisfait ou remboursé
+          <p className="text-gray-600 text-sm mt-10">
+            Dès {startingPriceLabel} · Paiement unique · Satisfait ou remboursé
           </p>
         </div>
       </section>

@@ -22,6 +22,7 @@
                     <tr>
                         <th>Nom</th>
                         <th>Email</th>
+                        <th>Statut</th>
                         <th>Inscription</th>
                         <th>Commandes</th>
                         <th></th>
@@ -32,6 +33,13 @@
                     <tr>
                         <td>{{ $client->name }}</td>
                         <td>{{ $client->email }}</td>
+                        <td>
+                            @if($client->is_active)
+                                <span class="badge badge-soft-success">Actif</span>
+                            @else
+                                <span class="badge badge-soft-danger">Désactivé</span>
+                            @endif
+                        </td>
                         <td>{{ $client->created_at->format('d/m/Y') }}</td>
                         <td>
                             <span class="badge bg-primary-subtle text-primary">{{ $client->orders_count }}</span>
@@ -43,7 +51,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="text-center text-muted py-4">Aucun client inscrit.</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4">Aucun client inscrit.</td></tr>
                     @endforelse
                 </tbody>
             </table>

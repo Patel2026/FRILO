@@ -66,6 +66,26 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}"
+                       href="{{ route('admin.reviews.index') }}">
+                        <i class="ri-star-smile-line"></i>
+                        <span>Avis clients</span>
+                        @php $pendingReviewCount = \App\Models\TemplateReview::where('status', 'pending')->count(); @endphp
+                        @if($pendingReviewCount > 0)
+                            <span class="badge bg-warning rounded-pill ms-auto">{{ $pendingReviewCount }}</span>
+                        @endif
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.faqs*') ? 'active' : '' }}"
+                       href="{{ route('admin.faqs.index') }}">
+                        <i class="ri-question-answer-line"></i>
+                        <span>FAQ</span>
+                    </a>
+                </li>
+
                 <!-- Secteurs -->
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.sectors*') ? 'active' : '' }}"
@@ -93,6 +113,40 @@
                         @if($newContactCount > 0)
                             <span class="badge bg-warning rounded-pill ms-auto">{{ $newContactCount }}</span>
                         @endif
+                    </a>
+                </li>
+
+                <li class="menu-title"><span>Plateforme</span></li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}"
+                       href="{{ route('admin.notifications.index') }}">
+                        <i class="ri-notification-3-line"></i>
+                        <span>Notifications</span>
+                        @php $adminUnreadCount = auth()->user()?->unreadNotifications()->count() ?? 0; @endphp
+                        @if($adminUnreadCount > 0)
+                            <span class="badge bg-danger rounded-pill ms-auto">{{ $adminUnreadCount > 99 ? '99+' : $adminUnreadCount }}</span>
+                        @endif
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.backups*') ? 'active' : '' }}"
+                       href="{{ route('admin.backups.index') }}">
+                        <i class="ri-database-2-line"></i>
+                        <span>Sauvegardes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.settings*') ? 'active' : '' }}"
+                       href="{{ route('admin.settings.index') }}">
+                        <i class="ri-settings-3-line"></i>
+                        <span>Paramètres</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.audit-logs*') ? 'active' : '' }}"
+                       href="{{ route('admin.audit-logs.index') }}">
+                        <i class="ri-file-list-3-line"></i>
+                        <span>Journal d'audit</span>
                     </a>
                 </li>
 

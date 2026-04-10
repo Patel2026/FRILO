@@ -1,7 +1,7 @@
 # MASTER SECURITY — FRILO
 ## Référentiel de Sécurité Unifié
 
-Version : 1.0
+Version : 1.1
 Statut : OBLIGATOIRE
 
 ---
@@ -41,13 +41,13 @@ Statut : OBLIGATOIRE
 
 ### Rôles
 - `client` : accès uniquement à ses propres commandes
-- `admin` : accès backoffice admin Laravel custom (`/admin`)
+- `super_admin` : accès backoffice admin Laravel custom (`/admin`)
 
 ### Règles
 - Tout endpoint API authentifié vérifie `auth:sanctum`
 - `GET /api/orders` retourne uniquement `where('user_id', auth()->id())`
 - `GET /api/orders/{id}` vérifie `OrderPolicy@view` → `order->user_id === auth()->id()`
-- Backoffice admin : middleware `auth` + `admin` et vérification `role = 'admin'`
+- Backoffice admin : middleware `auth` + `super_admin` et vérification `role = 'super_admin'`
 
 ### Interdits
 - Pas de bypass Policy "pour aller plus vite"
@@ -111,6 +111,12 @@ Configuration Laravel CORS :
 - Variables Next.js publiques : préfixe `NEXT_PUBLIC_` uniquement pour les non-sensibles
 - Token Next.js jamais dans le code source
 
+### Secrets métiers publiables via backoffice (Paramètres)
+- Les secrets de paiement (`payment.fedapay.secret_key`, `payment.fedapay.webhook_secret`) sont stockés chiffrés en base
+- Les secrets ne sont jamais restitués en clair dans l'UI admin
+- Le remplacement d'une clé est explicite (champ vide = conservation de l'existant)
+- En absence de révision publiée, fallback runtime sur `.env` uniquement
+
 ### Variables sensibles côté Laravel
 ```
 APP_KEY
@@ -151,6 +157,7 @@ Content-Security-Policy: default-src 'self'
   - Création de commande
   - Changement de statut commande
   - Tentatives d'accès non autorisé (403)
+  - Édition / test / publication / restauration des paramètres plateforme
 - Ne jamais logger :
   - Mots de passe
   - Tokens Bearer

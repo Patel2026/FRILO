@@ -62,20 +62,22 @@ export default function SectorPage() {
     <div className="min-h-screen bg-white">
 
       {/* Hero */}
-      <div className="sq-section bg-black text-white">
+      <div className="bg-black text-white pt-24 pb-10 md:pt-28 md:pb-12">
         <div className="sq-container">
-          <Link href="/secteurs" className="inline-flex items-center gap-1.5 text-gray-500 hover:text-white text-sm transition-colors mb-8">
+          <Link href="/secteurs" className="inline-flex items-center gap-1.5 text-gray-400 hover:text-white text-sm transition-colors mb-4">
             <ArrowLeft className="w-4 h-4" /> Tous les secteurs
           </Link>
-          <h1 className="sq-display text-white mb-4">{sector.name}.</h1>
-          <p className="text-gray-400 text-xl max-w-lg">{sector.description}</p>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight text-white mb-3">
+            {sector.name}.
+          </h1>
+          <p className="text-gray-300 text-base md:text-lg max-w-2xl">{sector.description}</p>
         </div>
       </div>
 
       {/* Templates grid */}
-      <div className="sq-section">
+      <div className="pt-10 pb-16 md:pt-12 md:pb-20">
         <div className="sq-container">
-          <p className="sq-label mb-8">
+          <p className="sq-label mb-5">
             {templates.length} modèle{templates.length > 1 ? 's' : ''} disponible{templates.length > 1 ? 's' : ''}
           </p>
 

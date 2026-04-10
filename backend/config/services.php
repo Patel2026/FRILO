@@ -31,6 +31,8 @@ return [
     ],
 
     'fedapay' => [
+        'enabled' => filter_var(env('FEDAPAY_ENABLED', true), FILTER_VALIDATE_BOOL),
+        'environment' => env('FEDAPAY_ENVIRONMENT', 'sandbox'),
         'secret_key' => env('FEDAPAY_SECRET_KEY'),
         'base_url' => env('FEDAPAY_BASE_URL', env('FEDAPAY_ENVIRONMENT', 'sandbox') === 'live'
             ? 'https://api.fedapay.com/v1'

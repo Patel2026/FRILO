@@ -55,6 +55,11 @@ class Order extends Model
         return $this->hasOne(PaymentTransaction::class)->latestOfMany();
     }
 
+    public function templateReview(): HasOne
+    {
+        return $this->hasOne(TemplateReview::class);
+    }
+
     public function scopeForUser($query, int $userId)
     {
         return $query->where('user_id', $userId);

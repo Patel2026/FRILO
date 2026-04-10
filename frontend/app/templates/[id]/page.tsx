@@ -4,17 +4,30 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Check, ExternalLink, Heart, Monitor, Scale, Smartphone } from 'lucide-react';
-import { businessService, Template } from '@/services/business.service';
+import { ArrowLeft, Check, ExternalLink, Heart, MessageSquare, Monitor, Scale, Smartphone, Star } from 'lucide-react';
+import { TestimonialCard } from '@/components/business/TestimonialCard';
+import { useAuthState } from '@/hooks/useAuthState';
+import { businessService, Template, TemplateReview, TemplateReviewEligibility, TemplateReviewSummary } from '@/services/business.service';
 import { cn, parseFeatures } from '@/lib/utils';
 import { buildPreviewUrl, hasLivePreview, parsePreviewGallery, parsePreviewPages } from '@/lib/templatePreview';
 import { trackFunnelEvent } from '@/lib/analytics';
 import { useTemplateCollections } from '@/hooks/useTemplateCollections';
+import axios from 'axios';
 
 export default function TemplateDetailPage() {
   const params = useParams();
   const id = params?.id as string;
+  const { user, isAuthenticated, loading: authLoading } = useAuthState();
   const [template, setTemplate] = useState<Template | null>(null);
+  const [templateReviews, setTemplateReviews] = useState<TemplateReview[]>([]);
+  const [reviewsSummary, setReviewsSummary] = useState<TemplateReviewSummary>({ count: 0, average_rating: null });
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [reviewEligibility, setReviewEligibility] = useState<TemplateReviewEligibility | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewContent, setReviewContent] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewNotice, setReviewNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [activePreviewPath, setActivePreviewPath] = useState('/');
@@ -33,16 +46,59 @@ export default function TemplateDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    businessService.getTemplate(id)
-      .then((data) => {
-        setTemplate(data);
-        const pages = parsePreviewPages(data.preview_pages);
+    Promise.all([
+      businessService.getTemplate(id),
+      businessService.getTemplateReviews(id).catch(() => ({
+        summary: { count: 0, average_rating: null },
+        data: [],
+      })),
+    ])
+      .then(([templateData, reviewsResponse]) => {
+        setTemplate(templateData);
+        setTemplateReviews(reviewsResponse.data);
+        setReviewsSummary(reviewsResponse.summary);
+        const pages = parsePreviewPages(templateData.preview_pages);
         setActivePreviewPath(pages[0]?.path ?? '/');
         setActiveGalleryIndex(0);
       })
-      .catch(() => setTemplate(null))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        setTemplate(null);
+        setTemplateReviews([]);
+        setReviewsSummary({ count: 0, average_rating: null });
+      })
+      .finally(() => {
+        setLoading(false);
+        setReviewsLoading(false);
+      });
   }, [id]);
+
+  useEffect(() => {
+    if (!id || authLoading) {
+      return;
+    }
+
+    if (!isAuthenticated || user?.role !== 'client') {
+      setReviewEligibility(null);
+      return;
+    }
+
+    businessService.getTemplateReviewEligibility(id)
+      .then((response) => setReviewEligibility(response))
+      .catch(() => {
+        setReviewEligibility(null);
+      });
+  }, [authLoading, id, isAuthenticated, user?.role]);
+
+  useEffect(() => {
+    if (reviewEligibility?.existing_review) {
+      setReviewRating(reviewEligibility.existing_review.rating);
+      setReviewContent(reviewEligibility.existing_review.content);
+      return;
+    }
+
+    setReviewRating(5);
+    setReviewContent('');
+  }, [reviewEligibility?.existing_review, reviewEligibility?.can_review]);
 
   useEffect(() => {
     if (!template) {
@@ -65,6 +121,15 @@ export default function TemplateDetailPage() {
     const timeoutId = window.setTimeout(() => setCompareNotice(null), 3000);
     return () => window.clearTimeout(timeoutId);
   }, [compareNotice]);
+
+  useEffect(() => {
+    if (!reviewNotice) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setReviewNotice(null), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [reviewNotice]);
 
   if (loading) {
     return (
@@ -121,6 +186,53 @@ export default function TemplateDetailPage() {
     const result = toggleCompare(template.id);
     if (result === 'max_reached') {
       setCompareNotice(`Vous pouvez comparer jusqu'à ${maxCompareItems} modèles.`);
+    }
+  };
+
+  const refreshReviewData = async () => {
+    if (!id) {
+      return;
+    }
+
+    const reviewsResponse = await businessService.getTemplateReviews(id);
+    setTemplateReviews(reviewsResponse.data);
+    setReviewsSummary(reviewsResponse.summary);
+
+    if (isAuthenticated && user?.role === 'client') {
+      const eligibility = await businessService.getTemplateReviewEligibility(id);
+      setReviewEligibility(eligibility);
+    }
+  };
+
+  const handleSubmitReview = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!template) {
+      return;
+    }
+
+    setReviewSubmitting(true);
+    setReviewError(null);
+    setReviewNotice(null);
+
+    try {
+      const response = await businessService.submitTemplateReview(template.id, {
+        rating: reviewRating,
+        content: reviewContent.trim(),
+      });
+      setReviewNotice(response.message);
+      await refreshReviewData();
+    } catch (error) {
+      if (axios.isAxiosError(error) && typeof error.response?.data?.message === 'string') {
+        setReviewError(error.response.data.message);
+      } else if (axios.isAxiosError(error) && error.response?.data?.errors) {
+        const firstError = Object.values(error.response.data.errors as Record<string, string[]>)[0]?.[0];
+        setReviewError(firstError || 'Impossible d’enregistrer votre avis pour le moment.');
+      } else {
+        setReviewError('Impossible d’enregistrer votre avis pour le moment.');
+      }
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -451,6 +563,178 @@ export default function TemplateDetailPage() {
           </div>
         </div>
       </div>
+
+      <section id="template-reviews" className="border-t border-gray-100 bg-[#faf9f7]">
+        <div className="sq-container py-16 md:py-20">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div className="space-y-5">
+              <div>
+                <p className="sq-label mb-4">Avis verifies</p>
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight text-black mb-4">
+                  Ce que disent les clients
+                  <br />
+                  de ce modele.
+                </h2>
+                <p className="text-base text-gray-500 leading-relaxed max-w-xl">
+                  Seuls les clients ayant commande ce template peuvent laisser un avis. Chaque retour est relu avant publication.
+                </p>
+              </div>
+
+              <div className="rounded-[2rem] border border-gray-200 bg-white p-6 md:p-7">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400 mb-3">Synthese</p>
+                <div className="flex items-end gap-4 mb-4">
+                  <div className="text-5xl font-black tracking-tight text-black">
+                    {reviewsSummary.average_rating ? reviewsSummary.average_rating.toFixed(1) : '—'}
+                  </div>
+                  <div className="pb-1">
+                    <div className="flex gap-1 mb-1">
+                      {[...Array(5)].map((_, index) => (
+                        <Star
+                          key={index}
+                          className={cn(
+                            'w-4 h-4',
+                            reviewsSummary.average_rating !== null && index < Math.round(reviewsSummary.average_rating)
+                              ? 'text-black fill-black'
+                              : 'text-gray-200 fill-gray-200'
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {reviewsSummary.count} avis publie{reviewsSummary.count > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Les avis modifies par un client repassent automatiquement en validation avant republication.
+                </p>
+              </div>
+
+              <div className="rounded-[2rem] border border-gray-200 bg-white p-6 md:p-7">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400 mb-4">Votre avis</p>
+
+                {authLoading ? (
+                  <p className="text-sm text-gray-500">Chargement de votre acces aux avis…</p>
+                ) : !isAuthenticated ? (
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      Connectez-vous avec votre compte client pour verifier si vous pouvez laisser un avis sur ce modele.
+                    </p>
+                    <Link href="/login" className="sq-btn sq-btn-black text-sm py-3 px-6">
+                      Se connecter
+                    </Link>
+                  </div>
+                ) : user?.role !== 'client' ? (
+                  <p className="text-sm text-gray-500">Les avis clients sont reserves aux comptes client.</p>
+                ) : reviewEligibility?.can_review ? (
+                  <form onSubmit={handleSubmitReview} className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-black mb-3">
+                        Note
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {[1, 2, 3, 4, 5].map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setReviewRating(value)}
+                            className={cn(
+                              'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors',
+                              reviewRating === value
+                                ? 'border-black bg-black text-white'
+                                : 'border-gray-200 text-gray-600 hover:border-black hover:text-black'
+                            )}
+                          >
+                            <Star className={cn('w-4 h-4', reviewRating === value ? 'fill-white' : '')} />
+                            {value}/5
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-black mb-2">
+                        Votre retour
+                      </label>
+                      <textarea
+                        value={reviewContent}
+                        onChange={(event) => setReviewContent(event.target.value)}
+                        rows={5}
+                        minLength={20}
+                        maxLength={1500}
+                        required
+                        placeholder="Expliquez ce que ce template vous a apporte, ce que vous avez apprecie et l'impact sur votre activite."
+                        className="w-full rounded-2xl border border-gray-200 bg-[#fcfcfb] px-4 py-3.5 text-sm text-black placeholder-gray-300 outline-none focus:border-black resize-none"
+                      />
+                    </div>
+
+                    {reviewEligibility.existing_review && (
+                      <div className="rounded-2xl bg-[#fcfcfb] border border-gray-100 px-4 py-3 text-sm text-gray-600">
+                        Statut actuel: <span className="font-semibold text-black">{reviewEligibility.existing_review.status}</span>.
+                        Toute modification repassera en validation.
+                      </div>
+                    )}
+
+                    {reviewError && <p className="text-sm text-red-600">{reviewError}</p>}
+                    {reviewNotice && <p className="text-sm text-emerald-700">{reviewNotice}</p>}
+
+                    <button
+                      type="submit"
+                      disabled={reviewSubmitting}
+                      className="sq-btn sq-btn-black text-sm py-3 px-6 disabled:opacity-50"
+                    >
+                      {reviewSubmitting ? 'Envoi…' : reviewEligibility.existing_review ? 'Mettre a jour mon avis' : 'Publier mon avis'}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-500 leading-relaxed">
+                      {reviewEligibility?.message || 'Vous devez avoir achete ce modele pour laisser un avis.'}
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <Link href={`/commande?templateId=${template.id}`} className="sq-btn sq-btn-black text-sm py-3 px-6">
+                        Commander ce modele
+                      </Link>
+                      <Link href="/dashboard/orders" className="sq-btn sq-btn-outline-black text-sm py-3 px-6">
+                        Voir mes commandes
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              {reviewsLoading ? (
+                <div className="grid gap-5 md:grid-cols-2">
+                  {[...Array(2)].map((_, index) => (
+                    <div key={index} className="h-72 rounded-2xl bg-white border border-gray-100 animate-pulse" />
+                  ))}
+                </div>
+              ) : templateReviews.length > 0 ? (
+                <div className="grid gap-5 md:grid-cols-2">
+                  {templateReviews.map((review) => (
+                    <TestimonialCard
+                      key={review.id}
+                      rating={review.rating}
+                      content={review.content}
+                      reviewerName={review.reviewer_name}
+                      reviewerRole={review.reviewer_role}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-[2rem] border border-dashed border-gray-200 bg-white px-6 py-12 text-center">
+                  <MessageSquare className="w-10 h-10 text-gray-200 mx-auto mb-4" />
+                  <p className="text-sm text-gray-500">
+                    Aucun avis publie pour ce modele pour le moment. Le premier retour verifie apparaitra ici.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur lg:hidden">
         <div className="px-4 py-3 flex items-center gap-3">

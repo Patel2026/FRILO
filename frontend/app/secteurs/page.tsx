@@ -43,7 +43,7 @@ export default function SectorsPage() {
       </div>
 
       {/* Grid */}
-      <div className="sq-section">
+      <div className="pt-12 pb-20 md:pt-14 md:pb-24">
         <div className="sq-container">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100">

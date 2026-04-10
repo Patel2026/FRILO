@@ -13,7 +13,11 @@ use RuntimeException;
 
 class OrderPaymentService
 {
-    public function __construct(private readonly FedapayClient $fedapayClient) {}
+    public function __construct(
+        private readonly FedapayClient $fedapayClient,
+        private readonly PlatformSettingsService $platformSettingsService,
+        private readonly AdminNotificationService $adminNotificationService
+    ) {}
 
     public function initiatePayment(Order $order, User $user, array $payload = []): array
     {
@@ -36,11 +40,12 @@ class OrderPaymentService
         $phoneNumber = $this->sanitizePhoneNumber($payload['phone_number'] ?? null);
 
         $customerId = $this->resolveFedapayCustomerId($user, $phoneNumber);
+        $paymentConfig = $this->platformSettingsService->getRuntimePaymentConfiguration();
         $transactionPayload = [
             'description' => 'Commande FRILO '.$this->orderReference($order->id),
             'amount' => (int) $order->price,
             'currency' => [
-                'iso' => (string) config('services.fedapay.currency', 'XOF'),
+                'iso' => (string) ($paymentConfig['currency'] ?? 'XOF'),
             ],
             'callback_url' => $this->buildCallbackUrl($order),
             'customer' => [
@@ -93,7 +98,7 @@ class OrderPaymentService
             'checkout_url' => $checkoutUrl,
             'mode' => $directMode ?? 'checkout',
             'amount' => (int) $order->price,
-            'currency' => (string) config('services.fedapay.currency', 'XOF'),
+            'currency' => (string) ($paymentConfig['currency'] ?? 'XOF'),
             'status' => $remoteStatus,
             'last_error_code' => Arr::get($transaction, 'last_error_code') ?? Arr::get($sendResult ?? [], 'last_error_code'),
             'raw_payload' => [
@@ -130,10 +135,26 @@ class OrderPaymentService
             return $order->fresh(['latestPayment']);
         }
 
+        $this->refreshTransaction($payment);
+
+        return $order->fresh(['latestPayment']);
+    }
+
+    public function refreshTransaction(PaymentTransaction $payment): PaymentTransaction
+    {
+        if (! $payment->fedapay_transaction_id) {
+            throw new RuntimeException('Transaction FedaPay absente: synchronisation impossible.');
+        }
+
+        $order = $payment->order()->first();
+        if (! $order) {
+            throw new RuntimeException('Commande introuvable pour cette transaction.');
+        }
+
         $transaction = $this->fedapayClient->getTransaction((int) $payment->fedapay_transaction_id);
         $this->updateFromTransactionPayload($order, $payment, $transaction);
 
-        return $order->fresh(['latestPayment']);
+        return $payment->fresh();
     }
 
     public function handleWebhook(string $payload, ?string $signatureHeader): void
@@ -262,7 +283,8 @@ class OrderPaymentService
 
     private function buildCallbackUrl(Order $order): string
     {
-        $baseCallbackUrl = (string) config('services.fedapay.callback_url');
+        $paymentConfig = $this->platformSettingsService->getRuntimePaymentConfiguration();
+        $baseCallbackUrl = (string) ($paymentConfig['callback_url'] ?? '');
         if ($baseCallbackUrl === '') {
             $baseCallbackUrl = rtrim((string) config('app.url'), '/').'/commande/paiement/retour';
         }
@@ -320,6 +342,8 @@ class OrderPaymentService
                     new OrderPaymentStatusUpdatedNotification($order, $current, $paymentStatus)
                 );
             }
+
+            $this->adminNotificationService->notifyPaymentStatusChanged($order, $current, $paymentStatus);
         }
     }
 
@@ -398,10 +422,11 @@ class OrderPaymentService
 
     private function verifyWebhookSignature(string $payload, ?string $header): void
     {
-        $secret = (string) config('services.fedapay.webhook_secret', '');
+        $paymentConfig = $this->platformSettingsService->getRuntimePaymentConfiguration();
+        $secret = (string) ($paymentConfig['webhook_secret'] ?? '');
         if ($secret === '') {
             if (app()->environment('production')) {
-                throw new RuntimeException('FEDAPAY_WEBHOOK_SECRET manquant en production.');
+                throw new RuntimeException('Secret webhook FedaPay manquant en production.');
             }
 
             return;
@@ -442,7 +467,7 @@ class OrderPaymentService
             throw new RuntimeException('Signature webhook FedaPay invalide.');
         }
 
-        $tolerance = (int) config('services.fedapay.webhook_tolerance', 300);
+        $tolerance = (int) ($paymentConfig['webhook_tolerance'] ?? 300);
         if ($tolerance > 0 && abs(time() - $timestamp) > $tolerance) {
             throw new RuntimeException('Webhook FedaPay rejeté: timestamp hors fenêtre autorisée.');
         }

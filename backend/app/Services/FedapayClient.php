@@ -9,6 +9,7 @@ use RuntimeException;
 class FedapayClient
 {
     public function __construct(
+        private readonly PlatformSettingsService $platformSettingsService,
         private readonly ?string $secretKey = null,
         private readonly ?string $baseUrl = null,
     ) {}
@@ -67,11 +68,18 @@ class FedapayClient
 
     private function client(): PendingRequest
     {
-        $secret = $this->secretKey ?? config('services.fedapay.secret_key');
-        $baseUrl = $this->baseUrl ?? config('services.fedapay.base_url');
+        $paymentConfig = $this->platformSettingsService->getRuntimePaymentConfiguration();
+
+        $enabled = (bool) ($paymentConfig['enabled'] ?? true);
+        if (! $enabled) {
+            throw new RuntimeException('Le paiement FedaPay est désactivé dans les paramètres publiés.');
+        }
+
+        $secret = $this->secretKey ?? ($paymentConfig['secret_key'] ?? null);
+        $baseUrl = $this->baseUrl ?? ($paymentConfig['base_url'] ?? null);
 
         if (! $secret || ! $baseUrl) {
-            throw new RuntimeException('Configuration FedaPay incomplète. Vérifiez FEDAPAY_SECRET_KEY et FEDAPAY_BASE_URL.');
+            throw new RuntimeException('Configuration FedaPay incomplète. Vérifiez les paramètres publiés (secret/base URL).');
         }
 
         return Http::baseUrl((string) $baseUrl)

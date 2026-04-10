@@ -10,8 +10,8 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! auth()->check() || ! auth()->user()->isAdmin()) {
-            abort(403, 'Accès réservé aux administrateurs FRILO.');
+        if (! auth()->check() || ! auth()->user()->isSuperAdmin()) {
+            abort(403, 'Accès réservé aux super-administrateurs FRILO.');
         }
 
         return $next($request);

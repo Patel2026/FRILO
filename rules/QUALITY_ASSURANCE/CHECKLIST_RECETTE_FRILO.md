@@ -1,7 +1,7 @@
 # CHECKLIST RECETTE — FRILO
 ## Recette fonctionnelle et technique
 
-Version : 1.0
+Version : 1.1
 Statut : RÉFÉRENCE
 
 ---
@@ -68,6 +68,7 @@ Statut : RÉFÉRENCE
 - [ ] `POST /api/orders` sans token → 401
 - [ ] `GET /api/orders` sans token → 401
 - [ ] Client ne peut pas accéder à `/admin`
+- [ ] Ancien rôle `admin` migré en `super_admin`
 - [ ] `price` accepté dans le body de POST /api/orders est ignoré (prix depuis template)
 - [ ] `user_id` dans le body est ignoré (user depuis auth token)
 - [ ] `status` dans le body est ignoré (toujours `pending` à la création)
@@ -89,7 +90,7 @@ Statut : RÉFÉRENCE
 
 ## 7. BACKOFFICE ADMIN CUSTOM
 
-- [ ] `admin@frilo.com` peut accéder à `/admin`
+- [ ] `admin@frilo.com` (rôle `super_admin`) peut accéder à `/admin`
 - [ ] `client@frilo.com` ne peut pas accéder à `/admin`
 - [ ] Liste des commandes avec filtres par statut
 - [ ] Détail commande affiche les instructions client
@@ -98,6 +99,12 @@ Statut : RÉFÉRENCE
 - [ ] Liste clients accessible en lecture
 - [ ] Liste demandes contact accessible côté admin (`/admin/contact-requests`)
 - [ ] Mise à jour du statut de traitement d'une demande contact côté admin
+- [ ] Rubrique `/admin/settings` accessible au `super_admin` uniquement
+- [ ] Édition section settings (`PATCH /admin/settings/{section}`) fonctionnelle
+- [ ] Test paiement (`POST /admin/settings/payment/test`) fonctionnel
+- [ ] Publication (`POST /admin/settings/publish`) crée une version active + nouveau brouillon
+- [ ] Historique (`GET /admin/settings/history`) visible et restauration brouillon possible
+- [ ] Secrets paiement jamais visibles en clair dans UI/API/DB brute
 
 ---
 

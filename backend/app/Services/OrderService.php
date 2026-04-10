@@ -15,6 +15,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class OrderService
 {
+    public function __construct(private readonly AdminNotificationService $adminNotificationService) {}
+
     /**
      * Créer une commande avec son instruction de personnalisation.
      * Le prix est snapshotté depuis le template — jamais accepté depuis le client.
@@ -52,6 +54,7 @@ class OrderService
         if ($user->isClient()) {
             $user->notify(new OrderCreatedNotification($order));
         }
+        $this->adminNotificationService->notifyOrderCreated($order);
 
         return $order;
     }

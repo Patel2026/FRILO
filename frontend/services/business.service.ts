@@ -26,6 +26,77 @@ export interface Template {
     sector?: Sector;
 }
 
+export interface TemplateReview {
+    id: number;
+    rating: number;
+    content: string;
+    reviewer_name: string;
+    reviewer_role: string;
+    template: {
+        id: number;
+        name: string;
+        slug: string;
+    } | null;
+    created_at: string;
+    approved_at?: string | null;
+    is_featured: boolean;
+}
+
+export interface FaqItem {
+    id: number;
+    question: string;
+    answer: string;
+    sort_order: number;
+}
+
+export interface PublicPricingPlan {
+    name: string;
+    price: number;
+    billing_label: string;
+    cta_label: string;
+    features: string[];
+    badge_label?: string;
+}
+
+export interface PublicPricingConfig {
+    currency_label: string;
+    section_title: string;
+    section_description: string;
+    custom_note: string;
+    starting_price: number;
+    standard: PublicPricingPlan;
+    premium: PublicPricingPlan;
+}
+
+export interface TemplateReviewSummary {
+    count: number;
+    average_rating: number | null;
+}
+
+export interface TemplateReviewListResponse {
+    summary: TemplateReviewSummary;
+    data: TemplateReview[];
+}
+
+export interface TemplateReviewEligibility {
+    can_review: boolean;
+    message: string;
+    eligible_order_id: number | null;
+    existing_review: {
+        id: number;
+        rating: number;
+        content: string;
+        status: 'pending' | 'approved' | 'rejected';
+        is_featured: boolean;
+        updated_at: string;
+    } | null;
+}
+
+export interface CreateTemplateReviewPayload {
+    rating: number;
+    content: string;
+}
+
 export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
 export type PaymentStatus = 'awaiting_payment' | 'paid' | 'failed' | 'cancelled' | 'refunded' | 'expired';
 
@@ -156,6 +227,57 @@ export const businessService = {
     async getTemplate(id: string): Promise<Template> {
         const response = await api.get(`/templates/${id}`);
         return response.data;
+    },
+
+    async getFeaturedTestimonials(limit = 3): Promise<TemplateReview[]> {
+        const response = await api.get('/testimonials', {
+            params: { limit },
+        });
+        return Array.isArray(response.data) ? response.data as TemplateReview[] : [];
+    },
+
+    async getFaqs(limit?: number): Promise<FaqItem[]> {
+        const params = typeof limit === 'number' ? { limit } : undefined;
+        const response = await api.get('/faqs', { params });
+        return Array.isArray(response.data) ? response.data as FaqItem[] : [];
+    },
+
+    async getPublicPricing(): Promise<PublicPricingConfig> {
+        const response = await api.get('/public/pricing');
+        return response.data as PublicPricingConfig;
+    },
+
+    async getTemplateReviews(templateId: number | string): Promise<TemplateReviewListResponse> {
+        const response = await api.get(`/templates/${templateId}/reviews`);
+        return response.data as TemplateReviewListResponse;
+    },
+
+    async getTemplateReviewEligibility(templateId: number | string): Promise<TemplateReviewEligibility> {
+        const response = await api.get(`/templates/${templateId}/review-eligibility`);
+        return response.data as TemplateReviewEligibility;
+    },
+
+    async submitTemplateReview(templateId: number | string, payload: CreateTemplateReviewPayload): Promise<{
+        message: string;
+        review: {
+            id: number;
+            rating: number;
+            content: string;
+            status: 'pending' | 'approved' | 'rejected';
+            updated_at: string;
+        };
+    }> {
+        const response = await api.post(`/templates/${templateId}/reviews`, payload);
+        return response.data as {
+            message: string;
+            review: {
+                id: number;
+                rating: number;
+                content: string;
+                status: 'pending' | 'approved' | 'rejected';
+                updated_at: string;
+            };
+        };
     },
 
     async createOrder(data: CreateOrderPayload): Promise<Order> {

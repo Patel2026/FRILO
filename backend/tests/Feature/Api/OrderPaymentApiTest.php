@@ -6,9 +6,11 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\PaymentTransaction;
+use App\Models\PlatformSettingRevision;
 use App\Models\Sector;
 use App\Models\Template;
 use App\Models\User;
+use App\Services\PlatformSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
@@ -30,6 +32,8 @@ class OrderPaymentApiTest extends TestCase
             'services.fedapay.webhook_secret' => 'whsec_test',
             'services.fedapay.webhook_tolerance' => 300,
         ]);
+
+        app(PlatformSettingsService::class)->clearRuntimeCache();
     }
 
     public function test_authenticated_user_can_initiate_fedapay_payment_for_own_order(): void
@@ -210,6 +214,81 @@ class OrderPaymentApiTest extends TestCase
             'fedapay_transaction_id' => 777,
             'status' => 'approved',
         ]);
+    }
+
+    public function test_initiate_payment_uses_published_platform_payment_configuration_when_available(): void
+    {
+        PlatformSettingRevision::create([
+            'status' => PlatformSettingRevision::STATUS_PUBLISHED,
+            'payload' => [
+                'payment' => [
+                    'fedapay' => [
+                        'enabled' => true,
+                        'environment' => 'sandbox',
+                        'base_url' => 'https://custom-api.fedapay.com/v1',
+                        'currency' => 'XOF',
+                        'callback_url' => 'http://localhost:3000/commande/paiement/retour',
+                        'webhook_tolerance' => 300,
+                    ],
+                ],
+            ],
+            'secret_payload' => [
+                'payment' => [
+                    'fedapay' => [
+                        'secret_key' => 'published_secret_key',
+                        'webhook_secret' => 'published_webhook_secret',
+                    ],
+                ],
+            ],
+            'published_at' => now(),
+        ]);
+        app(PlatformSettingsService::class)->clearRuntimeCache();
+
+        Http::fake([
+            'https://custom-api.fedapay.com/v1/customers' => Http::response([
+                'id' => 981,
+            ], 201),
+            'https://custom-api.fedapay.com/v1/transactions' => Http::response([
+                'id' => 887,
+                'reference' => 'tr_887',
+                'status' => 'pending',
+            ], 201),
+            'https://custom-api.fedapay.com/v1/transactions/887/token' => Http::response([
+                'token' => 'tok_887',
+                'url' => 'https://checkout.fedapay.com/pay/tok_887',
+            ], 200),
+        ]);
+
+        $user = User::factory()->create([
+            'name' => 'Client Runtime Config',
+            'email' => 'client.runtime.config@example.com',
+        ]);
+        Sanctum::actingAs($user);
+
+        $template = $this->createTemplate();
+        $order = Order::create([
+            'user_id' => $user->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Pending->value,
+            'payment_status' => PaymentStatus::AwaitingPayment->value,
+            'price' => 50000,
+        ]);
+
+        $response = $this->postJson("/api/orders/{$order->id}/payment-link", [
+            'mode' => 'checkout',
+        ]);
+
+        $response->assertCreated();
+        $response->assertJsonPath('payment.checkout_url', 'https://checkout.fedapay.com/pay/tok_887');
+
+        Http::assertSent(function ($request): bool {
+            $url = $request->url();
+            if (! str_starts_with($url, 'https://custom-api.fedapay.com/v1/')) {
+                return false;
+            }
+
+            return in_array('Bearer published_secret_key', $request->header('Authorization'), true);
+        });
     }
 
     private function createTemplate(int $price = 50000): Template

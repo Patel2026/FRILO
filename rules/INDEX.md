@@ -51,6 +51,7 @@
 - [CHANGE_POLICY_FRILO.md](OPERATIONS_GOVERNANCE/CHANGE_POLICY_FRILO.md) — Politique de modification du code et du domaine
 - [REPO_DELIVERY_PROTOCOL_FRILO.md](OPERATIONS_GOVERNANCE/REPO_DELIVERY_PROTOCOL_FRILO.md) — Git, branches, commits, PR, déploiement
 - [RUNBOOK_RELEASE_ROLLBACK_V1_FRILO.md](OPERATIONS_GOVERNANCE/RUNBOOK_RELEASE_ROLLBACK_V1_FRILO.md) — Procédure release/rollback V1 et smoke tests post-deploy
+- [RUNBOOK_SETTINGS_PAYMENT_KEYS_ROLLBACK_FRILO.md](OPERATIONS_GOVERNANCE/RUNBOOK_SETTINGS_PAYMENT_KEYS_ROLLBACK_FRILO.md) — Rotation des clés FedaPay et rollback rapide de configuration publiée
 
 ## BACKLOG
 - [BACKLOG_PRODUIT_FRILO.md](BACKLOG/BACKLOG_PRODUIT_FRILO.md) — Epics, features et user stories V1

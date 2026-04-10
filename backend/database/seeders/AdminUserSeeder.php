@@ -13,9 +13,9 @@ class AdminUserSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@frilo.com'],
             [
-                'name'     => 'Admin FRILO',
+                'name' => 'Super Admin FRILO',
                 'password' => Hash::make('password'),
-                'role'     => 'admin',
+                'role' => 'super_admin',
             ]
         );
     }

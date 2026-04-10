@@ -46,6 +46,11 @@ class Template extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(TemplateReview::class);
+    }
+
     public function getFullThumbnailUrlAttribute(): ?string
     {
         if (! $this->thumbnail) {

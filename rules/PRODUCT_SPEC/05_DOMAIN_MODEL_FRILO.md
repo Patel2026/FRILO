@@ -1,7 +1,7 @@
 # 05 - DOMAIN MODEL
 ## Modèle de Domaine — FRILO
 
-Version : 1.0
+Version : 1.1
 Statut : VALIDÉ
 
 ---
@@ -68,13 +68,13 @@ Attributs :
 - `name`
 - `email` (unique)
 - `password` (hashé bcrypt)
-- `role` (`client` | `admin`)
+- `role` (`client` | `super_admin`)
 - `email_verified_at`
 - `created_at` / `updated_at`
 
 Règles :
 - un utilisateur client peut passer plusieurs commandes
-- un utilisateur admin accède au backoffice `/admin`
+- un utilisateur super_admin accède au backoffice `/admin`
 - le mot de passe est hashé, jamais stocké en clair
 - l'email est unique
 
@@ -111,7 +111,7 @@ Attributs :
 Règles :
 - une commande a exactement une instruction
 - les instructions sont saisies par le client lors du tunnel
-- les instructions sont visibles par l'admin dans le backoffice pour la production
+- les instructions sont visibles par le super_admin dans le backoffice pour la production
 
 ---
 
@@ -141,13 +141,13 @@ Règles :
 | Statut | Signification | Acteur |
 |--------|---------------|--------|
 | `pending` | Commande reçue, en attente de traitement | système |
-| `processing` | En cours de production par l'équipe FRILO | admin |
-| `completed` | Site livré au client | admin |
-| `cancelled` | Commande annulée | admin ou client |
+| `processing` | En cours de production par l'équipe FRILO | super_admin |
+| `completed` | Site livré au client | super_admin |
+| `cancelled` | Commande annulée | super_admin ou client |
 
 ### Règles de transition
-- `pending` → `processing` : admin démarre la production
-- `processing` → `completed` : admin confirme la livraison
+- `pending` → `processing` : super_admin démarre la production
+- `processing` → `completed` : super_admin confirme la livraison
 - `pending` → `cancelled` : annulation avant traitement
 - `processing` → `cancelled` : annulation exceptionnelle
 - `completed` → ??? : irréversible, aucune transition possible

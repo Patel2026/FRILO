@@ -1,7 +1,7 @@
 # BACKOFFICE FRILO — CRUDs ET FONCTIONNALITÉS
 ## Spécification des opérations du backoffice Laravel custom
 
-Version : 1.0
+Version : 1.1
 Statut : VALIDÉ
 
 ---
@@ -30,7 +30,7 @@ Statut : VALIDÉ
 - Toute modification de statut passe par `OrderService::updateStatus()`
 
 ### Pas de création manuelle dans le backoffice
-Les commandes sont créées par les clients via l'API. L'admin ne crée pas de commande.
+Les commandes sont créées par les clients via l'API. Le super-admin ne crée pas de commande.
 
 ### Pas de suppression physique
 Désactivation logique uniquement si nécessaire.
@@ -119,9 +119,34 @@ KPIs affichés :
 
 ---
 
-## 6. Règles de Sécurité Backoffice
+## 6. Resource : Paramètres Plateforme
 
-- Seuls les utilisateurs avec `role = 'admin'` accèdent au backoffice `/admin`
+### Sections gérées
+- `general.*`
+- `branding.*`
+- `payment.fedapay.*`
+- `sla.*`
+- `notifications.*`
+- `legal.*`
+
+### Lifecycle
+- Édition sur révision `draft` uniquement
+- Test de configuration paiement via action dédiée
+- Publication atomique : une seule révision `published` active
+- Révisions précédentes archivées, jamais supprimées destructivement
+
+### Paiement FedaPay (admin)
+- Champs : `enabled`, `environment`, `base_url`, `currency`, `callback_url`, `webhook_tolerance`
+- Secrets : `secret_key`, `webhook_secret` stockés chiffrés
+- Impossible de publier une configuration invalide
+- Runtime : fallback `.env` si aucune révision publiée
+
+---
+
+## 7. Règles de Sécurité Backoffice
+
+- Seuls les utilisateurs avec `role = 'super_admin'` accèdent au backoffice `/admin`
 - Les données client (email, instructions) sont visibles uniquement dans le contexte de la commande
 - Les statuts et références de paiement (FedaPay) sont visibles en lecture pour pilotage opérationnel
 - Les actions de changement de statut sont tracées (logs Laravel structurés)
+- Les actions paramètres (`update`, `payment test`, `publish`, `restore`) sont tracées en logs d'audit structurés

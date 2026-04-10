@@ -28,6 +28,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'client',
+            'is_active' => true,
             'sector_id' => (int) $request->sector_id,
         ]);
         $user->load('sector');
@@ -57,6 +58,18 @@ class AuthController extends Controller
             ]);
 
             return response()->json(['message' => 'Identifiants invalides.'], 401);
+        }
+
+        if (! $user->isActive()) {
+            Log::warning('auth.login.blocked_inactive', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'message' => 'Votre compte est désactivé. Contactez le support FRILO.',
+            ], 403);
         }
 
         $token = $user->createToken('frilo-client')->plainTextToken;
@@ -196,6 +209,7 @@ class AuthController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->role,
+            'is_active' => $user->is_active,
             'sector_id' => $user->sector_id,
             'sector' => $sector ? [
                 'id' => $sector->id,

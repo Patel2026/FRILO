@@ -225,6 +225,24 @@ export default function OrderDetailPage() {
               </div>
             </div>
           </div>
+
+          {order.template?.id && (paymentStatusValue === 'paid' || order.status === 'processing' || order.status === 'completed') && (
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8">
+              <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-3">Avis client</p>
+              <h2 className="text-xl font-black text-black tracking-tight mb-3">
+                Vous pouvez laisser un avis sur ce modèle.
+              </h2>
+              <p className="text-sm text-gray-500 leading-relaxed mb-5">
+                Rendez-vous sur la fiche du template acheté pour partager votre retour. Votre avis sera relu avant publication.
+              </p>
+              <Link
+                href={`/templates/${order.template.id}#template-reviews`}
+                className="sq-btn sq-btn-black text-sm py-3 px-6"
+              >
+                Donner mon avis
+              </Link>
+            </div>
+          )}
         </div>
       ) : null}
     </div>

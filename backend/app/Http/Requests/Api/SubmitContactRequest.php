@@ -21,6 +21,7 @@ class SubmitContactRequest extends FormRequest
             'order_reference' => ['nullable', 'string', 'max:32', 'regex:/^#?ORD-\d{1,10}$/i'],
             'subject' => ['required', 'string', 'max:160'],
             'message' => ['required', 'string', 'min:10', 'max:5000'],
+            'accepted_terms' => ['accepted'],
         ];
     }
 }

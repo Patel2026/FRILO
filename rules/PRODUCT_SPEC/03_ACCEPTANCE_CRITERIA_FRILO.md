@@ -1,7 +1,7 @@
 # 03 - ACCEPTANCE CRITERIA
 ## Critères d'Acceptation par Fonctionnalité — FRILO
 
-Version : 1.0
+Version : 1.1
 Format : Given / When / Then (BDD)
 Statut : VALIDÉ
 
@@ -12,7 +12,7 @@ Statut : VALIDÉ
 ### Rôles
 - **Visiteur** (anonyme)
 - **Client** (authentifié, role: client)
-- **Admin** (authentifié, role: admin, accès backoffice Laravel custom `/admin`)
+- **Super Admin** (authentifié, role: super_admin, accès backoffice Laravel custom `/admin`)
 
 ### Statuts commande
 - `pending`
@@ -207,22 +207,53 @@ FEATURE: Dashboard client
 ## 5. BACKOFFICE ADMIN
 
 ```gherkin
-FEATURE: Gestion des commandes (Admin)
+FEATURE: Gestion des commandes (Super Admin)
 
   SCENARIO: Passage commande en "processing"
     GIVEN une commande status = "pending"
-    WHEN l'admin change le statut à "processing"
+    WHEN le super_admin change le statut à "processing"
     THEN le statut est mis à jour via OrderService
     AND le client est notifié (email)
 
   SCENARIO: Commande "completed"
     GIVEN une commande status = "processing"
-    WHEN l'admin passe à "completed"
+    WHEN le super_admin passe à "completed"
     THEN le statut est figé
     AND aucune autre transition n'est possible
 
-  SCENARIO: Non-admin accède à /admin
+  SCENARIO: Non-super_admin accède à /admin
     GIVEN un client avec role = "client"
     WHEN il tente d'accéder à /admin
     THEN l'accès est refusé (403 ou redirection)
+```
+
+## 6. PARAMÈTRES PLATEFORME (Backoffice)
+
+```gherkin
+FEATURE: Paramètres versionnés (Brouillon/Test/Publication)
+
+  SCENARIO: Édition d'un brouillon
+    GIVEN un super_admin connecté
+    WHEN il modifie la section "general" via /admin/settings
+    THEN la révision courante reste en statut "draft"
+    AND les changements sont persistés
+
+  SCENARIO: Publication atomique
+    GIVEN un brouillon valide prêt à publier
+    WHEN le super_admin publie la configuration
+    THEN une seule révision passe en "published"
+    AND une nouvelle révision "draft" est créée automatiquement
+    AND l'ancienne version publiée est archivée
+
+  SCENARIO: Secrets paiement protégés
+    GIVEN une configuration paiement avec secret_key/webhook_secret
+    WHEN le super_admin consulte /admin/settings
+    THEN les secrets ne sont jamais affichés en clair
+    AND la base stocke les secrets chiffrés
+
+  SCENARIO: Publication refusée si paiement invalide
+    GIVEN un brouillon avec clé FedaPay manquante et paiement activé
+    WHEN le super_admin tente de publier
+    THEN la publication est refusée
+    AND un message explicite est affiché dans l'UI
 ```

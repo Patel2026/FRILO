@@ -19,6 +19,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active',
         'sector_id',
         'avatar',
         'fedapay_customer_id',
@@ -31,12 +32,18 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_active' => 'boolean',
         'fedapay_customer_id' => 'integer',
     ];
 
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function templateReviews(): HasMany
+    {
+        return $this->hasMany(TemplateReview::class);
     }
 
     public function sector(): BelongsTo
@@ -46,12 +53,22 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === 'super_admin';
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
     }
 
     public function isClient(): bool
     {
         return $this->role === 'client';
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
     }
 
     public function sendPasswordResetNotification($token): void

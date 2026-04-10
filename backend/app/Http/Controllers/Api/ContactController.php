@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SubmitContactRequest;
 use App\Models\ContactRequest;
+use App\Services\AdminNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ContactController extends Controller
 {
+    public function __construct(private readonly AdminNotificationService $adminNotificationService) {}
+
     public function store(SubmitContactRequest $request): JsonResponse
     {
         $payload = $request->validated();
@@ -19,12 +22,14 @@ class ContactController extends Controller
         $contactRequest = ContactRequest::create([
             ...$payload,
             'status' => ContactRequest::STATUS_NEW,
+            'accepted_terms_at' => now(),
         ]);
 
         Log::info('contact.request.created', [
             'contact_request_id' => $contactRequest->id,
             'email' => $contactRequest->email,
         ]);
+        $this->adminNotificationService->notifyContactRequestCreated($contactRequest);
 
         return response()->json([
             'id' => $contactRequest->id,

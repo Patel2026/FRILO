@@ -2,12 +2,15 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\FedapayWebhookController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderPaymentController;
+use App\Http\Controllers\Api\PublicPricingController;
 use App\Http\Controllers\Api\SectorController;
 use App\Http\Controllers\Api\TemplateController;
+use App\Http\Controllers\Api\TemplateReviewController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,14 +33,18 @@ Route::post('/contact', [ContactController::class, 'store'])->middleware('thrott
 Route::post('/payments/fedapay/webhook', [FedapayWebhookController::class, 'store'])
     ->middleware('throttle:fedapay-webhook');
 
+Route::get('/faqs', [FaqController::class, 'index']);
+Route::get('/public/pricing', [PublicPricingController::class, 'show']);
 Route::get('/sectors', [SectorController::class, 'index']);
+Route::get('/testimonials', [TemplateReviewController::class, 'testimonials']);
 Route::get('/templates', [TemplateController::class, 'index']);
 Route::get('/templates/{id}', [TemplateController::class, 'show']);
+Route::get('/templates/{id}/reviews', [TemplateReviewController::class, 'indexForTemplate']);
 
 /*
 |--- Routes authentifiées (token Bearer Sanctum) ---
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'active_user'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::put('/user', [AuthController::class, 'updateProfile']);
@@ -46,6 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/summary', [OrderController::class, 'summary']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::get('/templates/{id}/review-eligibility', [TemplateReviewController::class, 'eligibility']);
+    Route::post('/templates/{id}/reviews', [TemplateReviewController::class, 'store']);
     Route::post('/orders/{id}/payment-link', [OrderPaymentController::class, 'store'])
         ->middleware('throttle:payments');
     Route::get('/orders/{id}/payment-status', [OrderPaymentController::class, 'show']);

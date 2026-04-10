@@ -8,6 +8,7 @@ export interface ContactRequestPayload {
   order_reference?: string;
   subject: string;
   message: string;
+  accepted_terms: boolean;
 }
 
 export type ContactRequestStatus = 'new' | 'in_progress' | 'done';

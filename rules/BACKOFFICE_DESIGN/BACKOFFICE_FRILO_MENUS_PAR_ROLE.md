@@ -1,7 +1,7 @@
 # BACKOFFICE FRILO — MENUS PAR RÔLE
 ## Navigation et accès par profil
 
-Version : 1.0
+Version : 1.1
 Statut : VALIDÉ
 
 ---
@@ -10,7 +10,7 @@ Statut : VALIDÉ
 
 | Rôle | Espace | Description |
 |------|--------|-------------|
-| `admin` | `/admin` (Laravel custom) | Opérateur FRILO — accès total backoffice |
+| `super_admin` | `/admin` (Laravel custom) | Opérateur FRILO — accès total backoffice |
 | `client` | `/dashboard` (Next.js) | Client — accès à ses commandes uniquement |
 | Visiteur | Public (Next.js) | Anonyme — catalogue + tunnel commande |
 
@@ -27,6 +27,7 @@ Statut : VALIDÉ
 | **Templates** | Catalogue de templates | CRUD complet |
 | **Secteurs** | Secteurs d'activité | CRUD complet |
 | **Clients** | Liste utilisateurs clients | Voir, désactiver |
+| **Paramètres** | Configuration métier de la plateforme | Éditer brouillon, tester paiement, publier version |
 
 ### Détail par section
 
@@ -48,6 +49,12 @@ Statut : VALIDÉ
 #### Clients
 - Lecture seule (nom, email, date inscription, nb commandes)
 - Action : désactiver un compte (pas de suppression)
+
+#### Paramètres
+- Sections : Général, Branding, Paiement, Workflow/SLA, Notifications, Légal
+- Cycle opératoire : `Brouillon -> Tester -> Publier`
+- Historique versionné : restauration d'une version en brouillon
+- Secrets paiement masqués, remplacement explicite requis
 
 ---
 
@@ -88,5 +95,5 @@ Le client ne peut pas :
 
 - `auth:sanctum` middleware sur toutes les routes API mutantes
 - `OrderPolicy` : un client ne peut lire que ses propres commandes
-- Admin backoffice : vérification `role = 'admin'` (middlewares `auth` + `admin`)
+- Backoffice : vérification `role = 'super_admin'` (middlewares `auth` + `super_admin`)
 - Aucun rôle client ne peut accéder à `/admin`

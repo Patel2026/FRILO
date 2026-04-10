@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\AdminAuditLogger;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,10 @@ use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
-    public function __construct(private OrderService $orderService) {}
+    public function __construct(
+        private readonly OrderService $orderService,
+        private readonly AdminAuditLogger $auditLogger
+    ) {}
 
     public function index(Request $request)
     {
@@ -53,6 +57,7 @@ class OrderController extends Controller
         ]);
 
         $newStatus = OrderStatus::from($request->status);
+        $previousStatus = $order->status;
         $this->orderService->updateStatus($order, $newStatus);
 
         Log::info('admin.order.status.changed', [
@@ -60,6 +65,19 @@ class OrderController extends Controller
             'new_status' => $newStatus->value,
             'admin_user_id' => $request->user()->id,
         ]);
+        $this->auditLogger->record(
+            event: 'order.status.changed',
+            payload: [
+                'order_id' => $order->id,
+                'from' => $previousStatus->value,
+                'to' => $newStatus->value,
+            ],
+            actor: $request->user(),
+            message: 'Changement statut commande depuis backoffice',
+            targetType: 'order',
+            targetId: (string) $order->id,
+            request: $request
+        );
 
         return redirect()
             ->route('admin.orders.show', $order)

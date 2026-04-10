@@ -147,6 +147,85 @@
     </div>
 </div>
 
+{{-- Alertes SLA --}}
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+            <div class="card-body">
+                <p class="text-uppercase fw-medium text-muted mb-1">SLA confirmation</p>
+                <h4 class="fs-22 fw-semibold mb-1">{{ $slaAlerts['overdue_confirmation_count'] }}</h4>
+                <p class="text-muted mb-0">Commandes pending en retard (> {{ $slaAlerts['confirmation_minutes'] }} min)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+            <div class="card-body">
+                <p class="text-uppercase fw-medium text-muted mb-1">SLA livraison</p>
+                <h4 class="fs-22 fw-semibold mb-1">{{ $slaAlerts['overdue_delivery_count'] }}</h4>
+                <p class="text-muted mb-0">Commandes processing en retard (> {{ $slaAlerts['delivery_hours'] }} h)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="card-title flex-grow-1 mb-0">Alertes SLA — commandes en retard</h5>
+                <a href="{{ route('admin.orders.index') }}" class="btn btn-soft-primary btn-sm">Voir commandes</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-nowrap align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Client</th>
+                                <th>Template</th>
+                                <th>Statut</th>
+                                <th>Créée le</th>
+                                <th>Retard</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($slaOverdueOrders as $order)
+                                <tr>
+                                    <td>#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
+                                    <td>{{ $order->user->name ?? '—' }}</td>
+                                    <td>{{ $order->template->name ?? '—' }}</td>
+                                    <td><span class="badge {{ $order->status->badgeClass() }}">{{ $order->status->label() }}</span></td>
+                                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>
+                                        @if($order->status->value === 'pending')
+                                            {{ max(0, now()->diffInMinutes($order->created_at) - $slaAlerts['confirmation_minutes']) }} min
+                                        @elseif($order->status->value === 'processing')
+                                            {{ max(0, now()->diffInHours($order->created_at) - $slaAlerts['delivery_hours']) }} h
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-secondary">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">Aucune alerte SLA active.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Dernières commandes --}}
 <div class="row">
     <div class="col-12">
