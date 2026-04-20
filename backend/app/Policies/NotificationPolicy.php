@@ -15,12 +15,19 @@ class NotificationPolicy
         return true;
     }
 
-    /**
-     * Un utilisateur peut voir/marquer une notification spécifique.
-     */
-    public function update(User $user, DatabaseNotification $notification): bool
+    public function view(User $user, DatabaseNotification $notification): bool
     {
         return (string) $user->id === (string) $notification->notifiable_id
             && $notification->notifiable_type === User::class;
+    }
+
+    public function update(User $user, DatabaseNotification $notification): bool
+    {
+        return $this->view($user, $notification);
+    }
+
+    public function delete(User $user, DatabaseNotification $notification): bool
+    {
+        return $this->view($user, $notification);
     }
 }
