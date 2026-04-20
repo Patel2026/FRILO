@@ -53,9 +53,14 @@ class NotificationController extends Controller
 
     public function markAsRead(Request $request, string $id): JsonResponse
     {
-        $notification = \Illuminate\Notifications\DatabaseNotification::findOrFail($id);
+        $this->authorize('viewAny', DatabaseNotification::class);
 
-        $this->authorize('update', $notification);
+        // Scoped to the authenticated user → returns 404 if notification
+        // belongs to another user (prevents information leakage).
+        $notification = $request->user()
+            ->notifications()
+            ->whereKey($id)
+            ->firstOrFail();
 
         if (! $notification->read_at) {
             $notification->markAsRead();
