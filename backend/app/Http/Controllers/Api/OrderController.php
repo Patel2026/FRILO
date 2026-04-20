@@ -89,10 +89,11 @@ class OrderController extends Controller
 
     public function show(Request $request, int $id): JsonResponse
     {
-        $order = Order::with(['template.sector', 'instruction', 'latestPayment'])
-            ->findOrFail($id);
+        $order = Order::findOrFail($id);
 
         $this->authorize('view', $order);
+
+        $order->load(['template.sector', 'instruction', 'latestPayment']);
 
         return response()->json($this->transformOrder($order));
     }

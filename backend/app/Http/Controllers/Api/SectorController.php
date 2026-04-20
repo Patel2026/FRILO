@@ -10,6 +10,8 @@ class SectorController extends Controller
 {
     public function index(): JsonResponse
     {
+        $this->authorize('viewAny', Sector::class);
+
         $sectors = Sector::active()->orderBy('name')->get();
 
         return response()->json($sectors);

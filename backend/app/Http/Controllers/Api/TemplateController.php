@@ -11,6 +11,8 @@ class TemplateController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Template::class);
+
         $query = Template::active()->with('sector');
 
         if ($request->filled('sector_slug')) {
@@ -22,7 +24,11 @@ class TemplateController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $template = Template::active()->with('sector')->findOrFail($id);
+        $template = Template::active()->findOrFail($id);
+
+        $this->authorize('view', $template);
+
+        $template->load('sector');
 
         return response()->json($template);
     }

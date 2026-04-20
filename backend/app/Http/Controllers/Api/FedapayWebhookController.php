@@ -16,6 +16,8 @@ class FedapayWebhookController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('handleWebhook', \App\Models\PaymentTransaction::class);
+
         $payload = $request->getContent();
         $signature = $request->header('X-FEDAPAY-SIGNATURE');
 

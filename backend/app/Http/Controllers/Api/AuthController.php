@@ -170,6 +170,8 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
+        $this->authorize('view', $request->user());
+
         $user = $request->user();
         $user->loadMissing('sector');
 
@@ -178,6 +180,8 @@ class AuthController extends Controller
 
     public function updateProfile(UpdateProfileRequest $request): JsonResponse
     {
+        $this->authorize('update', $request->user());
+
         $user = $request->user();
         $validated = $request->validated();
 

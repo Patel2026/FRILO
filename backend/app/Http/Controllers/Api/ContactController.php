@@ -16,6 +16,8 @@ class ContactController extends Controller
 
     public function store(SubmitContactRequest $request): JsonResponse
     {
+        $this->authorize('create', ContactRequest::class);
+
         $payload = $request->validated();
         $payload['order_reference'] = $this->normalizeOrderReference($payload['order_reference'] ?? null);
 

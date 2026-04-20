@@ -7,9 +7,9 @@ use App\Models\User;
 
 class FaqItemPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return $user->isSuperAdmin();
+        return true;
     }
 
     public function view(User $user, FaqItem $faqItem): bool

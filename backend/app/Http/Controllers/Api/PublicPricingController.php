@@ -12,6 +12,8 @@ class PublicPricingController extends Controller
 
     public function show(): JsonResponse
     {
+        $this->authorize('viewAny', \App\Models\PlatformSettingRevision::class);
+
         $pricing = $this->platformSettingsService->getRuntimePricingConfiguration();
 
         return response()->json([

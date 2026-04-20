@@ -14,6 +14,8 @@ class FaqController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', FaqItem::class);
+
         $limit = $request->filled('limit') ? (int) $request->integer('limit') : null;
         $faqs = $this->faqItemService->publishedFaqs($limit);
 

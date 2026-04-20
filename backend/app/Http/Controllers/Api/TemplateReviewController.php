@@ -16,6 +16,8 @@ class TemplateReviewController extends Controller
 
     public function testimonials(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', TemplateReview::class);
+
         $limit = (int) $request->integer('limit', 3);
         $reviews = $this->templateReviewService->featuredTestimonials($limit);
 
@@ -24,6 +26,8 @@ class TemplateReviewController extends Controller
 
     public function indexForTemplate(int $id): JsonResponse
     {
+        $this->authorize('viewAny', TemplateReview::class);
+
         $template = Template::active()->findOrFail($id);
         $reviews = $this->templateReviewService->approvedReviewsForTemplate($template);
         $summary = $this->templateReviewService->approvedSummaryForTemplate($template);
@@ -72,7 +76,7 @@ class TemplateReviewController extends Controller
         );
 
         return response()->json([
-            'message' => 'Votre avis a bien ete enregistre. Il sera publie apres validation par notre equipe.',
+            'message' => 'Votre avis a bien été enregistré. Il sera publié après validation par notre équipe.',
             'review' => [
                 'id' => $review->id,
                 'rating' => $review->rating,

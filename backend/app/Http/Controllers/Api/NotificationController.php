@@ -12,6 +12,8 @@ class NotificationController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', \Illuminate\Notifications\DatabaseNotification::class);
+
         $perPage = (int) $request->integer('per_page', 20);
         $perPage = max(1, min($perPage, 100));
 
@@ -42,6 +44,8 @@ class NotificationController extends Controller
 
     public function unreadCount(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', \Illuminate\Notifications\DatabaseNotification::class);
+
         return response()->json([
             'unread_count' => $request->user()->unreadNotifications()->count(),
         ]);
@@ -49,10 +53,9 @@ class NotificationController extends Controller
 
     public function markAsRead(Request $request, string $id): JsonResponse
     {
-        $notification = $request->user()
-            ->notifications()
-            ->whereKey($id)
-            ->firstOrFail();
+        $notification = \Illuminate\Notifications\DatabaseNotification::findOrFail($id);
+
+        $this->authorize('update', $notification);
 
         if (! $notification->read_at) {
             $notification->markAsRead();
@@ -67,6 +70,8 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', \Illuminate\Notifications\DatabaseNotification::class);
+
         $request->user()->unreadNotifications->markAsRead();
 
         return response()->json([

@@ -19,8 +19,11 @@ class OrderPaymentController extends Controller
 
     public function store(InitiateOrderPaymentRequest $request, int $id): JsonResponse
     {
-        $order = Order::with(['latestPayment'])->findOrFail($id);
+        $order = Order::findOrFail($id);
+
         $this->authorize('view', $order);
+
+        $order->load(['latestPayment']);
 
         try {
             $result = $this->orderPaymentService->initiatePayment(
@@ -46,8 +49,11 @@ class OrderPaymentController extends Controller
 
     public function show(Request $request, int $id): JsonResponse
     {
-        $order = Order::with(['latestPayment'])->findOrFail($id);
+        $order = Order::findOrFail($id);
+
         $this->authorize('view', $order);
+
+        $order->load(['latestPayment']);
 
         $refresh = $request->boolean('refresh', false);
         if ($refresh) {
