@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, LifeBuoy, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { AuthForms } from '@/components/business/AuthForms';
@@ -138,6 +138,10 @@ function OrderTunnelContent() {
   const nextStep = () => setCurrentStep(p => Math.min(p + 1, STEPS.length));
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [currentStep]);
+
+  useEffect(() => {
     if (isAuthenticated && currentStep === 2) {
       setCurrentStep(3);
     }
@@ -259,267 +263,424 @@ function OrderTunnelContent() {
   }
 
   const price = template ? (typeof template.price === 'string' ? parseInt(template.price) : template.price) : 0;
+  const formattedPrice = price.toLocaleString('fr-FR').replace(/\u202f/g, ' ');
+  const currentStepMeta = STEPS.find(step => step.id === currentStep) ?? STEPS[0];
+  const progress = ((currentStep - 1) / (STEPS.length - 1)) * 100;
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7]">
+    <div className="min-h-screen bg-[oklch(98%_0.004_29)] text-slate-950">
+      <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/95 backdrop-blur">
+        <div className="flex h-16 items-center gap-4 px-4 md:px-6">
+          <Link
+            href={template ? `/templates/${template.id}` : '/templates'}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 transition-colors hover:text-slate-950"
+          >
+            <ArrowLeft className="h-4 w-4" /> Retour
+          </Link>
 
-      {/* Top bar */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-30 h-14 flex items-center px-6 gap-6">
-        <Link href={template ? `/templates/${template.id}` : '/templates'} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-black transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Retour
-        </Link>
-
-        {/* Steps */}
-        <div className="flex-1 flex items-center justify-center gap-2">
-          {STEPS.map((step, i) => (
-            <div key={step.id} className="flex items-center gap-2">
-              <div className={cn(
-                "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all",
-                currentStep > step.id
-                  ? "bg-black text-white"
-                  : currentStep === step.id
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-gray-400"
-              )}>
-                {currentStep > step.id ? <Check className="w-3 h-3" /> : step.id}
+          <div className="min-w-0 flex-1">
+            <div className="mx-auto max-w-xl">
+              <div className="mb-1 flex items-center justify-between text-xs font-black uppercase tracking-[0.14em]">
+                <span className="text-[oklch(57%_0.24_29)]">{currentStepMeta.name}</span>
+                <span className="text-slate-400">{currentStep}/{STEPS.length}</span>
               </div>
-              <span className={cn(
-                "text-xs font-medium hidden md:block transition-colors",
-                currentStep >= step.id ? "text-black" : "text-gray-400"
-              )}>
-                {step.name}
-              </span>
-              {i < STEPS.length - 1 && (
-                <div className={cn(
-                  "w-8 h-px mx-1",
-                  currentStep > step.id ? "bg-black" : "bg-gray-200"
-                )} />
-              )}
+              <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-slate-950 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <Link href="/" className="text-xl font-black text-black tracking-tight hidden md:block">FRILO</Link>
+          <Link href="/" className="hidden text-xl font-black tracking-tight text-slate-950 md:block">FRILO</Link>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-
-          {/* Step 1 — Récapitulatif */}
+      <main
+        className={cn(
+          'mx-auto grid max-w-7xl gap-6 px-4 py-6 md:px-6 lg:py-8',
+          currentStep <= 4 ? 'max-w-[1400px]' : 'max-w-7xl lg:grid-cols-[minmax(0,1fr)_380px]'
+        )}
+      >
+        <section
+          className={cn(
+            'bg-white p-5 md:p-8 lg:min-h-[650px]',
+            currentStep <= 4 ? 'lg:bg-transparent lg:p-0' : 'lg:rounded-[2rem] lg:border lg:border-slate-100 lg:shadow-[0_18px_60px_rgba(15,23,42,0.05)]'
+          )}
+        >
           {currentStep === 1 && (
-            <div className="p-8">
-              <p className="sq-label mb-6">Votre commande</p>
-              {template ? (
-                <div>
-                  <div className="flex items-start gap-5 p-5 border border-gray-100 rounded-xl mb-8">
-                    <div className="w-20 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
-                      {template.full_thumbnail_url && (
-                        <Image
-                          src={template.full_thumbnail_url}
-                          alt={template.name}
-                          width={80}
-                          height={64}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-black text-black">{template.name}</p>
-                      {template.sector && <p className="text-xs text-gray-400 mt-0.5">{template.sector.name}</p>}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xl font-black text-black">{price.toLocaleString('fr-FR')}</p>
-                      <p className="text-xs text-gray-400">FCFA</p>
-                    </div>
+            <div className="grid h-full gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-center">
+              <div className="max-w-2xl">
+                <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Prêt à démarrer</p>
+                <h1 className="text-4xl font-black leading-none tracking-tight text-slate-950 md:text-6xl">
+                  Vous commandez ce modèle.
+                </h1>
+                <p className="mt-5 max-w-xl text-base leading-7 text-slate-500">
+                  FRILO l’adapte ensuite à votre activité avec les informations que vous donnerez aux prochaines étapes.
+                </p>
+
+                <div className="mt-8 divide-y divide-slate-100 border-y border-slate-100 text-sm">
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Modèle choisi</span>
+                    <span className="text-right font-black text-slate-950">{template?.name ?? 'Non sélectionné'}</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-gray-500 py-4 border-t border-gray-100 mb-2">
-                    <span>Paiement unique</span>
-                    <span className="font-semibold text-black">{price.toLocaleString('fr-FR')} FCFA</span>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Prix à payer</span>
+                    <span className="text-right font-black text-slate-950">{formattedPrice} FCFA</span>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-gray-500 py-4 border-t border-gray-100">
-                    <span>Délai de livraison</span>
-                    <span className="font-semibold text-black">48h ouvrées</span>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Après validation</span>
+                    <span className="text-right font-black text-slate-950">connexion, infos, paiement</span>
                   </div>
+                </div>
+
+                {template && (
                   <button
                     onClick={handleContinueFromSummary}
-                    className="sq-btn sq-btn-black w-full justify-center mt-8"
+                    className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-sm font-black text-white transition-colors hover:bg-black lg:hidden"
                   >
-                    Continuer <ChevronRight className="w-4 h-4 ml-1" />
+                    Continuer <ChevronRight className="ml-1 h-4 w-4" />
                   </button>
-                </div>
-              ) : (
-                <div className="py-12 text-center">
-                  <p className="text-gray-500 text-sm mb-5">Aucun modèle sélectionné.</p>
-                  <Link href="/templates" className="sq-btn sq-btn-black">Voir les modèles</Link>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Step 2 — Auth */}
-          {currentStep === 2 && (
-            <div className="p-8">
-              <p className="sq-label mb-6">Connexion ou inscription</p>
-              <AuthForms onSuccess={() => nextStep()} />
-            </div>
-          )}
-
-          {/* Step 3 — Détails projet */}
-          {currentStep === 3 && (
-            <div className="p-8">
-              <p className="sq-label mb-6">Détails de votre projet</p>
-              {draftRestored && (
-                <div className="mb-5 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
-                  <p className="text-sm text-emerald-700">
-                    Un brouillon de votre commande a été restauré automatiquement.
-                  </p>
-                </div>
-              )}
-              <ProjectDetailsForm
-                initialValues={{
-                  domainName: formData.domainName ?? '',
-                  description: formData.description ?? '',
-                  colors: formData.colors ?? '',
-                  specific_instructions: formData.specific_instructions ?? '',
-                }}
-                onChange={(data) =>
-                  setFormData(prev => {
-                    const next = { ...prev, ...data };
-                    if (
-                      prev.domainName === next.domainName &&
-                      prev.description === next.description &&
-                      prev.colors === next.colors &&
-                      prev.specific_instructions === next.specific_instructions
-                    ) {
-                      return prev;
-                    }
-
-                    return next;
-                  })
-                }
-                onSuccess={(data) => {
-                  setFormData(prev => ({ ...prev, ...data }));
-                  nextStep();
-                }}
-              />
-            </div>
-          )}
-
-          {/* Step 4 — Paiement */}
-          {currentStep === 4 && (
-            <div className="p-8">
-              <p className="sq-label mb-6">Paiement sécurisé</p>
-
-              <div className="border border-gray-100 rounded-xl p-5 mb-8 space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-500">{template?.name}</span>
-                  <span className="font-semibold text-black">{price.toLocaleString('fr-FR')} FCFA</span>
-                </div>
-                <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-3">
-                  <span className="font-bold text-black">Total</span>
-                  <span className="font-black text-black text-lg">{price.toLocaleString('fr-FR')} FCFA</span>
-                </div>
-              </div>
-
-              <div className="bg-[#f7f7f7] rounded-xl p-5 mb-8 text-center">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Paiement FedaPay</p>
-                <p className="text-sm text-gray-500">
-                  Vous allez être redirigé vers la page de paiement sécurisée FedaPay
-                  (Mobile Money, carte bancaire et moyens activés sur votre compte).
-                </p>
-                {createdOrderId && (
-                  <p className="text-xs text-gray-400 mt-3">
-                    Commande préparée: #{String(createdOrderId).padStart(5, '0')}
-                  </p>
                 )}
               </div>
 
-              {paymentError && (
-                <div className="mb-5 border border-red-100 bg-red-50 rounded-xl p-4 text-center">
-                  <p className="text-red-600 text-sm">{paymentError}</p>
-                  {paymentErrorType === 'auth' && (
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep(2)}
-                      className="mt-3 text-sm font-semibold text-black underline underline-offset-2"
-                    >
-                      Revenir à l&apos;étape Connexion
-                    </button>
-                  )}
-                  {paymentErrorType === 'generic' && (
-                    <button
-                      type="button"
-                      onClick={handlePayment}
-                      className="mt-3 text-sm font-semibold text-black underline underline-offset-2"
-                    >
-                      Réessayer maintenant
-                    </button>
-                  )}
-                  <div className="mt-3">
-                    <Link href={supportHref} className="text-sm font-semibold text-black underline underline-offset-2">
-                      Contacter le support
-                    </Link>
+              {template ? (
+                <div className="hidden lg:block">
+                  <div className="overflow-hidden rounded-3xl border border-slate-100 bg-slate-100">
+                    {template.full_thumbnail_url ? (
+                      <Image
+                        src={template.full_thumbnail_url}
+                        alt={template.name}
+                        width={720}
+                        height={440}
+                        className="h-56 w-full object-cover object-top"
+                      />
+                    ) : (
+                      <div className="h-56 w-full bg-slate-100" aria-hidden="true" />
+                    )}
                   </div>
+                  <div className="mt-5 flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xl font-black text-slate-950">{template.name}</p>
+                      {template.sector && <p className="mt-1 text-sm text-slate-500">{template.sector.name}</p>}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-black text-slate-950">{formattedPrice}</p>
+                      <p className="text-xs font-semibold text-slate-400">FCFA</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleContinueFromSummary}
+                    className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-sm font-black text-white transition-colors hover:bg-black"
+                  >
+                    Continuer <ChevronRight className="ml-1 h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-[2rem] border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
+                  <p className="mb-5 text-sm text-slate-500">Aucun modèle sélectionné.</p>
+                  <Link href="/templates" className="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-black text-white">
+                    Voir les modèles
+                  </Link>
                 </div>
               )}
-
-              <button
-                onClick={handlePayment}
-                disabled={isSubmitting || redirectingToPayment}
-                className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50"
-              >
-                {isSubmitting || redirectingToPayment
-                  ? 'Redirection vers FedaPay…'
-                  : `Payer avec FedaPay — ${price.toLocaleString('fr-FR')} FCFA`}
-              </button>
             </div>
           )}
 
-          {/* Step 5 — Confirmation */}
-          {currentStep === 5 && (
-            <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-8">
-                <Check className="w-7 h-7 text-white" />
+          {currentStep === 2 && (
+            <div className="grid h-full gap-10 lg:grid-cols-[minmax(0,0.9fr)_430px] lg:items-center">
+              <div className="max-w-2xl">
+                <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Compte client</p>
+                <h1 className="text-4xl font-black leading-none tracking-tight text-slate-950 md:text-6xl">
+                  Connectez-vous pour continuer.
+                </h1>
+                <p className="mt-5 max-w-xl text-base leading-7 text-slate-500">
+                  Votre espace garde la commande, le paiement et les échanges FRILO au même endroit.
+                </p>
+
+                <div className="mt-8 divide-y divide-slate-100 border-y border-slate-100 text-sm">
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Modèle choisi</span>
+                    <span className="text-right font-black text-slate-950">{template?.name ?? 'Non sélectionné'}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Montant</span>
+                    <span className="text-right font-black text-slate-950">{formattedPrice} FCFA</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Ensuite</span>
+                    <span className="text-right font-black text-slate-950">vos informations projet</span>
+                  </div>
+                </div>
               </div>
-              <h2 className="text-3xl font-black text-black tracking-tight mb-3">
-                Commande confirmée.
-              </h2>
-              <p className="text-gray-500 text-sm mb-2">Référence</p>
-              <p className="text-2xl font-black text-black mb-6">#ORD-{orderRef}</p>
-              <p className="text-gray-500 text-sm max-w-sm mx-auto mb-10">
-                Notre équipe prend le relais. Vous recevrez un e-mail de confirmation
-                et votre site sera livré sous 48h ouvrées.
+
+              <div className="lg:w-[430px] lg:justify-self-end lg:rounded-[2rem] lg:border lg:border-slate-100 lg:bg-white lg:p-8 lg:shadow-[0_18px_60px_rgba(15,23,42,0.05)]">
+                <AuthForms onSuccess={() => nextStep()} />
+              </div>
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div className="grid h-full gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(520px,0.9fr)] lg:items-start">
+              <div className="max-w-xl lg:pt-12">
+                <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Informations utiles</p>
+                <h1 className="text-4xl font-black leading-none tracking-tight text-slate-950 md:text-6xl">
+                  Dites-nous quoi adapter.
+                </h1>
+                <p className="mt-5 text-base leading-7 text-slate-500">
+                  Trois réponses suffisent pour lancer la commande. FRILO demandera le logo, les images et les détails fins ensuite.
+                </p>
+
+                <div className="mt-8 divide-y divide-slate-100 border-y border-slate-100 text-sm">
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Votre modèle</span>
+                    <span className="text-right font-black text-slate-950">{template?.name ?? 'Non sélectionné'}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">À préparer maintenant</span>
+                    <span className="text-right font-black text-slate-950">nom, activité, préférences</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Logo et images</span>
+                    <span className="text-right font-black text-slate-950">après paiement</span>
+                  </div>
+                </div>
+
+                {draftRestored && (
+                  <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+                    <p className="text-sm text-emerald-700">Un brouillon de votre commande a été restauré automatiquement.</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="lg:rounded-[2rem] lg:border lg:border-slate-100 lg:bg-white lg:p-8 lg:shadow-[0_18px_60px_rgba(15,23,42,0.05)]">
+                <ProjectDetailsForm
+                  initialValues={{
+                    domainName: formData.domainName ?? '',
+                    description: formData.description ?? '',
+                    colors: formData.colors ?? '',
+                    specific_instructions: formData.specific_instructions ?? '',
+                  }}
+                  onChange={(data) =>
+                    setFormData(prev => {
+                      const next = { ...prev, ...data };
+                      if (
+                        prev.domainName === next.domainName &&
+                        prev.description === next.description &&
+                        prev.colors === next.colors &&
+                        prev.specific_instructions === next.specific_instructions
+                      ) {
+                        return prev;
+                      }
+
+                      return next;
+                    })
+                  }
+                  onSuccess={(data) => {
+                    setFormData(prev => ({ ...prev, ...data }));
+                    nextStep();
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div className="grid h-full gap-10 lg:grid-cols-[minmax(0,0.85fr)_470px] lg:items-center">
+              <div className="max-w-2xl">
+                <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Paiement sécurisé</p>
+                <h1 className="text-4xl font-black leading-none tracking-tight text-slate-950 md:text-6xl">
+                  Votre site peut passer en production.
+                </h1>
+                <p className="mt-5 max-w-xl text-base leading-7 text-slate-500">
+                  Le paiement valide la commande. FRILO démarre ensuite l’adaptation du modèle avec vos informations.
+                </p>
+
+                <div className="mt-8 divide-y divide-slate-100 border-y border-slate-100 text-sm">
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Montant unique</span>
+                    <span className="text-right font-black text-slate-950">{formattedPrice} FCFA</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Paiement</span>
+                    <span className="text-right font-black text-slate-950">FedaPay sécurisé</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-5 py-4">
+                    <span className="text-slate-500">Après validation</span>
+                    <span className="text-right font-black text-slate-950">production FRILO</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:w-[470px] lg:justify-self-end">
+                <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.05)] md:p-8">
+                  <div className="flex items-start justify-between gap-5">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Total à payer</p>
+                      <p className="mt-3 text-4xl font-black leading-none text-slate-950">
+                        {formattedPrice}
+                      </p>
+                      <p className="mt-1 text-sm font-black text-slate-400">FCFA</p>
+                    </div>
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
+                      <ShieldCheck className="h-5 w-5" />
+                    </div>
+                  </div>
+
+                  <div className="mt-8 rounded-3xl bg-slate-50 p-5">
+                    <p className="font-black text-slate-950">Paiement via FedaPay</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                      Vous serez redirigé vers FedaPay pour payer de façon sécurisée. Les moyens disponibles dépendent de votre compte et de votre pays.
+                    </p>
+                    {createdOrderId && (
+                      <p className="mt-3 text-xs font-semibold text-slate-400">Commande préparée : #{String(createdOrderId).padStart(5, '0')}</p>
+                    )}
+                  </div>
+
+                  {paymentError && (
+                    <div className="mt-5 rounded-2xl border border-red-100 bg-red-50 p-4 text-center">
+                      <p className="text-sm text-red-600">{paymentError}</p>
+                      {paymentErrorType === 'auth' && (
+                        <button
+                          type="button"
+                          onClick={() => setCurrentStep(2)}
+                          className="mt-3 text-sm font-black text-slate-950 underline underline-offset-4"
+                        >
+                          Revenir à l&apos;étape Connexion
+                        </button>
+                      )}
+                      {paymentErrorType === 'generic' && (
+                        <button
+                          type="button"
+                          onClick={handlePayment}
+                          className="mt-3 text-sm font-black text-slate-950 underline underline-offset-4"
+                        >
+                          Réessayer maintenant
+                        </button>
+                      )}
+                      <div className="mt-3">
+                        <Link href={supportHref} className="text-sm font-black text-slate-950 underline underline-offset-4">
+                          Contacter le support
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handlePayment}
+                    disabled={isSubmitting || redirectingToPayment}
+                    className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-sm font-black text-white transition-colors hover:bg-black disabled:opacity-50"
+                  >
+                    {isSubmitting || redirectingToPayment
+                      ? 'Redirection vers FedaPay…'
+                      : 'Payer maintenant'}
+                  </button>
+                  <p className="mt-4 text-center text-xs leading-5 text-slate-400">
+                    La commande part en production après confirmation du paiement.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 5 && (
+            <div className="mx-auto max-w-xl py-8 text-center">
+              <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-slate-950">
+                <Check className="h-7 w-7 text-white" />
+              </div>
+              <h1 className="text-3xl font-black leading-tight text-slate-950 md:text-4xl">Commande confirmée.</h1>
+              <p className="mt-5 text-sm text-slate-500">Référence</p>
+              <p className="mt-1 text-2xl font-black text-slate-950">#ORD-{orderRef}</p>
+              <p className="mx-auto mt-6 max-w-sm text-sm leading-6 text-slate-500">
+                Notre équipe prend le relais. Vous recevrez un e-mail de confirmation et votre site sera livré sous 48h ouvrées.
               </p>
-              <div className="flex items-center justify-center gap-4 flex-wrap">
-                <Link href="/dashboard/orders" className="sq-btn sq-btn-black">
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+                <Link href="/dashboard/orders" className="inline-flex items-center justify-center rounded-full bg-slate-950 px-6 py-3 text-sm font-black text-white">
                   Suivre ma commande
                 </Link>
-                <Link href="/" className="sq-btn sq-btn-outline-black">
+                <Link href="/" className="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-3 text-sm font-black text-slate-950">
                   Retour à l'accueil
                 </Link>
               </div>
             </div>
           )}
-        </div>
+        </section>
 
-        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-5">
-          <p className="sq-label mb-2">Assistance FRILO</p>
-          <p className="text-sm text-gray-500 mb-4">
-            Besoin d&apos;aide pendant votre commande ? Notre équipe vous accompagne et reprend votre demande rapidement.
-          </p>
-          <div className="flex flex-wrap items-center gap-3">
-            <Link href={supportHref} className="sq-btn sq-btn-outline-black text-sm py-2.5 px-4">
-              Contacter le support
-            </Link>
-            {isAuthenticated && (
-              <Link href="/dashboard/orders" className="text-sm font-semibold text-gray-500 hover:text-black transition-colors">
-                Voir mes commandes en cours
-              </Link>
+        <aside
+          className={cn(
+            'hidden space-y-4 lg:sticky lg:top-24 lg:block lg:self-start',
+            currentStep <= 4 && 'lg:hidden'
+          )}
+        >
+          <div className="rounded-[2rem] border border-slate-100 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.05)]">
+            <p className="mb-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">Votre sélection</p>
+            {template ? (
+              <div>
+                <div className="overflow-hidden rounded-3xl bg-slate-100">
+                  {template.full_thumbnail_url ? (
+                    <Image
+                      src={template.full_thumbnail_url}
+                      alt={template.name}
+                      width={640}
+                      height={360}
+                      className="h-40 w-full object-cover object-top"
+                    />
+                  ) : (
+                    <div className="h-40 bg-slate-100" />
+                  )}
+                </div>
+                <div className="mt-5 flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-lg font-black text-slate-950">{template.name}</p>
+                    {template.sector && <p className="mt-1 text-sm text-slate-500">{template.sector.name}</p>}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xl font-black text-slate-950">{formattedPrice}</p>
+                    <p className="text-xs font-semibold text-slate-400">FCFA</p>
+                  </div>
+                </div>
+                <div className="mt-5 grid gap-3 border-t border-slate-100 pt-5 text-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-slate-500">Paiement</span>
+                    <span className="font-black text-slate-950">unique</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-slate-500">Livraison</span>
+                    <span className="font-black text-slate-950">48h ouvrées</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">Aucun modèle sélectionné.</p>
             )}
           </div>
-        </div>
-      </div>
+
+          <div className="rounded-[2rem] border border-slate-100 bg-white p-5 shadow-[0_18px_60px_rgba(15,23,42,0.05)]">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
+                <LifeBuoy className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-black text-slate-950">Assistance FRILO</p>
+                <p className="mt-1 text-sm leading-6 text-slate-500">
+                  Une question pendant l’achat ? Notre équipe peut reprendre votre demande avec le modèle choisi.
+                </p>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <Link href={supportHref} className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2.5 text-sm font-black text-slate-950 transition-colors hover:border-slate-950">
+                    Contacter le support
+                  </Link>
+                  {isAuthenticated && (
+                    <Link href="/dashboard/orders" className="text-sm font-black text-slate-500 transition-colors hover:text-slate-950">
+                      Mes commandes
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </main>
     </div>
   );
 }

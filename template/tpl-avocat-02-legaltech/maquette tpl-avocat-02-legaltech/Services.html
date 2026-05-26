@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#424845",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#1a4c62",
+                        "surface": "#fbf9f4",
+                        "primary-container": "#87a593",
+                        "secondary-container": "#b5e3fe",
+                        "inverse-surface": "#30312e",
+                        "on-tertiary-fixed": "#1f1b11",
+                        "on-primary-fixed-variant": "#314c3e",
+                        "surface-variant": "#e4e2dd",
+                        "on-primary-container": "#203b2d",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f4",
+                        "surface-container": "#f0eee9",
+                        "surface-dim": "#dbdad5",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#cbead6",
+                        "on-surface": "#1b1c19",
+                        "on-tertiary-fixed-variant": "#4c463a",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#afcebb",
+                        "primary-fixed-dim": "#afcebb",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#38667d",
+                        "secondary-fixed": "#c1e8ff",
+                        "surface-container-high": "#eae8e3",
+                        "secondary-fixed-dim": "#9fcde7",
+                        "primary": "#496455",
+                        "tertiary": "#645e50",
+                        "on-primary": "#ffffff",
+                        "background": "#fbf9f4",
+                        "outline-variant": "#c2c8c4",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#a59d8e",
+                        "on-tertiary-container": "#3a3529",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f2f1ec",
+                        "on-primary-fixed": "#052014",
+                        "on-secondary-fixed": "#001e2b",
+                        "tertiary-fixed-dim": "#cec6b5",
+                        "tertiary-fixed": "#ebe1d0",
+                        "surface-container-highest": "#e4e2dd",
+                        "secondary": "#35647b",
+                        "on-background": "#1b1c19",
+                        "surface-tint": "#496455",
+                        "outline": "#727875",
+                        "surface-container-low": "#f5f3ee"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#fbf9f4]/70 dark:bg-[#1b1c19]/70 backdrop-blur-xl shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto font-['Plus_Jakarta_Sans'] tracking-tight">
+<div class="text-xl font-bold text-[#496455] dark:text-[#87a593]">The Sanctuary Law</div>
+<!-- Desktop Navigation -->
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300" href="#">Home</a>
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300" href="#">About</a>
+<a class="text-[#496455] dark:text-[#87a593] font-semibold border-b-2 border-[#496455]" href="#">Services</a>
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300" href="#">Contact</a>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-full font-medium scale-95 active:opacity-80 transition-transform shadow-md">
+                Book a Consultation
+            </button>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Hero Section -->
+<header class="mb-20 max-w-3xl">
+<span class="text-xs font-bold uppercase tracking-widest text-primary mb-4 block">Our Practice Areas</span>
+<h1 class="text-5xl md:text-6xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-6">
+                Legal support designed for <span class="text-primary italic">humanity</span>.
+            </h1>
+<p class="text-xl text-on-surface-variant leading-relaxed">
+                We've reimagined legal services to be approachable, transparent, and restorative. Our goal is to guide you through life's transitions with dignity and peace of mind.
+            </p>
+</header>
+<!-- Services Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Family Law -->
+<div class="md:col-span-7 group bg-surface-container-low rounded-xl p-8 md:p-12 flex flex-col justify-between transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl relative overflow-hidden">
+<div class="relative z-10">
+<div class="w-14 h-14 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-3xl" data-icon="family_history">family_history</span>
+</div>
+<h2 class="text-3xl font-bold text-primary mb-4">Family Law</h2>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-8 max-w-md">
+                        Navigating family changes requires more than just a lawyer; it needs a steady hand. We handle divorce, custody, and adoption with a focus on emotional well-being and long-term stability for everyone involved.
+                    </p>
+</div>
+<div class="flex items-center gap-4 relative z-10">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">Learn more</button>
+<button class="text-primary font-bold flex items-center gap-2 px-4 py-3 hover:bg-surface-container rounded-lg transition-colors">
+                        View FAQs <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Decorative element -->
+<div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+</div>
+<!-- Mediation -->
+<div class="md:col-span-5 bg-surface-container-highest rounded-xl p-8 flex flex-col justify-between transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl border border-transparent hover:border-outline-variant/10">
+<div>
+<div class="w-12 h-12 bg-primary-container/30 text-primary rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-2xl" data-icon="handshake">handshake</span>
+</div>
+<h2 class="text-2xl font-bold text-primary mb-3">Mediation</h2>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                        Resolution without the courtroom. We facilitate calm, productive conversations to help parties find common ground and create their own binding agreements.
+                    </p>
+</div>
+<button class="w-full bg-surface-container-lowest text-primary border border-primary/20 py-3 rounded-full font-semibold hover:bg-primary hover:text-on-primary transition-all">
+                    Inquire
+                </button>
+</div>
+<!-- Small Business Law -->
+<div class="md:col-span-5 bg-secondary-container/20 rounded-xl p-8 flex flex-col justify-between transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl border border-transparent hover:border-outline-variant/10">
+<div>
+<div class="w-12 h-12 bg-secondary text-on-secondary rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-2xl" data-icon="storefront">storefront</span>
+</div>
+<h2 class="text-2xl font-bold text-primary mb-3">Small Business Law</h2>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                        Protecting your dream from the ground up. From formation to contracts, we provide the legal foundation so you can focus on growth and community impact.
+                    </p>
+</div>
+<button class="w-full bg-secondary text-on-secondary py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">
+                    Start My Business
+                </button>
+</div>
+<!-- Real Estate -->
+<div class="md:col-span-7 bg-surface-container-low rounded-xl p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl relative overflow-hidden">
+<div class="flex-1 relative z-10">
+<div class="w-14 h-14 bg-tertiary-fixed text-on-tertiary-fixed rounded-full flex items-center justify-center mb-8">
+<span class="material-symbols-outlined text-3xl" data-icon="home_work">home_work</span>
+</div>
+<h2 class="text-3xl font-bold text-primary mb-4">Real Estate</h2>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-8">
+                        Whether it's your first home or your tenth investment, we ensure your transitions are seamless. We review contracts, handle closings, and resolve title issues with meticulous care.
+                    </p>
+<button class="bg-primary-container text-on-primary-container px-8 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">Learn more</button>
+</div>
+<div class="flex-1 w-full h-64 rounded-xl overflow-hidden shadow-inner">
+<img alt="Modern architecture" class="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700" data-alt="Modern architectural detail of a sunlit building corner with clean lines and soft shadows on white stone" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC6MoFxBSDUCOQhuOSGYKFyBigl83EgiEKE67ztkRfbRQilbrXuB9nbfpYQBodCG1cjRZNup-pShXjWOsijRSZE4lI_LRrKF0t9S2brlzCpa1EeYMBpG0QlE6EljFqWXQD7MedVWlpF-epVwrhwghHfV2ja5nWeO5sqXe8iZ-dJVtYXLjUj6PuL3rw5pWC-tTK1cuLYJPdGv0QJStNCscGk5JPre9SaB-Z3-hbzJWqnL4YAASQmubZuvnd7Jn362LQx7DZ5FYWu3Fi"/>
+</div>
+</div>
+</div>
+<!-- Call to Action -->
+<section class="mt-24 bg-primary rounded-xl p-12 md:p-20 text-center relative overflow-hidden">
+<div class="relative z-10 max-w-2xl mx-auto">
+<h2 class="text-4xl md:text-5xl font-bold text-on-primary mb-6 tracking-tight">Ready to find your sanctuary?</h2>
+<p class="text-primary-fixed text-xl mb-10 opacity-90">
+                    Our initial consultations are designed to provide clarity and a path forward, not a sales pitch. Let's talk about your needs.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-surface text-primary px-10 py-4 rounded-full font-bold text-lg hover:bg-surface-container transition-colors shadow-lg">
+                        Schedule a Call
+                    </button>
+<button class="bg-transparent border-2 border-primary-fixed text-primary-fixed px-10 py-4 rounded-full font-bold text-lg hover:bg-primary-container/20 transition-colors">
+                        Send a Message
+                    </button>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="absolute bottom-0 right-0 w-96 h-96 bg-primary-container/20 rounded-full blur-[100px] -mb-48 -mr-48"></div>
+<div class="absolute top-0 left-0 w-64 h-64 bg-secondary/10 rounded-full blur-[80px] -mt-32 -ml-32"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#fbf9f4] dark:bg-[#1b1c19] w-full rounded-t-[3rem] mt-12 border-t border-outline-variant/10">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-16 w-full max-w-7xl mx-auto">
+<div class="mb-8 md:mb-0">
+<div class="text-lg font-bold text-[#496455] dark:text-[#87a593] mb-4">The Sanctuary Law</div>
+<p class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4]">
+                    © 2024 The Human Legal Practice. All rights reserved.
+                </p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">Privacy Policy</a>
+<a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">Terms of Service</a>
+<a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">LinkedIn</a>
+<a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">Instagram</a>
+</div>
+</div>
+</footer>
+</body></html>

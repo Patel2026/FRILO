@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mon Parcours | Sacha Coach</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="tailwind-config.js"></script>
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body class="bg-surface text-slate-800 antialiased selection:bg-accent selection:text-white flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-primary/5 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-serif font-bold text-xl">S</div>
+                <span class="font-serif font-bold text-2xl text-primary tracking-tight">Sacha.</span>
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Accueil</a>
+                <a href="about.html" class="text-primary font-medium text-sm tracking-wide">Mon Parcours</a>
+                <a href="services.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Coaching</a>
+                <a href="contact.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Contact</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4">
+                <a href="contact.html" class="btn-primary px-6 py-2.5 text-sm tracking-wide shadow-soft hover:shadow-soft-hover">
+                    Séance Découverte
+                </a>
+            </div>
+
+            <button class="md:hidden text-primary">
+                <span class="material-symbols-outlined text-3xl">menu</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-32 pb-24">
+        <!-- 1. En-tête douce -->
+        <section class="max-w-4xl mx-auto px-6 text-center mb-20 animate-fade-in">
+            <span class="inline-block py-1 px-4 rounded-full bg-accent/10 text-xs font-semibold text-accent uppercase tracking-widest mb-6">Plaisir de vous rencontrer</span>
+            <h1 class="text-5xl md:text-6xl font-serif font-bold text-primary mb-6 leading-tight">Moi aussi, je croyais <br><span class="italic font-light">que le burn-out n'arrivait qu'aux autres.</span></h1>
+        </section>
+
+        <!-- 2. L'histoire (Layout asymétrique) -->
+        <section class="max-w-7xl mx-auto px-6 mb-32">
+            <div class="grid md:grid-cols-2 gap-16 items-start">
+                <div class="sticky top-32">
+                    <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&w=800&q=80" alt="Sacha" class="w-full aspect-[4/5] object-cover rounded-[3rem] shadow-soft bg-slate-100">
+                    <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-3xl shadow-soft border border-slate-100 text-center animate-float">
+                        <span class="block text-4xl font-serif font-bold text-primary">2018</span>
+                        <span class="text-xs uppercase tracking-widest text-slate-400 font-bold">L'année du déclic</span>
+                    </div>
+                </div>
+                
+                <div class="prose prose-lg text-slate-600 font-light leading-relaxed prose-headings:font-serif prose-headings:text-primary">
+                    <h2 class="text-3xl font-bold mb-6">Le masque du "cadre parfait"</h2>
+                    <p class="mb-6">Il y a quelques années, j'occupais un poste de direction convoité dans une belle entreprise de la place, à Cotonou. Sur le papier, j'étais la fierté de ma famille. J'avais les revenus, le statut, les responsabilités.</p>
+                    <p class="mb-6">Mais la vérité était tout autre : je dormais 4 heures par nuit, je répondais aux emails pendant les repas de famille, et j'avais une boule au ventre permanente chaque dimanche soir.</p>
+                    
+                    <h2 class="text-3xl font-bold mb-6 mt-12">Le point de rupture</h2>
+                    <p class="mb-6">La pression sociétale au Bénin pousse souvent à "tenir bon" coûte que coûte. Mais le corps finit toujours par parler. Mon point de rupture est arrivé sous la forme d'un épuisement total lors d'une simple réunion de routine.</p>
+                    <p class="mb-6">J'ai compris à ce moment-là que je gravissais une échelle qui n'était pas appuyée sur le bon mur.</p>
+                    
+                    <h2 class="text-3xl font-bold mb-6 mt-12">La renaissance par le coaching</h2>
+                    <p class="mb-6">J'ai tout mis en pause et investi dans un coach professionnel. C'est là que j'ai découvert la puissance de la démarche introspective : ce n'était pas un psychologue qui remuait le passé, mais un partenaire qui me forçait à assumer mes vrais objectifs d'avenir.</p>
+                    <p class="mb-6">Cette transformation m'a inspiré. J'ai quitté mon poste, je me suis formé, et j'ai été certifié par l'International Coaching Federation (ICF).</p>
+                    <p class="mb-8 font-medium text-primary text-xl mt-8">Aujourd'hui, ma mission est simple : empêcher d'autres leaders de s'éteindre à petit feu.</p>
+                    
+                    <p class="signature text-4xl mb-12">Sacha</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Mes Croyances / Méthodologie -->
+        <section class="max-w-7xl mx-auto px-6 py-24 bg-gradient-primary rounded-[4rem] text-white my-10 relative overflow-hidden shadow-2xl">
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+            
+            <div class="relative z-10 text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-4xl font-serif font-bold mb-6">Mon Approche de Coaching</h2>
+                <p class="text-white/80 font-light text-lg">Je ne vous donnerai pas de conseils magiques. Le coaching est l'art de poser les questions qui vous forceront à trouver vos propres réponses.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 relative z-10">
+                <div class="bg-white/10 p-8 rounded-3xl border border-white/10 backdrop-blur-sm text-center">
+                    <span class="material-symbols-outlined text-accent text-5xl mb-4">gpp_maybe</span>
+                    <h3 class="text-xl font-serif font-bold mb-2">Zéro Jugement</h3>
+                    <p class="text-white/70 text-sm font-light leading-relaxed">Cet espace est sanctuarisé. Vos peurs, croyances et doutes y sont accueillis avec une stricte confidentialité.</p>
+                </div>
+                <div class="bg-white/10 p-8 rounded-3xl border border-white/10 backdrop-blur-sm text-center">
+                    <span class="material-symbols-outlined text-accent text-5xl mb-4">route</span>
+                    <h3 class="text-xl font-serif font-bold mb-2">Orienté Solutions</h3>
+                    <p class="text-white/70 text-sm font-light leading-relaxed">Nous n'analysons pas éternellement le passé. Nous débloquons le présent pour construire un futur clair.</p>
+                </div>
+                <div class="bg-white/10 p-8 rounded-3xl border border-white/10 backdrop-blur-sm text-center">
+                    <span class="material-symbols-outlined text-accent text-5xl mb-4">balance</span>
+                    <h3 class="text-xl font-serif font-bold mb-2">Ancrage Culturel</h3>
+                    <p class="text-white/70 text-sm font-light leading-relaxed">J'intègre les réalités de la pression familiale et sociale ouest-africaine dans le processus de libération.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Personnalisé (Minimisé) -->
+    <footer class="bg-white py-12 border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-slate-500 font-light">
+            <span class="font-serif font-bold text-2xl text-primary tracking-tight mb-4 block">Sacha.</span>
+            <div class="flex justify-center gap-6 mb-6">
+                <a href="about.html" class="hover:text-accent transition-colors font-medium">Mon Parcours</a>
+                <a href="services.html" class="hover:text-accent transition-colors font-medium">Programmes</a>
+                <a href="contact.html" class="hover:text-accent transition-colors font-medium">Contact</a>
+            </div>
+            <p>&copy; 2026 Sacha Coaching. Tous droits réservés.</p>
+        </div>
+    </footer>
+</body>
+</html>

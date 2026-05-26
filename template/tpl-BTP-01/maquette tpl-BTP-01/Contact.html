@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@700;800;900&amp;family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-secondary-fixed-variant": "#6e3900",
+                  "on-error": "#ffffff",
+                  "on-primary-fixed": "#101b30",
+                  "tertiary-fixed-dim": "#b2c8e7",
+                  "secondary-container": "#fd8b00",
+                  "on-error-container": "#93000a",
+                  "error": "#ba1a1a",
+                  "tertiary": "#001225",
+                  "on-surface": "#101b30",
+                  "outline-variant": "#c5c6cd",
+                  "inverse-surface": "#263046",
+                  "primary-fixed": "#d7e2ff",
+                  "on-primary-container": "#828da7",
+                  "inverse-primary": "#bbc6e2",
+                  "inverse-on-surface": "#edf0ff",
+                  "on-tertiary-fixed-variant": "#334861",
+                  "secondary": "#904d00",
+                  "on-background": "#101b30",
+                  "primary-container": "#1b263b",
+                  "tertiary-fixed": "#d1e4ff",
+                  "surface-tint": "#545e76",
+                  "surface-dim": "#cfdaf6",
+                  "error-container": "#ffdad6",
+                  "secondary-fixed": "#ffdcc3",
+                  "background": "#f9f9ff",
+                  "primary-fixed-dim": "#bbc6e2",
+                  "on-primary-fixed-variant": "#3c475d",
+                  "on-tertiary-container": "#798fab",
+                  "surface": "#f9f9ff",
+                  "surface-container-low": "#f1f3ff",
+                  "on-surface-variant": "#45474d",
+                  "on-tertiary": "#ffffff",
+                  "secondary-fixed-dim": "#ffb77d",
+                  "surface-container": "#e8edff",
+                  "on-primary": "#ffffff",
+                  "surface-bright": "#f9f9ff",
+                  "tertiary-container": "#0f273f",
+                  "surface-container-highest": "#d7e2ff",
+                  "surface-container-high": "#e0e8ff",
+                  "outline": "#75777d",
+                  "surface-variant": "#d7e2ff",
+                  "on-secondary": "#ffffff",
+                  "surface-container-lowest": "#ffffff",
+                  "on-secondary-fixed": "#2f1500",
+                  "on-tertiary-fixed": "#031d34",
+                  "on-secondary-container": "#603100",
+                  "primary": "#051125"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0px",
+                  "lg": "0px",
+                  "xl": "0px",
+                  "full": "9999px"
+          },
+          "fontFamily": {
+                  "headline": ["Work Sans"],
+                  "body": ["Public Sans"],
+                  "label": ["Public Sans"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .tonal-shift { background-color: #f1f3ff; }
+    .mechanical-hover:hover { transform: translate(-4px, -4px); }
+    .shadow-block { box-shadow: 4px 4px 0px #d7e2ff; }
+    .button-active-shadow:active { transform: translate(0px, 0px); box-shadow: 0px 0px 0px transparent; }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar Navigation Shell -->
+<header class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-['Work_Sans'] font-bold uppercase tracking-tighter rounded-none w-full top-0 sticky z-50 tonal-shift flat no shadows">
+<nav class="flex justify-between items-center px-6 md:px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter">STRUCTUR</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150 mechanical snapping hover:translate-y-[-2px]" href="#">Home</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150 mechanical snapping hover:translate-y-[-2px]" href="#">About</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150 mechanical snapping hover:translate-y-[-2px]" href="#">Services</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150 mechanical snapping hover:translate-y-[-2px]" href="#">Projects</a>
+<a class="text-orange-600 dark:text-orange-500 border-b-4 border-orange-600 dark:border-orange-500 pb-1 hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150 mechanical snapping hover:translate-y-[-2px]" href="#">Contact</a>
+</div>
+<button class="bg-secondary-container text-on-primary px-6 py-2 font-bold hover:translate-y-[-2px] transition-all duration-150">
+        Request Quote
+      </button>
+</nav>
+</header>
+<main>
+<!-- Hero Section: Brutalist Impact -->
+<section class="relative bg-primary-container py-24 md:py-32 px-6 md:px-12 overflow-hidden">
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<img class="w-full h-full object-cover grayscale" data-alt="high-contrast architectural photography of raw concrete and steel beams with sharp geometric shadows and industrial textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiWKQVw-7U1Kx-9wIKB6cT-58a_t5ISoScUUUo9iFNhpCLxHm5YqLG9hqghpnWKtGevqhKRudzNSBuPrNvVMR83p8rZzak83jranraWQvBH60I7CskTbOZlzJUr2NAKT9V3O__f8TphY6amfiAK_PWneQ8ezR1KdKMTPVi08QuswRg0rX8cAz1CI7J_WIwhy4-C9f3R92x2N_8e4tSxleZ3wpT49CSoO1y7SuJkocFgTYQhNqYEuHJGv8xZyx-LtxszkOmJ7ro2uM"/>
+</div>
+<div class="relative z-10 max-w-5xl">
+<p class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-secondary-fixed mb-4">Contact Our Technical Team</p>
+<h1 class="font-headline text-5xl md:text-7xl font-black text-on-primary tracking-tighter leading-none mb-8">
+          LET'S BUILD THE <br/> <span class="text-secondary-container">FUTURE OF STRUCTURE.</span>
+</h1>
+<p class="max-w-2xl text-primary-fixed text-lg leading-relaxed">
+          From complex industrial frameworks to minimalist brutalist residences, our engineering team is ready to translate your blueprint into reality.
+        </p>
+</div>
+</section>
+<!-- Contact Grid: Bento Style -->
+<section class="px-6 md:px-12 py-20 bg-surface grid grid-cols-1 lg:grid-cols-12 gap-0">
+<!-- Contact Info Sidebar -->
+<div class="lg:col-span-4 bg-surface-container-low p-12 flex flex-col justify-between">
+<div>
+<h2 class="font-headline text-3xl font-bold tracking-tight mb-12">OFFICE LOCATIONS</h2>
+<div class="space-y-12">
+<div>
+<p class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-2">Main Headquarters</p>
+<address class="not-italic text-xl font-medium leading-tight">
+                1200 Industrial Plz, Ste 400<br/>
+                Chicago, IL 60601
+              </address>
+</div>
+<div>
+<p class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-2">Direct Communications</p>
+<div class="space-y-2">
+<a class="block text-xl font-bold hover:text-secondary transition-colors" href="tel:+13125550192">+1 (312) 555-0192</a>
+<a class="block text-xl font-bold hover:text-secondary transition-colors" href="mailto:info@structur.build">info@structur.build</a>
+</div>
+</div>
+<div>
+<p class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-4">Networks</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 bg-primary flex items-center justify-center text-on-primary hover:bg-secondary-container transition-colors" href="#">
+<span class="material-symbols-outlined">share</span>
+</a>
+<a class="w-10 h-10 bg-primary flex items-center justify-center text-on-primary hover:bg-secondary-container transition-colors" href="#">
+<span class="material-symbols-outlined">architecture</span>
+</a>
+<a class="w-10 h-10 bg-primary flex items-center justify-center text-on-primary hover:bg-secondary-container transition-colors" href="#">
+<span class="material-symbols-outlined">link</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-20 pt-8 border-t border-outline-variant/20">
+<p class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-4">Availability</p>
+<p class="text-sm">Mon — Fri: 08:00 - 18:00 CST</p>
+<p class="text-sm">Emergency Support: 24/7 For Active Sites</p>
+</div>
+</div>
+<!-- Quote Request Form -->
+<div class="lg:col-span-8 bg-surface-container-lowest p-8 md:p-16">
+<div class="max-w-2xl">
+<h2 class="font-headline text-3xl font-bold tracking-tight mb-4">REQUEST A QUOTE</h2>
+<p class="text-on-surface-variant mb-12">Submit your project parameters and our structural engineers will review your requirements within 48 business hours.</p>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+<div class="col-span-1">
+<label class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-1 block" for="name">Full Name</label>
+<input class="w-full bg-transparent border-b-2 border-outline focus:border-secondary focus:ring-0 px-0 py-2 outline-none transition-all placeholder:text-outline-variant" id="name" name="name" placeholder="Johnathan Doe" type="text"/>
+</div>
+<div class="col-span-1">
+<label class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-1 block" for="email">Corporate Email</label>
+<input class="w-full bg-transparent border-b-2 border-outline focus:border-secondary focus:ring-0 px-0 py-2 outline-none transition-all placeholder:text-outline-variant" id="email" name="email" placeholder="doe@company.com" type="email"/>
+</div>
+<div class="col-span-2">
+<label class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-1 block" for="project_type">Project Type</label>
+<select class="w-full bg-transparent border-b-2 border-outline focus:border-secondary focus:ring-0 px-0 py-2 outline-none transition-all appearance-none" id="project_type" name="project_type">
+<option value="industrial">Industrial Infrastructure</option>
+<option value="commercial">High-Rise Commercial</option>
+<option value="residential">Bespoke Brutalist Residential</option>
+<option value="consulting">Structural Consulting</option>
+</select>
+</div>
+<div class="col-span-2">
+<label class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-outline mb-1 block" for="message">Project Scope &amp; Details</label>
+<textarea class="w-full bg-transparent border-b-2 border-outline focus:border-secondary focus:ring-0 px-0 py-2 outline-none transition-all placeholder:text-outline-variant" id="message" name="message" placeholder="Describe the site location, square footage, and key structural requirements..." rows="4"></textarea>
+</div>
+<div class="col-span-2 pt-6">
+<button class="relative bg-primary text-on-primary px-12 py-5 font-black uppercase tracking-wider text-sm mechanical-hover shadow-block transition-all active:translate-x-0 active:translate-y-0 active:shadow-none w-full md:w-auto" type="submit">
+                Transmit Quote Request
+              </button>
+</div>
+</form>
+</div>
+</div>
+</section>
+<!-- Map Section -->
+<section class="w-full h-[500px] bg-surface-container-high relative">
+<div class="absolute inset-0 bg-slate-200">
+<img class="w-full h-full object-cover" data-alt="dark-themed minimalist vector map of Chicago downtown area with bold street lines and custom map markers" data-location="Chicago" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1611hhGC3GisAMJbrqrwBLSIUlzMPcsagOITLjHV5233Q2DLdXkg0mYXq0O1XdYqYljmPY6lN4hpYj1G5Wm5MAYvYgDWIDljY6NLZWchcJOI4YMaQ60AGKPTwv53UippiL1ChBtAXC9mgCAu_zIMgTiuig3XS9TljiUeFF9D9PGObAq2N0B5XZJYtP59Ke0a7YQb_IX4kIEFYOQw5hkl6g-Q_UwtZqK5J8I2xSKvW67rSnAX5AskOSLaA0-_qcFnWueHAo-9wiK8"/>
+<!-- Floating Map Overlay -->
+<div class="absolute bottom-12 left-6 md:left-12 bg-primary p-8 text-on-primary max-w-sm hidden md:block">
+<p class="font-label text-[0.6875rem] uppercase tracking-[0.1em] mb-2 opacity-70">Project HQ</p>
+<h3 class="text-xl font-bold mb-4">VISIT THE STUDIO</h3>
+<p class="text-sm opacity-90 leading-relaxed">Our studio is open for scheduled consultations and blueprint reviews. Please contact us via the form above to book a session with a Lead Engineer.</p>
+<div class="mt-6 flex items-center text-secondary-container font-bold text-sm">
+<span class="material-symbols-outlined mr-2">directions</span>
+            GET DIRECTIONS
+          </div>
+</div>
+</div>
+</section>
+<!-- Project Progress/Status Chips Section (Example of Design System Status Chip) -->
+<section class="bg-surface-container-low py-12 px-6 md:px-12 flex flex-wrap items-center gap-8 justify-center border-t border-outline-variant/10">
+<p class="font-label text-[0.6875rem] uppercase tracking-[0.2em] font-bold">Live Site Status:</p>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed font-label text-[0.625rem] font-bold uppercase tracking-widest">Active: Chicago Terminal 2</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-primary-container text-on-primary-container font-label text-[0.625rem] font-bold uppercase tracking-widest">Completed: Nexus Tower</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed font-label text-[0.625rem] font-bold uppercase tracking-widest">Active: Marina Bridge</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-['Public_Sans'] text-[0.6875rem] uppercase tracking-[0.1em] rounded-none border-t-0 tonal-stacking-low flat no shadows grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 w-full">
+<div class="md:col-span-1">
+<div class="text-xl font-black text-slate-900 dark:text-slate-50 mb-6">STRUCTUR</div>
+<p class="normal-case leading-relaxed text-slate-500 max-w-[200px]">Architectural brutalism and heavy engineering for the modern landscape.</p>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-6">Navigation</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Sitemap</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Careers</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">LinkedIn</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-6">Compliance</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Safety Protocols</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-6">Newsletter</h4>
+<div class="flex border-b-2 border-slate-300 dark:border-slate-700 pb-2">
+<input class="bg-transparent border-none focus:ring-0 text-[0.6875rem] w-full p-0" placeholder="EMAIL ADDRESS" type="email"/>
+<button class="material-symbols-outlined text-slate-400">arrow_forward</button>
+</div>
+<p class="mt-8 text-slate-400 font-medium">© 2024 STRUCTUR ARCHITECTURAL BRUTALISM. ALL RIGHTS RESERVED.</p>
+</div>
+</footer>
+</body></html>

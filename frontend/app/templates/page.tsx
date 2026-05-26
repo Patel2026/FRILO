@@ -230,24 +230,45 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen bg-white pb-28 lg:pb-0">
-      <div className="pt-32 pb-16 sq-container text-center">
-        <p className="sq-label mb-4">Catalogue</p>
-        <h1 className="sq-display text-black mb-6">Nos modèles.</h1>
-        <p className="text-gray-500 text-lg max-w-xl mx-auto">
-          Filtrez, comparez et trouvez rapidement le modèle qui convertit pour votre activité.
-        </p>
+      <div className="bg-black px-5 pb-14 pt-32 text-white md:pb-16 md:pt-36">
+        <div className="mx-auto grid max-w-7xl gap-10 sm:px-6 lg:grid-cols-[1fr_0.72fr] lg:items-end lg:px-8">
+          <div>
+            <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Modèles FRILO</p>
+            <h1 className="max-w-4xl text-4xl font-black leading-[0.98] md:text-5xl lg:text-6xl">
+              Choisissez l’image que votre entreprise va donner.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/65 md:text-lg">
+              Parcourez des vitrines prêtes à adapter à votre métier. Le prix est visible, l’aperçu est concret, la commande reste simple.
+            </p>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 md:p-6">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">Comment choisir</p>
+            <div className="mt-5 space-y-4">
+              <div>
+                <p className="text-sm font-black text-white">Regardez d’abord l’image perçue.</p>
+                <p className="mt-1 text-sm leading-6 text-white/55">Le bon modèle doit rassurer votre client avant même le premier message.</p>
+              </div>
+              <div className="h-px bg-white/10" />
+              <div>
+                <p className="text-sm font-black text-white">Puis vérifiez le contenu.</p>
+                <p className="mt-1 text-sm leading-6 text-white/55">Services, preuves, contact et présentation doivent pouvoir parler pour vous.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="border-y border-gray-100 sticky top-16 bg-white z-30">
-        <div className="sq-container">
-          <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide -mb-px">
+      <div className="sticky top-16 z-30 border-b border-slate-100 bg-white/95 backdrop-blur">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 overflow-x-auto py-3 scrollbar-hide">
             <button
               onClick={() => setActiveSlug(null)}
               className={cn(
-                'text-sm font-medium px-5 py-4 whitespace-nowrap border-b-2 transition-colors',
+                'whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition-colors',
                 activeSlug === null
-                  ? 'border-black text-black'
-                  : 'border-transparent text-gray-400 hover:text-black'
+                  ? 'bg-black text-white'
+                  : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-950'
               )}
             >
               Tous
@@ -257,10 +278,10 @@ export default function TemplatesPage() {
                 key={sector.slug}
                 onClick={() => setActiveSlug(sector.slug)}
                 className={cn(
-                  'text-sm font-medium px-5 py-4 whitespace-nowrap border-b-2 transition-colors',
+                  'whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition-colors',
                   activeSlug === sector.slug
-                    ? 'border-black text-black'
-                    : 'border-transparent text-gray-400 hover:text-black'
+                    ? 'bg-black text-white'
+                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-950'
                 )}
               >
                 {sector.name}
@@ -270,8 +291,24 @@ export default function TemplatesPage() {
         </div>
       </div>
 
-      <div className="sq-container py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_220px_220px_auto_auto] gap-3">
+      <div className="px-5 py-10 md:py-12">
+        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Sélection</p>
+              <h2 className="mt-3 text-3xl font-black leading-tight text-slate-950 md:text-4xl">
+                Trouvez une base qui ressemble déjà à une vraie entreprise.
+              </h2>
+            </div>
+            {!loading && !error && (
+              <p className="max-w-sm text-sm leading-6 text-slate-500">
+                {visibleTemplates.length} modèle{visibleTemplates.length > 1 ? 's' : ''} affiché{visibleTemplates.length > 1 ? 's' : ''}
+                {normalizedSearch ? ` pour “${searchTerm.trim()}”` : ''}.
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 rounded-[1.35rem] border border-slate-100 bg-slate-50 p-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_220px_220px_auto_auto]">
           <label htmlFor="templates-search" className="block">
             <span className="sr-only">Rechercher un modèle</span>
             <div className="relative">
@@ -281,8 +318,8 @@ export default function TemplatesPage() {
                 type="text"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Rechercher par nom, secteur ou fonctionnalité"
-                className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-3 text-sm text-black outline-none focus:border-black"
+                placeholder="Rechercher un modèle"
+                className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-black outline-none transition-colors focus:border-black"
               />
             </div>
           </label>
@@ -293,7 +330,7 @@ export default function TemplatesPage() {
               id="templates-sort"
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value as TemplateSort)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-black outline-none focus:border-black"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
             >
               <option value="featured">Tri recommandé</option>
               <option value="price_asc">Prix croissant</option>
@@ -309,7 +346,7 @@ export default function TemplatesPage() {
               id="templates-price-filter"
               value={priceFilter}
               onChange={(event) => setPriceFilter(event.target.value as TemplatePriceFilter)}
-              className="w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-black outline-none focus:border-black"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
             >
               <option value="all">Tous les budgets</option>
               <option value="budget">Budget {budgetThresholdLabel}</option>
@@ -321,10 +358,10 @@ export default function TemplatesPage() {
             type="button"
             onClick={() => setShowFavoritesOnly((prev) => !prev)}
             className={cn(
-              'inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors',
+              'inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-black transition-colors',
               showFavoritesOnly
                 ? 'border-black bg-black text-white'
-                : 'border-gray-200 bg-white text-gray-600 hover:text-black hover:border-black'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-black hover:text-black'
             )}
           >
             <Star className={cn('w-4 h-4', showFavoritesOnly ? 'fill-white' : '')} />
@@ -335,27 +372,21 @@ export default function TemplatesPage() {
             type="button"
             onClick={resetFilters}
             disabled={!hasActiveFilters}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-600 transition-colors enabled:hover:text-black enabled:hover:border-black disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-600 transition-colors enabled:hover:border-black enabled:hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
           >
             <X className="w-4 h-4" />
             Réinitialiser
           </button>
         </div>
-
-        {!loading && !error && (
-          <p className="mt-3 text-sm text-gray-500">
-            {visibleTemplates.length} modèle{visibleTemplates.length > 1 ? 's' : ''} trouvé{visibleTemplates.length > 1 ? 's' : ''}
-            {normalizedSearch ? ` pour “${searchTerm.trim()}”` : ''}.
-          </p>
-        )}
+        </div>
       </div>
 
-      <div className="pt-4 pb-14 md:pb-16">
-        <div className="sq-container">
+      <div className="px-5 pb-14 md:pb-16">
+        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {[...Array(8)].map((_, index) => (
-                <div key={index} className="aspect-[3/2] bg-gray-100 rounded animate-pulse" />
+                <div key={index} className="aspect-[3/2] animate-pulse rounded-2xl bg-slate-100" />
               ))}
             </div>
           ) : error ? (
@@ -363,7 +394,7 @@ export default function TemplatesPage() {
               <p className="text-sm text-amber-800">{error}</p>
             </div>
           ) : visibleTemplates.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {visibleTemplates.map((template) => (
                 <TemplateCard
                   key={template.id}
@@ -407,11 +438,18 @@ export default function TemplatesPage() {
         </div>
       </div>
 
-      <div className="border-t border-gray-100 py-20 text-center">
-        <p className="text-gray-500 text-sm mb-4">Vous ne trouvez pas ce que vous cherchez ?</p>
-        <Link href="/contact" className="sq-btn sq-btn-black inline-flex">
-          Parler à un expert
-        </Link>
+      <div className="px-5 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[1.5rem] bg-black p-6 text-white sm:px-8 md:flex md:items-center md:justify-between md:gap-8 lg:px-10">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Besoin d’un avis ?</p>
+            <p className="mt-2 max-w-2xl text-2xl font-black leading-tight">
+              Dites-nous votre activité, on vous oriente vers le modèle le plus crédible.
+            </p>
+          </div>
+          <Link href="/contact" className="mt-6 inline-flex shrink-0 items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-black text-slate-950 md:mt-0">
+            Parler à un expert
+          </Link>
+        </div>
       </div>
 
       {comparedTemplates.length > 0 && (

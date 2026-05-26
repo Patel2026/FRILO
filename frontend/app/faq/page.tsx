@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { ArrowRight, Plus } from 'lucide-react';
 import { businessService, FaqItem } from '@/services/business.service';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +18,7 @@ export default function FAQPage() {
         setError(null);
         const data = await businessService.getFaqs();
         setFaqs(data);
+        setOpen(data[0]?.id ?? null);
       } catch {
         setFaqs([]);
         setError("Impossible de charger la FAQ pour le moment.");
@@ -31,25 +32,50 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <div className="bg-[oklch(7%_0.006_29)] px-5 pb-14 pt-32 text-white md:pb-16 md:pt-36">
+        <div className="mx-auto grid max-w-7xl gap-10 sm:px-6 lg:grid-cols-[1fr_0.72fr] lg:items-end lg:px-8">
+          <div>
+            <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Questions</p>
+            <h1 className="max-w-4xl text-4xl font-black leading-[0.98] md:text-5xl lg:text-6xl">
+              Avant de commander, tout doit être clair.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/65 md:text-lg">
+              Les réponses importantes sur le prix, la livraison, la propriété du site et l’accompagnement FRILO.
+            </p>
+          </div>
 
-      {/* Hero */}
-      <div className="sq-section bg-black text-white">
-        <div className="sq-container text-center">
-          <p className="sq-label text-gray-500 mb-5">FAQ</p>
-          <h1 className="sq-display text-white mb-6">Questions<br />fréquentes.</h1>
-          <p className="text-gray-400 text-xl max-w-lg mx-auto">
-            Tout ce que vous devez savoir sur FRILO, nos modèles et notre processus.
-          </p>
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 md:p-6">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">À retenir</p>
+            <p className="mt-3 text-xl font-black leading-tight">
+              Vous choisissez un modèle. FRILO l’adapte à votre activité et vous accompagne jusqu’à la mise en ligne.
+            </p>
+            <Link
+              href="/templates"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950"
+            >
+              Voir les modèles <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* FAQ list */}
-      <div className="sq-section">
-        <div className="sq-container max-w-3xl">
+      <div className="px-5 py-12 md:py-16">
+        <div className="mx-auto grid max-w-7xl gap-10 sm:px-6 lg:grid-cols-[0.46fr_0.54fr] lg:px-8">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Réponses utiles</p>
+            <h2 className="mt-3 max-w-xl text-3xl font-black leading-tight text-slate-950 md:text-4xl">
+              Les points qui rassurent avant de payer.
+            </h2>
+            <p className="mt-5 max-w-md text-sm leading-6 text-slate-500">
+              Une bonne commande commence quand le client comprend le délai, le prix, ce qu’il reçoit et comment il sera accompagné.
+            </p>
+          </div>
+
+          <div>
           {loading ? (
             <div className="space-y-4">
               {[...Array(6)].map((_, index) => (
-                <div key={index} className="h-16 rounded-2xl bg-gray-100 animate-pulse" />
+                <div key={index} className="h-24 animate-pulse rounded-[1.25rem] bg-slate-100" />
               ))}
             </div>
           ) : error ? (
@@ -61,50 +87,58 @@ export default function FAQPage() {
               <p className="text-sm text-gray-500">Aucune question fréquente n&apos;est publiée pour le moment.</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {faqs.map((faq) => (
-                <div key={faq.id}>
+            <div className="space-y-3">
+              {faqs.map((faq, index) => (
+                <div key={faq.id} className="rounded-[1.25rem] border border-slate-100 bg-slate-50 px-5">
                   <button
                     onClick={() => setOpen(open === faq.id ? null : faq.id)}
-                    className="w-full flex items-start justify-between gap-6 py-7 text-left group"
+                    className="group flex w-full items-start justify-between gap-5 py-5 text-left"
+                    aria-expanded={open === faq.id}
                   >
-                    <span className="text-base font-semibold text-black group-hover:text-gray-600 transition-colors leading-snug">
-                      {faq.question}
+                    <span className="flex gap-4">
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-xs font-black text-white">
+                        {index + 1}
+                      </span>
+                      <span className="pt-1 text-base font-black leading-snug text-slate-950 transition-colors group-hover:text-[oklch(57%_0.24_29)]">
+                        {faq.question}
+                      </span>
                     </span>
-                    <Plus className={cn(
-                      "w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5 transition-transform duration-200",
-                      open === faq.id && "rotate-45"
-                    )} />
+                    <Plus
+                      className={cn(
+                        "mt-1 h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200",
+                        open === faq.id && "rotate-45 text-[oklch(57%_0.24_29)]"
+                      )}
+                    />
                   </button>
-                  <div className={cn(
-                    "overflow-hidden transition-all duration-300",
-                    open === faq.id ? "max-h-[420px] pb-7" : "max-h-0"
-                  )}>
-                    <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">{faq.answer}</p>
+                  <div
+                    className={cn(
+                      "grid transition-[grid-template-rows] duration-300",
+                      open === faq.id ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                    )}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="pb-5 pl-12 text-sm leading-6 text-slate-500 whitespace-pre-line md:pl-12">{faq.answer}</p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
+          </div>
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="bg-black sq-section text-white">
-        <div className="sq-container text-center">
-          <p className="sq-label text-gray-500 mb-5">Encore des questions ?</p>
-          <h2 className="sq-heading text-white mb-6">On est là pour vous.</h2>
-          <p className="text-gray-400 text-lg mb-10 max-w-md mx-auto">
-            Notre équipe répond à toutes vos questions en moins de 24h.
-          </p>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link href="/contact" className="sq-btn sq-btn-white">
-              Nous contacter
-            </Link>
-            <Link href="/templates" className="sq-btn sq-btn-outline-white">
-              Voir les modèles
-            </Link>
+      <div className="px-5 pb-20">
+        <div className="mx-auto max-w-7xl rounded-[1.5rem] bg-[oklch(7%_0.006_29)] p-6 text-white sm:px-8 md:flex md:items-center md:justify-between md:gap-8 lg:px-10">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Encore une hésitation ?</p>
+            <p className="mt-2 max-w-2xl text-2xl font-black leading-tight">
+              Écrivez-nous avant de choisir. On vous aide à partir sur le bon modèle.
+            </p>
           </div>
+          <Link href="/contact" className="mt-6 inline-flex shrink-0 items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-black text-slate-950 md:mt-0">
+            Nous contacter
+          </Link>
         </div>
       </div>
     </div>

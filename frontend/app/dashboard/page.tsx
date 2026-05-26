@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Clock, CheckCircle, ArrowRight, AlertTriangle, Sparkles, LifeBuoy, CreditCard, PackageCheck } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { ArrowRight, AlertTriangle } from 'lucide-react';
 import { businessService, Order, OrderSummary, Template } from '@/services/business.service';
 import { authService, AuthUser } from '@/services/auth.service';
 import { cn } from '@/lib/utils';
@@ -29,7 +28,6 @@ type NextStep = {
   description: string;
   ctaLabel: string;
   ctaHref: string;
-  icon: LucideIcon;
 };
 
 function getNextStep(order: Order | null): NextStep {
@@ -39,7 +37,6 @@ function getNextStep(order: Order | null): NextStep {
       description: 'Choisissez un modèle adapté à votre activité pour lancer votre présence en ligne.',
       ctaLabel: 'Comparer les modèles',
       ctaHref: '/templates/compare',
-      icon: Sparkles,
     };
   }
 
@@ -49,7 +46,6 @@ function getNextStep(order: Order | null): NextStep {
       description: 'Votre commande est prête. Confirmez le paiement pour que l’équipe démarre la production.',
       ctaLabel: 'Payer maintenant',
       ctaHref: `/dashboard/orders/${order.id}`,
-      icon: CreditCard,
     };
   }
 
@@ -59,7 +55,6 @@ function getNextStep(order: Order | null): NextStep {
       description: 'Votre paiement est validé. Notre équipe confirme la prise en charge sous 2h ouvrées.',
       ctaLabel: 'Suivre la commande',
       ctaHref: `/dashboard/orders/${order.id}`,
-      icon: Clock,
     };
   }
 
@@ -69,7 +64,6 @@ function getNextStep(order: Order | null): NextStep {
       description: 'Votre site est en cours de finalisation. Vous pouvez suivre l’évolution en temps réel.',
       ctaLabel: 'Voir l’avancement',
       ctaHref: `/dashboard/orders/${order.id}`,
-      icon: PackageCheck,
     };
   }
 
@@ -78,7 +72,6 @@ function getNextStep(order: Order | null): NextStep {
     description: 'Votre dernière commande est terminée. Vous pouvez en lancer une nouvelle quand vous voulez.',
     ctaLabel: 'Nouvelle commande',
     ctaHref: '/templates',
-    icon: CheckCircle,
   };
 }
 
@@ -96,7 +89,7 @@ export default function DashboardPage() {
 
     Promise.all([
       authService.getUser(),
-      businessService.getOrders(1, 5),
+      businessService.getOrders(1, 3),
       businessService.getOrderSummary(),
       businessService.getTemplates(),
     ]).then(([u, ordersRes, summaryRes, templatesRes]) => {
@@ -133,76 +126,100 @@ export default function DashboardPage() {
   const firstName = user?.name.split(' ')[0] ?? 'Client';
   const latestOrder = orders[0] ?? null;
   const nextStep = useMemo(() => getNextStep(latestOrder), [latestOrder]);
-  const NextStepIcon = nextStep.icon;
   const backlogHint = pending > 0
     ? `${pending} commande${pending > 1 ? 's' : ''} en attente de traitement`
     : 'Aucune commande en attente actuellement';
+  const quickLinks = total > 0
+    ? [
+        { label: 'Nouvelle commande', href: '/templates' },
+        { label: 'Toutes mes commandes', href: '/dashboard/orders' },
+        { label: 'Profil', href: '/dashboard/profile' },
+        { label: 'Support', href: '/contact' },
+      ]
+    : [
+        { label: 'Comparer les modèles', href: '/templates/compare' },
+        { label: 'Voir les modèles', href: '/templates' },
+        { label: 'Profil', href: '/dashboard/profile' },
+        { label: 'Support', href: '/contact' },
+      ];
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl">
-
-      {/* Header */}
-      <div className="mb-8 md:mb-10">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Tableau de bord</p>
-        <h1 className="text-3xl font-black text-black tracking-tight">
-          {loading ? 'Bonjour.' : `Bonjour, ${firstName}.`}
-        </h1>
-        <p className="text-sm text-gray-500 mt-3">
-          Suivez vos commandes, lancez vos prochaines actions et contactez rapidement l’équipe FRILO.
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: 'Commandes', value: total, icon: ShoppingBag },
-          { label: 'En attente', value: pending, icon: Clock },
-          { label: 'En cours', value: inProgress, icon: Clock },
-          { label: 'Livrées', value: delivered, icon: CheckCircle },
-        ].map(({ label, value, icon: Icon }) => (
-          <div key={label} className="bg-white rounded-2xl p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">{label}</p>
-              <Icon className="w-4 h-4 text-gray-300" />
-            </div>
-            <p className="text-4xl font-black text-black tracking-tight">
-              {loading ? '—' : value}
+    <div className="max-w-[1180px] p-4 md:p-6">
+      <section className="overflow-hidden rounded-[2rem] bg-black text-white">
+        <div className="grid gap-6 p-5 md:p-7 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-end">
+          <div>
+            <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[oklch(70%_0.19_29)]">Espace client</p>
+            <h1 className="max-w-2xl text-3xl font-black leading-tight tracking-tight md:text-5xl">
+              {loading ? 'Bonjour.' : `Bonjour, ${firstName}.`}
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-white/62">
+              {nextStep.description}
             </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link href={nextStep.ctaHref} className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-black transition-colors hover:bg-gray-100">
+                {nextStep.ctaLabel}
+              </Link>
+              <Link href="/dashboard/orders" className="inline-flex items-center gap-1 text-sm font-black text-white/70 transition-colors hover:text-white">
+                Voir les commandes <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/10 pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+            {[
+              { label: 'Commandes', value: total },
+              { label: 'En attente', value: pending },
+              { label: 'En cours', value: inProgress },
+              { label: 'Livrées', value: delivered },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-white/38">{label}</p>
+                <p className="mt-2 text-3xl font-black tracking-tight">{loading ? '...' : value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 px-5 py-4 md:px-7">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <p className="text-xs font-semibold text-white/50">{backlogHint}</p>
+            <div className="flex items-center gap-3">
+              <div className="h-1.5 w-32 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-white"
+                  style={{ width: `${completionRate}%` }}
+                />
+              </div>
+              <p className="text-xs font-black text-white">{completionRate}% livré</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-gray-200 py-3">
+        {quickLinks.map(link => (
+          <Link key={link.href} href={link.href} className="text-sm font-semibold text-gray-500 transition-colors hover:text-black">
+            {link.label}
+          </Link>
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 md:p-6 mb-6">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Progression globale</p>
-          <p className="text-sm font-semibold text-black">{completionRate}% livré</p>
-        </div>
-        <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden">
-          <div
-            className="h-full rounded-full bg-black transition-all duration-500"
-            style={{ width: `${completionRate}%` }}
-          />
-        </div>
-        <p className="text-xs text-gray-500 mt-3">{backlogHint}</p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
-        {/* Recent orders */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-            <p className="text-sm font-bold text-black">Commandes récentes</p>
-            <Link
-              href="/dashboard/orders"
-              className="text-xs font-semibold text-gray-400 hover:text-black transition-colors flex items-center gap-1"
-            >
-              Tout voir <ArrowRight className="w-3 h-3" />
-            </Link>
+      <section className="mt-4">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Commandes récentes</p>
+            <p className="mt-1 text-sm text-gray-500">{nextStep.title}</p>
           </div>
+          <Link href="/dashboard/orders" className="inline-flex items-center gap-1 text-sm font-black text-black">
+            Tout voir <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
 
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
           {loading ? (
             <div className="divide-y divide-gray-50">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="px-6 py-5 flex items-center justify-between">
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between px-5 py-4">
                   <div className="space-y-2">
                     <div className="h-4 w-40 bg-gray-100 rounded animate-pulse" />
                     <div className="h-3 w-24 bg-gray-100 rounded animate-pulse" />
@@ -212,7 +229,7 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : error ? (
-            <div className="px-6 py-16 text-center">
+            <div className="px-6 py-8 text-center">
               <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
               <p className="text-sm text-gray-500 mb-5">{error}</p>
               <button
@@ -228,21 +245,21 @@ export default function DashboardPage() {
               </button>
             </div>
           ) : orders.length === 0 ? (
-            <div className="px-6 py-10">
-              <div className="text-center pb-8 border-b border-gray-100">
-                <ShoppingBag className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-                <p className="text-sm text-gray-500 mb-5">Aucune commande pour le moment.</p>
+            <div className="px-5 py-6">
+              <div className="border-b border-gray-100 pb-6">
+                <p className="text-lg font-black text-black">Aucune commande pour le moment.</p>
+                <p className="mt-2 max-w-xl text-sm text-gray-500">Choisissez un modèle, FRILO l’adapte ensuite à votre activité.</p>
                 <Link href="/templates" className="sq-btn sq-btn-black text-sm py-3 px-6">
                   Voir les modèles
                 </Link>
               </div>
 
               {featuredTemplates.length > 0 && (
-                <div className="pt-7">
-                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
+                <div className="pt-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">
                     {user?.sector?.name ? `Suggestions pour ${user.sector.name}` : 'Suggestions de modèles'}
                   </p>
-                  <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     {featuredTemplates.map(template => (
                       <Link
                         key={template.id}
@@ -270,7 +287,7 @@ export default function DashboardPage() {
                   <Link
                     key={order.id}
                     href={`/dashboard/orders/${order.id}`}
-                    className="px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 hover:bg-gray-50 transition-colors"
+                    className="grid gap-3 px-5 py-4 transition-colors hover:bg-gray-50 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
                   >
                     <div>
                       <p className="text-sm font-semibold text-black">{name}</p>
@@ -296,60 +313,7 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
-
-        {/* Right column */}
-        <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <NextStepIcon className="w-4 h-4 text-gray-400" />
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Prochaine étape</p>
-            </div>
-            <h2 className="text-lg font-black text-black tracking-tight">{nextStep.title}</h2>
-            <p className="text-sm text-gray-500 mt-2">{nextStep.description}</p>
-            <Link href={nextStep.ctaHref} className="sq-btn sq-btn-black text-sm py-2.5 px-4 mt-5 inline-flex">
-              {nextStep.ctaLabel}
-            </Link>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Actions rapides</p>
-            <div className="space-y-2">
-              {total > 0 ? (
-                <Link href="/templates" className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3 text-sm text-black hover:bg-gray-50 transition-colors">
-                  <span>Lancer une nouvelle commande</span>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </Link>
-              ) : (
-                <Link href="/templates/compare" className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3 text-sm text-black hover:bg-gray-50 transition-colors">
-                  <span>Comparer les modèles</span>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </Link>
-              )}
-              <Link href="/dashboard/orders" className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3 text-sm text-black hover:bg-gray-50 transition-colors">
-                <span>Voir toutes mes commandes</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-              </Link>
-              <Link href="/dashboard/profile" className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3 text-sm text-black hover:bg-gray-50 transition-colors">
-                <span>Mettre à jour mon profil</span>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-              </Link>
-            </div>
-          </div>
-
-          <div className="rounded-2xl bg-black text-white p-6">
-            <div className="flex items-center gap-2 mb-3">
-              <LifeBuoy className="w-4 h-4 text-white/70" />
-              <p className="text-xs font-bold uppercase tracking-widest text-white/60">Support</p>
-            </div>
-            <p className="text-sm text-white/80">
-              Besoin d’aide sur une commande en cours ? Notre équipe support vous répond rapidement.
-            </p>
-            <Link href="/contact" className="inline-flex mt-5 rounded-xl bg-white text-black text-sm font-semibold px-4 py-2.5 hover:bg-gray-100 transition-colors">
-              Contacter le support
-            </Link>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

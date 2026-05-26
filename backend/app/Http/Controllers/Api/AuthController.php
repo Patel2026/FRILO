@@ -133,26 +133,11 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($status === Password::INVALID_TOKEN) {
-            return response()->json([
-                'message' => 'Le lien de réinitialisation est invalide ou expiré.',
-                'errors' => [
-                    'token' => ['Le lien de réinitialisation est invalide ou expiré.'],
-                ],
-            ], 422);
-        }
-
-        if ($status === Password::INVALID_USER) {
-            return response()->json([
-                'message' => 'Aucun compte ne correspond à cette adresse e-mail.',
-                'errors' => [
-                    'email' => ['Aucun compte ne correspond à cette adresse e-mail.'],
-                ],
-            ], 422);
-        }
-
         return response()->json([
-            'message' => 'Impossible de réinitialiser le mot de passe pour le moment.',
+            'message' => 'Le lien de réinitialisation est invalide ou expiré.',
+            'errors' => [
+                'token' => ['Le lien de réinitialisation est invalide ou expiré.'],
+            ],
         ], 422);
     }
 

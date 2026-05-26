@@ -15,6 +15,7 @@
 - [06_BUSINESS_INTERFACE_CONTRACTS_FRILO.md](PRODUCT_SPEC/06_BUSINESS_INTERFACE_CONTRACTS_FRILO.md) — Contrats pricing/paiement/SLA et interfaces futures FRILO Suite
 - [DATA_MODEL_FRILO.md](PRODUCT_SPEC/DATA_MODEL_FRILO.md) — Schéma logique MySQL, tables, relations, index
 - [API_INTEGRATION_LAYER_FRILO.md](PRODUCT_SPEC/API_INTEGRATION_LAYER_FRILO.md) — Contrat d'interface REST (endpoints, payloads, codes HTTP)
+- [TEMPLATE_PREVIEW_INTEGRATION_FRILO.md](PRODUCT_SPEC/TEMPLATE_PREVIEW_INTEGRATION_FRILO.md) — Stratégie canonique d’intégration des templates HTML locaux dans FRILO
 
 ## BUSINESS_EXECUTION
 - [README.md](BUSINESS_EXECUTION/README.md) — Périmètre du bloc business/exécution + owners/versioning

@@ -2,19 +2,15 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Bell, CheckCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Bell, CheckCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { notificationsService, NotificationItem, NotificationListResponse } from '@/services/notifications.service';
 
 function formatDate(value: string | null): string {
-  if (!value) {
-    return 'À l’instant';
-  }
+  if (!value) return 'À l’instant';
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return 'À l’instant';
-  }
+  if (Number.isNaN(date.getTime())) return 'À l’instant';
 
   return date.toLocaleString('fr-FR', {
     day: 'numeric',
@@ -23,6 +19,13 @@ function formatDate(value: string | null): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+function notificationTone(type: string) {
+  if (type.includes('payment')) return 'Paiement';
+  if (type.includes('order')) return 'Commande';
+  if (type.includes('review')) return 'Avis';
+  return 'Information';
 }
 
 export default function NotificationsPage() {
@@ -90,6 +93,7 @@ export default function NotificationsPage() {
   const notifications = result?.data ?? [];
   const meta = result?.meta;
   const unreadCount = result?.unread_count ?? 0;
+  const total = meta?.total ?? notifications.length;
 
   const handleMarkAsRead = async (item: NotificationItem) => {
     if (item.is_read || processingIds[item.id]) return;
@@ -144,46 +148,54 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 w-full">
-      <div className="mb-8 md:mb-10">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Tableau de bord</p>
-        <h1 className="text-3xl font-black text-black tracking-tight">Notifications</h1>
-        <p className="text-sm text-gray-500 mt-3">
-          Suivez les évolutions de vos commandes et paiements en temps réel.
+    <div className="w-full max-w-[1180px] p-4 md:p-6">
+      <div className="mb-6 flex flex-col justify-between gap-4 border-b border-gray-200 pb-5 lg:flex-row lg:items-end">
+        <div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Espace client</p>
+          <h1 className="text-3xl font-black tracking-tight text-black">Notifications</h1>
+          <p className="mt-2 max-w-xl text-sm text-gray-500">
+            Les mises à jour utiles sur vos commandes, paiements et échanges FRILO.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleMarkAllAsRead}
+          disabled={markingAll || unreadCount === 0}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 px-5 py-3 text-sm font-black text-gray-600 transition-colors hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
+        >
+          <CheckCheck className="h-4 w-4" />
+          Tout marquer lu
+        </button>
+      </div>
+
+      <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+          {loading ? 'Chargement' : `${total} notification${total > 1 ? 's' : ''}`}
+        </p>
+        <p className={cn(
+          "text-sm font-semibold",
+          unreadCount > 0 ? "text-black" : "text-gray-400"
+        )}>
+          {unreadCount > 0
+            ? `${unreadCount} non lue${unreadCount > 1 ? 's' : ''}`
+            : 'Tout est lu'}
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold text-black">
-            {unreadCount > 0
-              ? `${unreadCount} notification${unreadCount > 1 ? 's' : ''} non lue${unreadCount > 1 ? 's' : ''}`
-              : 'Toutes les notifications sont lues'}
-          </p>
-          <button
-            type="button"
-            onClick={handleMarkAllAsRead}
-            disabled={markingAll || unreadCount === 0}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 hover:text-black hover:border-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <CheckCheck className="w-4 h-4" />
-            Tout marquer lu
-          </button>
-        </div>
-
+      <div className="overflow-hidden border-y border-gray-200">
         {loading ? (
-          <div className="divide-y divide-gray-50">
-            {[...Array(6)].map((_, index) => (
-              <div key={index} className="px-6 py-4 space-y-2">
-                <div className="h-4 w-52 bg-gray-100 rounded animate-pulse" />
-                <div className="h-3 w-80 bg-gray-100 rounded animate-pulse" />
+          <div className="divide-y divide-gray-100">
+            {[...Array(5)].map((_, index) => (
+              <div key={index} className="py-5">
+                <div className="h-4 w-56 animate-pulse rounded bg-gray-100" />
+                <div className="mt-3 h-3 w-80 max-w-full animate-pulse rounded bg-gray-100" />
               </div>
             ))}
           </div>
         ) : error ? (
-          <div className="px-6 py-16 text-center">
-            <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
-            <p className="text-sm text-gray-500 mb-5">{error}</p>
+          <div className="py-12">
+            <AlertTriangle className="mb-3 h-10 w-10 text-amber-400" />
+            <p className="mb-6 max-w-xl text-sm text-gray-500">{error}</p>
             <button
               type="button"
               onClick={() => {
@@ -191,71 +203,80 @@ export default function NotificationsPage() {
                 setLoading(true);
                 setReloadKey((value) => value + 1);
               }}
-              className="sq-btn sq-btn-black text-sm py-3 px-6"
+              className="inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
             >
               Réessayer
             </button>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="px-6 py-16 text-center">
-            <Bell className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-            <p className="text-sm text-gray-500 mb-5">Aucune notification récente.</p>
-            <Link href="/dashboard/orders" className="sq-btn sq-btn-black text-sm py-3 px-6">
+          <div className="py-12">
+            <Bell className="mb-4 h-10 w-10 text-gray-300" />
+            <p className="text-xl font-black text-black">Aucune notification récente.</p>
+            <p className="mt-2 max-w-xl text-sm text-gray-500">
+              Les prochaines mises à jour de commande et de paiement apparaîtront ici.
+            </p>
+            <Link href="/dashboard/orders" className="mt-6 inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900">
               Voir mes commandes
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-100">
             {notifications.map((item) => {
               const href = item.action_url || '/dashboard/orders';
+
               return (
-                <div key={item.id} className={cn(
-                  'px-6 py-4',
-                  !item.is_read && 'bg-slate-50/60'
-                )}>
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          'w-2 h-2 rounded-full',
-                          item.is_read ? 'bg-gray-300' : 'bg-black'
-                        )} />
-                        <p className="text-sm font-semibold text-black">{item.title}</p>
-                      </div>
-                      {item.message && (
-                        <p className="text-sm text-gray-500 mt-1">{item.message}</p>
-                      )}
-                      <p className="text-xs text-gray-400 mt-2">{formatDate(item.created_at)}</p>
+                <article
+                  key={item.id}
+                  className={cn(
+                    "grid gap-4 py-5 transition-colors md:grid-cols-[minmax(0,1fr)_auto] md:items-center",
+                    !item.is_read && "bg-gray-50"
+                  )}
+                >
+                  <div className="min-w-0 md:pr-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={cn(
+                        "h-2 w-2 rounded-full",
+                        item.is_read ? "bg-gray-300" : "bg-black"
+                      )} />
+                      <span className="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-500">
+                        {notificationTone(item.type)}
+                      </span>
+                      <p className="text-xs font-semibold text-gray-400">{formatDate(item.created_at)}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {!item.is_read && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            void handleMarkAsRead(item);
-                          }}
-                          disabled={processingIds[item.id]}
-                          className="inline-flex items-center rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-600 hover:text-black hover:border-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        >
-                          Marquer lu
-                        </button>
-                      )}
-                      <Link
-                        href={href}
-                        className="inline-flex items-center rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:text-black hover:border-black transition-colors"
-                      >
-                        {item.action_label || 'Voir'}
-                      </Link>
-                    </div>
+                    <h2 className="mt-3 text-base font-black text-black">{item.title}</h2>
+                    {item.message && (
+                      <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">{item.message}</p>
+                    )}
                   </div>
-                </div>
+                  <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                    {!item.is_read && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void handleMarkAsRead(item);
+                        }}
+                        disabled={processingIds[item.id]}
+                        className="inline-flex items-center rounded-full border border-gray-200 px-4 py-2 text-xs font-black text-gray-600 transition-colors hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-45"
+                      >
+                        Marquer lu
+                      </button>
+                    )}
+                    <Link
+                      href={href}
+                      className="inline-flex items-center gap-1 rounded-full bg-black px-4 py-2 text-xs font-black text-white transition-colors hover:bg-gray-900"
+                    >
+                      {item.action_label || 'Voir'}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </article>
               );
             })}
           </div>
         )}
 
         {meta && meta.last_page > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+          <div className="flex items-center justify-between border-t border-gray-100 py-4">
             <p className="text-xs text-gray-400">
               Page {meta.current_page} sur {meta.last_page} · {meta.total} notification{meta.total > 1 ? 's' : ''}
             </p>
@@ -268,9 +289,9 @@ export default function NotificationsPage() {
                   setPage((value) => Math.max(1, value - 1));
                 }}
                 disabled={meta.current_page === 1}
-                className="p-2 rounded-lg border border-gray-200 text-gray-400 hover:text-black hover:border-black disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="rounded-lg border border-gray-200 p-2 text-gray-400 transition-all hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="h-4 w-4" />
               </button>
               <button
                 type="button"
@@ -280,9 +301,9 @@ export default function NotificationsPage() {
                   setPage((value) => Math.min(meta.last_page, value + 1));
                 }}
                 disabled={meta.current_page === meta.last_page}
-                className="p-2 rounded-lg border border-gray-200 text-gray-400 hover:text-black hover:border-black disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="rounded-lg border border-gray-200 p-2 text-gray-400 transition-all hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>

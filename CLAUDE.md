@@ -535,3 +535,17 @@ npm run lint
 ---
 
 *CLAUDE.md — FRILO — version alignée production, workflow commande, RBAC et qualité*
+
+## Agent skills
+
+### Issue tracker
+
+FRILO uses local markdown issues under `.scratch/<feature-or-ticket>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+FRILO uses the default Matt Pocock triage labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+FRILO is a single-context repo; domain docs are routed through `.claude/CLAUDE.md`, `rules/INDEX.md`, and `rules/STRATEGY_FOUNDATION/DECISIONS_FRILO.md`. See `docs/agents/domain.md`.

@@ -1,0 +1,67 @@
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            "colors": {
+                "on-surface-variant": "#424845",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed-variant": "#1a4c62",
+                "surface": "#fbf9f4",
+                "primary-container": "#87a593",
+                "secondary-container": "#b5e3fe",
+                "inverse-surface": "#30312e",
+                "on-tertiary-fixed": "#1f1b11",
+                "on-primary-fixed-variant": "#314c3e",
+                "surface-variant": "#e4e2dd",
+                "on-primary-container": "#203b2d",
+                "on-error": "#ffffff",
+                "surface-bright": "#fbf9f4",
+                "surface-container": "#f0eee9",
+                "surface-dim": "#dbdad5",
+                "error": "#ba1a1a",
+                "primary-fixed": "#cbead6",
+                "on-surface": "#1b1c19",
+                "on-tertiary-fixed-variant": "#4c463a",
+                "on-tertiary": "#ffffff",
+                "inverse-primary": "#afcebb",
+                "primary-fixed-dim": "#afcebb",
+                "error-container": "#ffdad6",
+                "on-secondary-container": "#38667d",
+                "secondary-fixed": "#c1e8ff",
+                "surface-container-high": "#eae8e3",
+                "secondary-fixed-dim": "#9fcde7",
+                "primary": "#496455",
+                "tertiary": "#645e50",
+                "on-primary": "#ffffff",
+                "background": "#fbf9f4",
+                "outline-variant": "#c2c8c4",
+                "on-secondary": "#ffffff",
+                "tertiary-container": "#a59d8e",
+                "on-tertiary-container": "#3a3529",
+                "surface-container-lowest": "#ffffff",
+                "inverse-on-surface": "#f2f1ec",
+                "on-primary-fixed": "#052014",
+                "on-secondary-fixed": "#001e2b",
+                "tertiary-fixed-dim": "#cec6b5",
+                "tertiary-fixed": "#ebe1d0",
+                "surface-container-highest": "#e4e2dd",
+                "secondary": "#35647b",
+                "on-background": "#1b1c19",
+                "surface-tint": "#496455",
+                "outline": "#727875",
+                "surface-container-low": "#f5f3ee"
+            },
+            "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Plus Jakarta Sans"],
+                "label": ["Plus Jakarta Sans"]
+            }
+        },
+    }
+}

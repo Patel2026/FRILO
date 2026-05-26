@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Monitor, Smartphone } from 'lucide-react';
 import { businessService, Template } from '@/services/business.service';
 import { cn } from '@/lib/utils';
-import { buildPreviewUrl, hasLivePreview, parsePreviewPages, TemplatePreviewPage } from '@/lib/templatePreview';
+import { buildPreviewUrl, hasLivePreview, parsePreviewPages } from '@/lib/templatePreview';
 import { trackFunnelEvent } from '@/lib/analytics';
 
 export default function TemplateImmersivePreviewPage() {
@@ -60,16 +60,14 @@ export default function TemplateImmersivePreviewPage() {
     return (
       <div className="h-screen bg-black text-white flex flex-col items-center justify-center gap-4">
         <p className="text-gray-400">Template introuvable.</p>
-        <Link href="/templates" className="sq-btn sq-btn-white">Retour au catalogue</Link>
+        <Link href="/templates" className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">
+          Retour au catalogue
+        </Link>
       </div>
     );
   }
 
   const livePreviewEnabled = hasLivePreview(template.preview_url);
-  const previewPages = parsePreviewPages(template.preview_pages);
-  const pages: TemplatePreviewPage[] = previewPages.length > 0
-    ? previewPages
-    : [{ label: 'Accueil', path: '/' }];
 
   const iframeSrc = livePreviewEnabled && template.preview_url
     ? buildPreviewUrl(template.preview_url, activePreviewPath)
@@ -80,85 +78,127 @@ export default function TemplateImmersivePreviewPage() {
       <div className="h-screen bg-black text-white flex flex-col items-center justify-center px-6 text-center">
         <p className="text-sm text-gray-400 mb-2">Cette démo immersive n'est pas encore configurée pour ce template.</p>
         <p className="text-xs text-gray-500 mb-6">Ajoute une URL de prévisualisation dans l'admin pour activer le mode live.</p>
-        <Link href={`/templates/${template.id}`} className="sq-btn sq-btn-white">Retour au détail</Link>
+        <Link href={`/templates/${template.id}`} className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">
+          Retour au détail
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-[#0f0f0f] text-white flex flex-col overflow-hidden">
-      <div className="h-14 px-4 md:px-6 border-b border-white/10 flex items-center gap-3">
+    <div className="flex h-screen flex-col overflow-hidden bg-[oklch(7%_0.006_29)] text-white">
+      <div className="flex h-16 items-center gap-3 border-b border-white/10 px-4 md:px-6">
         <Link
           href={`/templates/${template.id}`}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/55 transition-colors hover:text-white"
         >
-          <ArrowLeft className="w-4 h-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> Retour
         </Link>
 
-        <div className="hidden md:flex items-center gap-2 rounded-lg bg-white/10 p-1">
+        <div className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/10 p-1 md:flex">
           <button
             type="button"
             onClick={() => setViewMode('desktop')}
             className={cn(
-              "rounded-md px-3 py-1.5 text-xs font-semibold transition-colors inline-flex items-center gap-1.5",
-              viewMode === 'desktop' ? "bg-white text-black" : "text-gray-300 hover:text-white"
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black transition-colors",
+              viewMode === 'desktop' ? "bg-white text-slate-950" : "text-white/60 hover:text-white"
             )}
           >
-            <Monitor className="w-4 h-4" />
+            <Monitor className="h-4 w-4" />
             Desktop
           </button>
           <button
             type="button"
             onClick={() => setViewMode('mobile')}
             className={cn(
-              "rounded-md px-3 py-1.5 text-xs font-semibold transition-colors inline-flex items-center gap-1.5",
-              viewMode === 'mobile' ? "bg-white text-black" : "text-gray-300 hover:text-white"
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black transition-colors",
+              viewMode === 'mobile' ? "bg-white text-slate-950" : "text-white/60 hover:text-white"
             )}
           >
-            <Smartphone className="w-4 h-4" />
+            <Smartphone className="h-4 w-4" />
             Mobile
           </button>
         </div>
 
-        <div className="ml-auto text-xs text-gray-400 hidden md:block">
-          Démo immersive · {template.name}
+        <div className="ml-auto hidden min-w-0 text-center md:block">
+          <p className="truncate text-xs font-black uppercase tracking-[0.16em] text-white/35">
+            Aperçu réel
+          </p>
+          <p className="truncate text-sm font-black text-white">{template.name}</p>
         </div>
-      </div>
 
-      <div className="px-4 md:px-6 py-3 border-b border-white/10 overflow-x-auto">
-        <div className="flex items-center gap-2 min-w-max">
-          {pages.map((page) => (
+        <div className="ml-auto flex items-center gap-2 md:ml-4">
+          <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/10 p-1 md:hidden">
             <button
               type="button"
-              key={`${page.label}-${page.path}`}
-              onClick={() => setActivePreviewPath(page.path)}
-              data-testid={`immersive-page-${page.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+              onClick={() => setViewMode('desktop')}
               className={cn(
-                "rounded-full px-4 py-2 text-xs font-semibold transition-colors",
-                activePreviewPath === page.path
-                  ? "bg-white text-black"
-                  : "bg-white/10 text-gray-200 hover:bg-white/20"
+                "inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                viewMode === 'desktop' ? "bg-white text-slate-950" : "text-white/55"
               )}
+              aria-label="Affichage desktop"
+              aria-pressed={viewMode === 'desktop'}
             >
-              {page.label}
+              <Monitor className="h-4 w-4" />
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => setViewMode('mobile')}
+              className={cn(
+                "inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                viewMode === 'mobile' ? "bg-white text-slate-950" : "text-white/55"
+              )}
+              aria-label="Affichage mobile"
+              aria-pressed={viewMode === 'mobile'}
+            >
+              <Smartphone className="h-4 w-4" />
+            </button>
+          </div>
+          <Link
+            href={`/commande?templateId=${template.id}`}
+            onClick={() =>
+              trackFunnelEvent('start_order', {
+                template_id: template.id,
+                template_name: template.name,
+                source: 'immersive_preview_topbar',
+              })
+            }
+            className="hidden rounded-full bg-white px-5 py-2.5 text-sm font-black text-slate-950 transition-colors hover:bg-white/90 sm:inline-flex"
+          >
+            Commander
+          </Link>
         </div>
       </div>
 
-      <div className="flex-1 p-3 md:p-6 flex items-stretch justify-center overflow-hidden">
+      <div className="flex flex-1 items-stretch justify-center overflow-hidden p-3 md:p-5">
         <div className={cn(
-          "bg-white shadow-2xl overflow-hidden transition-all duration-300",
+          "overflow-hidden bg-white shadow-2xl transition-all duration-300",
           viewMode === 'desktop'
-            ? "w-full max-w-[1600px] h-full rounded-xl border border-white/10"
-            : "w-[380px] h-[760px] rounded-[2.5rem] border-8 border-zinc-800"
+            ? "h-full w-full max-w-[1680px] rounded-2xl border border-white/10"
+            : "h-full max-h-[760px] w-[360px] rounded-[2.5rem] border-[10px] border-zinc-900"
         )}>
           <iframe
             src={buildPreviewUrl(template.preview_url!, activePreviewPath)}
-            className="w-full h-full"
+            className="h-full w-full"
             title={`Demo ${template.name}`}
           />
         </div>
+      </div>
+
+      <div className="border-t border-white/10 bg-[oklch(7%_0.006_29)] px-4 py-3 sm:hidden">
+        <Link
+          href={`/commande?templateId=${template.id}`}
+          onClick={() =>
+            trackFunnelEvent('start_order', {
+              template_id: template.id,
+              template_name: template.name,
+              source: 'immersive_preview_mobile_bottom',
+            })
+          }
+          className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950"
+        >
+          Commander ce modèle
+        </Link>
       </div>
     </div>
   );

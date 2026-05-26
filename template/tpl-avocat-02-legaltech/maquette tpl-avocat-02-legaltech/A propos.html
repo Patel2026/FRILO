@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#424845",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#1a4c62",
+                    "surface": "#fbf9f4",
+                    "primary-container": "#87a593",
+                    "secondary-container": "#b5e3fe",
+                    "inverse-surface": "#30312e",
+                    "on-tertiary-fixed": "#1f1b11",
+                    "on-primary-fixed-variant": "#314c3e",
+                    "surface-variant": "#e4e2dd",
+                    "on-primary-container": "#203b2d",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container": "#f0eee9",
+                    "surface-dim": "#dbdad5",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#cbead6",
+                    "on-surface": "#1b1c19",
+                    "on-tertiary-fixed-variant": "#4c463a",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#afcebb",
+                    "primary-fixed-dim": "#afcebb",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#38667d",
+                    "secondary-fixed": "#c1e8ff",
+                    "surface-container-high": "#eae8e3",
+                    "secondary-fixed-dim": "#9fcde7",
+                    "primary": "#496455",
+                    "tertiary": "#645e50",
+                    "on-primary": "#ffffff",
+                    "background": "#fbf9f4",
+                    "outline-variant": "#c2c8c4",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#a59d8e",
+                    "on-tertiary-container": "#3a3529",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-primary-fixed": "#052014",
+                    "on-secondary-fixed": "#001e2b",
+                    "tertiary-fixed-dim": "#cec6b5",
+                    "tertiary-fixed": "#ebe1d0",
+                    "surface-container-highest": "#e4e2dd",
+                    "secondary": "#35647b",
+                    "on-background": "#1b1c19",
+                    "surface-tint": "#496455",
+                    "outline": "#727875",
+                    "surface-container-low": "#f5f3ee"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#fbf9f4]/70 dark:bg-[#1b1c19]/70 backdrop-blur-xl shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<span class="text-xl font-bold text-[#496455] dark:text-[#87a593] font-['Plus_Jakarta_Sans'] tracking-tight">The Sanctuary Law</span>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300 font-['Plus_Jakarta_Sans'] tracking-tight" href="#">Home</a>
+<a class="text-[#496455] dark:text-[#87a593] font-semibold border-b-2 border-[#496455] font-['Plus_Jakarta_Sans'] tracking-tight" href="#">About</a>
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300 font-['Plus_Jakarta_Sans'] tracking-tight" href="#">Services</a>
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300 font-['Plus_Jakarta_Sans'] tracking-tight" href="#">Contact</a>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-full text-sm font-semibold scale-95 active:opacity-80 transition-transform">
+                Book a Consultation
+            </button>
+</div>
+</nav>
+<main class="pt-32 pb-24">
+<!-- Hero Section: Editorial Asymmetry -->
+<section class="max-w-7xl mx-auto px-8 mb-32">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-end">
+<div class="md:col-span-7">
+<p class="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-6">Our Narrative</p>
+<h1 class="text-5xl md:text-7xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-8">
+                        A sanctuary built for <span class="text-primary">human stories.</span>
+</h1>
+</div>
+<div class="md:col-span-5 md:pb-4">
+<p class="text-on-surface-variant text-lg leading-relaxed border-l-2 border-primary-fixed pl-8">
+                        The law shouldn't feel like a labyrinth. We founded this practice to provide a clear, empathetic path through life's most complex transitions.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Lawyer's Story: Tonal Layering -->
+<section class="mb-32 px-4">
+<div class="max-w-7xl mx-auto bg-surface-container-low rounded-xl overflow-hidden p-8 md:p-16 flex flex-col md:flex-row gap-16 items-center">
+<div class="w-full md:w-1/2 aspect-[4/5] rounded-lg overflow-hidden shadow-2xl relative group">
+<img alt="Professional portrait" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Candid portrait of a professional woman in a sunlit office, wearing warm neutral tones, looking thoughtfully out a window with soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOoYbkuJAfDdojguDBml2cEqeJUmBq1AdDJrfVVDe3744wDFq_BDpf9aFayIso9vRhMPY6V_Ax3bdy0S6Rx9fzBKjKFK94GkxpsXg6kc9RDNiC1VL89I55sr3NosUXKWyvLCd1z1dfWq82z8knXNQ8yvccmjJF_-B8_B3BExnHas7lLXThq5HPFPLRqcQpvB5RnB6ifV_dTvEM0kuSDKgXd4O4gkE5VyVKlBMHnyXYNIxfjupnW_SzWjn0o2zHswHuFxkrdmJaxFV0"/>
+<div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+</div>
+<div class="w-full md:w-1/2 space-y-8">
+<h2 class="text-4xl font-bold text-primary tracking-tight">The Lawyer's Story</h2>
+<div class="space-y-6 text-on-surface-variant leading-relaxed text-lg">
+<p>
+                            I spent years in high-rise corporate firms, watching people get lost in the machinery of litigation. I saw how the "win at all costs" mentality often left the most vulnerable feeling even more isolated.
+                        </p>
+<p>
+                            The Sanctuary Law was born from a simple realization: law is not about arguments; it's about lives. I wanted to create a firm that felt like a living room instead of a courtroom—a place where resilience is honored and empathy is the first priority.
+                        </p>
+</div>
+<div class="flex items-center gap-4 pt-4">
+<div class="h-12 w-12 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">history_edu</span>
+</div>
+<span class="font-semibold text-primary">Founder &amp; Principal Attorney</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Personal Approach: We Listen First (Glassmorphism & Air) -->
+<section class="max-w-7xl mx-auto px-8 mb-32 text-center">
+<div class="bg-surface-container-highest/30 backdrop-blur-md rounded-xl p-12 md:p-24 border border-white/20">
+<p class="text-primary font-bold tracking-widest uppercase text-sm mb-6">Our Methodology</p>
+<h2 class="text-4xl md:text-6xl font-extrabold text-on-surface mb-8 tracking-tight italic">"We listen first."</h2>
+<div class="max-w-2xl mx-auto text-on-surface-variant text-lg">
+<p>
+                        Most legal practices start with a contract. We start with a conversation. Understanding your "why" is the only way we can effectively advocate for your "how." Every case begins with an uninterrupted space for you to tell your story.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Core Values: Bento-inspired Layout -->
+<section class="max-w-7xl mx-auto px-8 mb-32">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Value 1: Trust -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-500 p-10 rounded-lg flex flex-col justify-between min-h-[320px] shadow-sm hover:shadow-xl">
+<div>
+<span class="material-symbols-outlined text-4xl text-primary mb-6 group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<h3 class="text-2xl font-bold text-on-surface mb-4">Trust</h3>
+<p class="text-on-surface-variant leading-relaxed">Radical transparency is our baseline. You will never wonder about the status of your case or the honesty of our advice.</p>
+</div>
+<div class="pt-8 text-primary font-bold text-sm tracking-widest uppercase">The Pillar</div>
+</div>
+<!-- Value 2: Listening -->
+<div class="group bg-surface-container-highest hover:bg-surface-container-lowest transition-all duration-500 p-10 rounded-lg flex flex-col justify-between min-h-[320px] shadow-sm hover:shadow-xl">
+<div>
+<span class="material-symbols-outlined text-4xl text-secondary mb-6 group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">hearing</span>
+<h3 class="text-2xl font-bold text-on-surface mb-4">Listening</h3>
+<p class="text-on-surface-variant leading-relaxed">We hear the silence between the words. Our practice is built on deep comprehension, ensuring no nuance is overlooked.</p>
+</div>
+<div class="pt-8 text-secondary font-bold text-sm tracking-widest uppercase">The Heart</div>
+</div>
+<!-- Value 3: Support -->
+<div class="group bg-surface-container-low hover:bg-surface-container-lowest transition-all duration-500 p-10 rounded-lg flex flex-col justify-between min-h-[320px] shadow-sm hover:shadow-xl">
+<div>
+<span class="material-symbols-outlined text-4xl text-primary mb-6 group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">psychology_alt</span>
+<h3 class="text-2xl font-bold text-on-surface mb-4">Support</h3>
+<p class="text-on-surface-variant leading-relaxed">Legal challenges are emotionally taxing. We provide the structural and psychological scaffolding you need to stay upright.</p>
+</div>
+<div class="pt-8 text-primary font-bold text-sm tracking-widest uppercase">The Bridge</div>
+</div>
+</div>
+</section>
+<!-- Final CTA: Subtle Gradient & Depth -->
+<section class="max-w-4xl mx-auto px-8 mb-32 text-center">
+<div class="bg-surface-container rounded-xl p-12 relative overflow-hidden">
+<div class="absolute -top-24 -left-24 w-64 h-64 bg-secondary-container/30 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -right-24 w-64 h-64 bg-primary-container/20 rounded-full blur-3xl"></div>
+<h2 class="text-3xl font-bold text-on-surface mb-6 relative z-10">Ready to find your sanctuary?</h2>
+<p class="text-on-surface-variant mb-10 text-lg relative z-10">Let's start with a quiet conversation about your future.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1">
+                        Book a Consultation
+                    </button>
+<button class="bg-white text-primary border border-outline-variant/30 px-8 py-4 rounded-full font-bold hover:bg-surface-container-low transition-colors">
+                        View Our Services
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full rounded-t-[3rem] bg-[#fbf9f4] dark:bg-[#1b1c19] tonal-shift via surface-container-low">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-16 w-full max-w-7xl mx-auto">
+<div class="mb-8 md:mb-0">
+<span class="text-lg font-bold text-[#496455] dark:text-[#87a593] font-['Plus_Jakarta_Sans']">The Sanctuary Law</span>
+<p class="mt-2 text-xs text-[#424845] dark:text-[#c2c8c4] tracking-widest uppercase">The Human Legal Practice</p>
+</div>
+<div class="flex gap-8 mb-8 md:mb-0">
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest" href="#">Privacy Policy</a>
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest" href="#">Terms of Service</a>
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest" href="#">LinkedIn</a>
+<a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest" href="#">Instagram</a>
+</div>
+<p class="text-xs text-[#424845] dark:text-[#c2c8c4] font-['Plus_Jakarta_Sans'] uppercase tracking-widest">© 2024 The Human Legal Practice. All rights reserved.</p>
+</div>
+</footer>
+</body></html>

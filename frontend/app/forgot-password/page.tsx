@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { authService, forgotPasswordSchema, ForgotPasswordPayload } from '@/services/auth.service';
@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
       setSuccess(message);
     } catch (submitError) {
       if (axios.isAxiosError(submitError) && submitError.response?.status === 429) {
-        setError('Une demande a déjà été faite récemment. Veuillez patienter avant de réessayer.');
+        setError('Une demande a déjà été faite récemment. Patientez avant de réessayer.');
       } else {
         setError('Impossible d’envoyer le lien de réinitialisation pour le moment.');
       }
@@ -68,78 +68,86 @@ export default function ForgotPasswordPage() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
-      </div>
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent" />
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-black text-white flex-col justify-between p-16">
-        <Link href="/" className="text-2xl font-black tracking-tight">FRILO</Link>
-        <div>
-          <h2 className="sq-heading text-white mb-6">
-            Réinitialisez<br />votre accès.
-          </h2>
-          <p className="text-gray-400 text-lg">
-            Entrez votre e-mail et recevez un lien sécurisé pour créer un nouveau mot de passe.
-          </p>
-        </div>
-        <p className="text-gray-600 text-sm">© {new Date().getFullYear()} FRILO. Tous droits réservés.</p>
-      </div>
+    <main className="min-h-screen bg-white px-6 py-8 md:px-10">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[1180px] flex-col">
+        <header className="mb-10 flex items-center justify-between border-b border-gray-200 pb-5">
+          <Link href="/" className="text-xl font-black tracking-tight text-black">FRILO</Link>
+          <Link href="/login" className="text-sm font-black text-gray-500 transition-colors hover:text-black">
+            Connexion
+          </Link>
+        </header>
 
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 bg-white">
-        <Link href="/" className="text-xl font-black mb-12 lg:hidden">FRILO</Link>
-
-        <div className="max-w-sm w-full mx-auto">
-          <h1 className="text-3xl font-black text-black tracking-tight mb-2">Mot de passe oublié</h1>
-          <p className="text-gray-500 text-sm mb-10">
-            Vous vous souvenez de votre mot de passe ?{' '}
-            <Link href="/login" className="text-black font-semibold underline underline-offset-2">
+        <section className="grid flex-1 gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center">
+          <div className="max-w-2xl">
+            <Link href="/login" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition-colors hover:text-black">
+              <ArrowLeft className="h-4 w-4" />
               Retour à la connexion
             </Link>
-          </p>
+            <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">
+              Récupération
+            </p>
+            <h1 className="text-4xl font-black leading-tight text-black md:text-5xl">
+              Recevez un lien sécurisé.
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-gray-500">
+              Indiquez l’adresse e-mail de votre compte FRILO. Si elle existe, nous vous envoyons un lien pour créer un nouveau mot de passe.
+            </p>
+          </div>
 
-          {error && (
-            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {error}
-            </div>
-          )}
+          <div className="border-y border-gray-200 py-6">
+            {error && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl bg-red-50 px-4 py-3 text-red-700">
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <p className="text-sm font-semibold">{error}</p>
+              </div>
+            )}
 
-          {success && (
-            <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              {success}
-            </div>
-          )}
+            {success && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-emerald-700">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <p className="text-sm font-semibold">{success}</p>
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
-                Adresse e-mail
-              </label>
-              <input
-                {...register('email')}
-                type="email"
-                placeholder="vous@exemple.com"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
-              />
-              {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
-            </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div>
+                <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
+                  Adresse e-mail
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    {...register('email')}
+                    type="email"
+                    placeholder="vous@exemple.com"
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 pl-11 text-sm text-black outline-none transition-colors placeholder:text-gray-300 focus:border-black"
+                  />
+                </div>
+                {errors.email && <p className="mt-2 text-xs font-semibold text-red-500">{errors.email.message}</p>}
+              </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50"
-            >
-              {isSubmitting ? 'Envoi…' : 'Envoyer le lien de réinitialisation'}
-            </button>
-          </form>
-        </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="inline-flex w-full justify-center rounded-full bg-black px-7 py-3.5 text-sm font-black text-white transition-colors hover:bg-gray-900 disabled:opacity-50"
+              >
+                {isSubmitting ? 'Envoi en cours' : 'Envoyer le lien'}
+              </button>
+            </form>
+
+            <p className="mt-6 text-sm leading-6 text-gray-500">
+              Pensez aussi à vérifier vos courriers indésirables si le message tarde à arriver.
+            </p>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
-

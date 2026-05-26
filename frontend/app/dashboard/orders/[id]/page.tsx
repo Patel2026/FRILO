@@ -3,26 +3,44 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowUpRight } from 'lucide-react';
+import axios from 'axios';
 import { businessService, Order, PaymentStatus } from '@/services/business.service';
 import { cn } from '@/lib/utils';
-import axios from 'axios';
 
 const statusConfig = {
-  pending:    { label: 'En attente', classes: 'bg-amber-50 text-amber-700', dot: 'bg-amber-400' },
-  processing: { label: 'En cours', classes: 'bg-blue-50 text-blue-700', dot: 'bg-blue-400' },
-  completed:  { label: 'Livré', classes: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-400' },
-  cancelled:  { label: 'Annulé', classes: 'bg-red-50 text-red-700', dot: 'bg-red-400' },
+  pending: { label: 'En attente', classes: 'bg-amber-50 text-amber-700', dot: 'bg-amber-400', next: 'FRILO attend la confirmation du paiement ou les derniers éléments.' },
+  processing: { label: 'En production', classes: 'bg-blue-50 text-blue-700', dot: 'bg-blue-400', next: 'FRILO prépare votre site avec les informations transmises.' },
+  completed: { label: 'Livrée', classes: 'bg-emerald-50 text-emerald-700', dot: 'bg-emerald-400', next: 'Votre site est livré. Vous pouvez consulter la commande et laisser un avis.' },
+  cancelled: { label: 'Annulée', classes: 'bg-red-50 text-red-700', dot: 'bg-red-400', next: 'Cette commande est annulée. Contactez le support si besoin.' },
 };
 
-const paymentStatusConfig: Record<PaymentStatus, { label: string; classes: string }> = {
-  awaiting_payment: { label: 'En attente de paiement', classes: 'bg-amber-50 text-amber-700' },
-  paid: { label: 'Payée', classes: 'bg-emerald-50 text-emerald-700' },
-  failed: { label: 'Échouée', classes: 'bg-red-50 text-red-700' },
-  cancelled: { label: 'Annulée', classes: 'bg-gray-100 text-gray-700' },
-  refunded: { label: 'Remboursée', classes: 'bg-blue-50 text-blue-700' },
-  expired: { label: 'Expirée', classes: 'bg-slate-100 text-slate-700' },
+const paymentStatusConfig: Record<PaymentStatus, { label: string; classes: string; next: string }> = {
+  awaiting_payment: { label: 'Paiement en attente', classes: 'bg-amber-50 text-amber-700', next: 'Le paiement doit être confirmé avant la production.' },
+  paid: { label: 'Payée', classes: 'bg-emerald-50 text-emerald-700', next: 'Le paiement est confirmé. FRILO peut avancer sur la production.' },
+  failed: { label: 'Paiement échoué', classes: 'bg-red-50 text-red-700', next: 'Le paiement n’a pas abouti. Vous pouvez relancer le paiement.' },
+  cancelled: { label: 'Paiement annulé', classes: 'bg-gray-100 text-gray-700', next: 'Le paiement a été annulé. Contactez le support si ce n’était pas prévu.' },
+  refunded: { label: 'Remboursée', classes: 'bg-sky-50 text-sky-700', next: 'Le paiement a été remboursé.' },
+  expired: { label: 'Paiement expiré', classes: 'bg-slate-100 text-slate-700', next: 'Le lien de paiement a expiré. Vous pouvez générer un nouveau lien.' },
 };
+
+const stepLabels = [
+  'Commande reçue',
+  'Paiement confirmé',
+  'Production FRILO',
+  'Site livré',
+];
+
+function getInstruction(order: Order) {
+  return order.instruction || order.instructions?.[0] || null;
+}
+
+function getCurrentStep(order: Order, paymentStatus: PaymentStatus) {
+  if (order.status === 'completed') return 4;
+  if (order.status === 'processing') return 3;
+  if (paymentStatus === 'paid') return 2;
+  return 1;
+}
 
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
@@ -63,16 +81,16 @@ export default function OrderDetailPage() {
       label: order.status,
       classes: 'bg-gray-50 text-gray-600',
       dot: 'bg-gray-400',
+      next: 'Consultez les détails de cette commande.',
     };
   }, [order]);
 
-  const paymentStatus = useMemo(() => {
-    if (!order) return null;
-    const rawStatus = (order.payment_status || 'awaiting_payment') as PaymentStatus;
-    return paymentStatusConfig[rawStatus] || paymentStatusConfig.awaiting_payment;
-  }, [order]);
-
   const paymentStatusValue = (order?.payment_status || 'awaiting_payment') as PaymentStatus;
+  const paymentStatus = paymentStatusConfig[paymentStatusValue] || paymentStatusConfig.awaiting_payment;
+  const canPay = order && order.status !== 'cancelled' && paymentStatusValue !== 'paid' && paymentStatusValue !== 'refunded';
+  const instruction = order ? getInstruction(order) : null;
+  const projectName = instruction?.enterprise_name || 'Projet sans nom';
+  const currentStep = order ? getCurrentStep(order, paymentStatusValue) : 1;
 
   const handleStartPayment = async () => {
     if (!order) return;
@@ -100,33 +118,45 @@ export default function OrderDetailPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl">
-      <div className="mb-8">
+    <div className="w-full max-w-[1180px] p-4 md:p-6">
+      <div className="mb-6 border-b border-gray-200 pb-5">
         <Link
           href="/dashboard/orders"
-          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-black transition-colors mb-4"
+          className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition-colors hover:text-black"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
           Retour aux commandes
         </Link>
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Commande</p>
-        <h1 className="text-3xl font-black text-black tracking-tight">
-          {order ? `#${String(order.id).padStart(4, '0')}` : '#—'}
-        </h1>
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Commande #{order ? String(order.id).padStart(4, '0') : '0000'}</p>
+            <h1 className="text-3xl font-black tracking-tight text-black">{loading ? 'Chargement' : projectName}</h1>
+            <p className="mt-2 max-w-xl text-sm text-gray-500">
+              {order
+                ? `${order.template?.name || 'Modèle'}${order.template?.sector?.name ? ` · ${order.template.sector.name}` : ''}`
+                : 'Suivi de commande FRILO'}
+            </p>
+          </div>
+          {order?.created_at && (
+            <p className="text-sm font-semibold text-gray-400">
+              {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          )}
+        </div>
       </div>
 
       {loading ? (
-        <div className="bg-white border border-gray-100 rounded-2xl p-8">
+        <div className="border-y border-gray-200 py-8">
           <div className="space-y-3">
-            <div className="h-4 w-40 bg-gray-100 rounded animate-pulse" />
-            <div className="h-4 w-56 bg-gray-100 rounded animate-pulse" />
-            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+            <div className="h-5 w-56 animate-pulse rounded bg-gray-100" />
+            <div className="h-4 w-80 max-w-full animate-pulse rounded bg-gray-100" />
+            <div className="h-4 w-48 animate-pulse rounded bg-gray-100" />
           </div>
         </div>
       ) : error ? (
-        <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center">
-          <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
-          <p className="text-sm text-gray-500 mb-5">{error}</p>
+        <div className="border-y border-gray-200 py-12">
+          <AlertTriangle className="mb-3 h-10 w-10 text-amber-400" />
+          <p className="mb-6 max-w-xl text-sm text-gray-500">{error}</p>
           <button
             type="button"
             onClick={() => {
@@ -134,114 +164,129 @@ export default function OrderDetailPage() {
               setLoading(true);
               setReloadKey(v => v + 1);
             }}
-            className="sq-btn sq-btn-black text-sm py-3 px-6"
+            className="inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
           >
             Réessayer
           </button>
         </div>
-      ) : order ? (
-        <div className="space-y-6">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div>
-                <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-2">Projet</p>
-                <p className="text-xl font-black text-black">
-                  {order.instruction?.enterprise_name || order.instructions?.[0]?.enterprise_name || 'Projet sans nom'}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {order.template?.name || 'Template'}{order.template?.sector?.name ? ` · ${order.template.sector.name}` : ''}
-                </p>
-              </div>
-              {status && (
-                <span className={cn("inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full", status.classes)}>
-                  <span className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", status.dot)} />
+      ) : order && status ? (
+        <div className="space-y-8">
+          <section className="border-y border-gray-200">
+            <div className="grid gap-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+              <div className="border-b border-gray-100 py-5 md:border-b-0 md:pr-8">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">État commande</p>
+                <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold", status.classes)}>
+                  <span className={cn("h-1.5 w-1.5 flex-shrink-0 rounded-full", status.dot)} />
                   {status.label}
                 </span>
+                <p className="mt-3 max-w-sm text-sm text-gray-500">{status.next}</p>
+              </div>
+              <div className="border-b border-gray-100 py-5 md:border-b-0 md:px-8">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Paiement</p>
+                <span className={cn("inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold", paymentStatus.classes)}>
+                  {paymentStatus.label}
+                </span>
+                <p className="mt-3 max-w-sm text-sm text-gray-500">{paymentStatus.next}</p>
+              </div>
+              <div className="py-5 md:pl-8 md:text-right">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Total</p>
+                <p className="text-xl font-black text-black">{order.price.toLocaleString('fr-FR')} FCFA</p>
+                {order.paid_at && (
+                  <p className="mt-2 text-xs font-semibold text-gray-400">
+                    Payée le {new Date(order.paid_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {canPay && (
+            <section className="bg-black px-5 py-5 text-white md:px-6">
+              <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-red-500">Action requise</p>
+                  <p className="mt-2 text-lg font-black">Confirmez le paiement pour lancer la production.</p>
+                  <p className="mt-1 max-w-2xl text-sm text-white/60">
+                    Vous serez redirigé vers FedaPay. Mobile Money et carte peuvent être proposés selon votre compte.
+                  </p>
+                  {paymentError && <p className="mt-3 text-sm font-semibold text-red-300">{paymentError}</p>}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleStartPayment}
+                  disabled={isStartingPayment}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-black text-black transition-colors hover:bg-gray-100 disabled:opacity-60 md:w-auto"
+                >
+                  {isStartingPayment ? 'Redirection...' : 'Payer maintenant'}
+                </button>
+              </div>
+            </section>
+          )}
+
+          <section>
+            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-gray-400">Avancement</p>
+            <div className="grid gap-3 md:grid-cols-4">
+              {stepLabels.map((label, index) => {
+                const stepNumber = index + 1;
+                const isDone = stepNumber <= currentStep;
+
+                return (
+                  <div key={label} className="border-t border-gray-200 pt-4">
+                    <span className={cn(
+                      "inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-black",
+                      isDone ? "bg-black text-white" : "bg-gray-100 text-gray-400"
+                    )}>
+                      {stepNumber}
+                    </span>
+                    <p className={cn("mt-3 text-sm font-black", isDone ? "text-black" : "text-gray-400")}>{label}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="border-y border-gray-200 py-6">
+            <div className="mb-5 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+              <div>
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Informations transmises</p>
+                <h2 className="text-xl font-black tracking-tight text-black">Ce que FRILO utilise pour adapter le modèle.</h2>
+              </div>
+              {order.template?.id && (
+                <Link
+                  href={`/templates/${order.template.id}`}
+                  className="inline-flex items-center gap-1 text-sm font-black text-black underline underline-offset-4"
+                >
+                  Revoir le modèle
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
               )}
             </div>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border border-gray-100 rounded-xl p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Prix</p>
-                <p className="text-lg font-black text-black">{order.price.toLocaleString('fr-FR')} FCFA</p>
+            <dl className="divide-y divide-gray-100 text-sm">
+              <div className="grid gap-2 py-4 md:grid-cols-[220px_minmax(0,1fr)]">
+                <dt className="font-bold text-gray-400">Activité</dt>
+                <dd className="min-w-0 break-words text-black">{instruction?.activity_description || 'Non renseigné'}</dd>
               </div>
-              <div className="border border-gray-100 rounded-xl p-4">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Date de commande</p>
-                <p className="text-sm font-semibold text-black">
-                  {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                </p>
+              <div className="grid gap-2 py-4 md:grid-cols-[220px_minmax(0,1fr)]">
+                <dt className="font-bold text-gray-400">Couleurs souhaitées</dt>
+                <dd className="min-w-0 break-words text-black">{(instruction?.colors || []).join(', ') || 'Non renseigné'}</dd>
               </div>
-              <div className="border border-gray-100 rounded-xl p-4 md:col-span-2">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Paiement</p>
-                {paymentStatus && (
-                  <span className={cn("inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-full", paymentStatus.classes)}>
-                    {paymentStatus.label}
-                  </span>
-                )}
-                {order.paid_at && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    Confirmé le {new Date(order.paid_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  </p>
-                )}
-                {paymentStatusValue !== 'paid' && (
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={handleStartPayment}
-                      disabled={isStartingPayment}
-                      className="sq-btn sq-btn-black text-sm py-2.5 px-4 disabled:opacity-50"
-                    >
-                      {isStartingPayment ? 'Redirection…' : 'Payer maintenant'}
-                    </button>
-                    {paymentError && (
-                      <p className="text-xs text-red-600 mt-2">{paymentError}</p>
-                    )}
-                  </div>
-                )}
+              <div className="grid gap-2 py-4 md:grid-cols-[220px_minmax(0,1fr)]">
+                <dt className="font-bold text-gray-400">Notes complémentaires</dt>
+                <dd className="min-w-0 break-words text-black">{instruction?.specific_instructions || 'Aucune note'}</dd>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8">
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-4">Instructions client</p>
-            <div className="space-y-4 text-sm">
-              <div>
-                <p className="text-gray-400 mb-1">Activité</p>
-                <p className="text-black">
-                  {order.instruction?.activity_description || order.instructions?.[0]?.activity_description || 'Non renseigné'}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-400 mb-1">Couleurs souhaitées</p>
-                <p className="text-black">
-                  {(order.instruction?.colors || order.instructions?.[0]?.colors || []).join(', ') || 'Non renseigné'}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-400 mb-1">Notes complémentaires</p>
-                <p className="text-black">
-                  {order.instruction?.specific_instructions || order.instructions?.[0]?.specific_instructions || 'Aucune note'}
-                </p>
-              </div>
-            </div>
-          </div>
+            </dl>
+          </section>
 
           {order.template?.id && (paymentStatusValue === 'paid' || order.status === 'processing' || order.status === 'completed') && (
-            <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8">
-              <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-3">Avis client</p>
-              <h2 className="text-xl font-black text-black tracking-tight mb-3">
-                Vous pouvez laisser un avis sur ce modèle.
-              </h2>
-              <p className="text-sm text-gray-500 leading-relaxed mb-5">
-                Rendez-vous sur la fiche du template acheté pour partager votre retour. Votre avis sera relu avant publication.
+            <section className="pb-2">
+              <p className="text-sm text-gray-500">
+                Votre retour aide FRILO à améliorer les modèles.{' '}
+                <Link href={`/templates/${order.template.id}#template-reviews`} className="font-black text-black underline underline-offset-4">
+                  Donner mon avis
+                </Link>
               </p>
-              <Link
-                href={`/templates/${order.template.id}#template-reviews`}
-                className="sq-btn sq-btn-black text-sm py-3 px-6"
-              >
-                Donner mon avis
-              </Link>
-            </div>
+            </section>
           )}
         </div>
       ) : null}

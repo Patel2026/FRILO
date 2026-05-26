@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@700;800;900&amp;family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#6e3900",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed": "#101b30",
+                    "tertiary-fixed-dim": "#b2c8e7",
+                    "secondary-container": "#fd8b00",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "tertiary": "#001225",
+                    "on-surface": "#101b30",
+                    "outline-variant": "#c5c6cd",
+                    "inverse-surface": "#263046",
+                    "primary-fixed": "#d7e2ff",
+                    "on-primary-container": "#828da7",
+                    "inverse-primary": "#bbc6e2",
+                    "inverse-on-surface": "#edf0ff",
+                    "on-tertiary-fixed-variant": "#334861",
+                    "secondary": "#904d00",
+                    "on-background": "#101b30",
+                    "primary-container": "#1b263b",
+                    "tertiary-fixed": "#d1e4ff",
+                    "surface-tint": "#545e76",
+                    "surface-dim": "#cfdaf6",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#ffdcc3",
+                    "background": "#f9f9ff",
+                    "primary-fixed-dim": "#bbc6e2",
+                    "on-primary-fixed-variant": "#3c475d",
+                    "on-tertiary-container": "#798fab",
+                    "surface": "#f9f9ff",
+                    "surface-container-low": "#f1f3ff",
+                    "on-surface-variant": "#45474d",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#ffb77d",
+                    "surface-container": "#e8edff",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f9f9ff",
+                    "tertiary-container": "#0f273f",
+                    "surface-container-highest": "#d7e2ff",
+                    "surface-container-high": "#e0e8ff",
+                    "outline": "#75777d",
+                    "surface-variant": "#d7e2ff",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed": "#2f1500",
+                    "on-tertiary-fixed": "#031d34",
+                    "on-secondary-container": "#603100",
+                    "primary": "#051125"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Work Sans"],
+                    "body": ["Public Sans"],
+                    "label": ["Public Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-shift { background-color: #f1f3ff; }
+        .mechanical-hover:hover { transform: translateY(-2px); transition: transform 150ms cubic-bezier(0, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar Component -->
+<nav class="bg-slate-50 dark:bg-slate-950 rounded-none w-full top-0 sticky z-50 tonal-shift bg-slate-100 dark:bg-slate-900 flat no shadows flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter font-headline">STRUCTUR</div>
+<div class="hidden md:flex gap-10 items-center">
+<a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-orange-600 dark:text-orange-500 border-b-4 border-orange-600 dark:border-orange-500 pb-1 hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="#">Home</a>
+<a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="#">About</a>
+<a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="#">Services</a>
+<a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="#">Projects</a>
+<a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="#">Contact</a>
+</div>
+<button class="bg-secondary-container text-on-secondary-container font-headline font-bold uppercase px-8 py-3 mechanical-hover active:translate-y-1">
+            Request Quote
+        </button>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[870px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover grayscale-[30%] contrast-[110%]" data-alt="Modern construction site with massive yellow cranes against a dramatic blue sky at dusk, low angle shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPB0Vl0OO2gaJhr_SAiRHNXe3XRFOHr6eoe7UqbMN93UvKLN_A2q3QPt4vATEuYdK9gdJqjrQwE9ajvpmTG72v1Lfto_l3OPo4nasmZ9GUGnRLT1FUChpbO1A6LrSfjyiDMKRws3-WUCfmOFT04nQRf6bV8IQ1hjU-LW8yteLBtb5HPrrLt7nnePUD03guchPGBqrTWpDCOUBopet-8fsKDqimRrklZ7fKr1RM50QhVfsRE3zpSLyCrhOHW7bhK3wq0Wqapj_0d_o"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-transparent"></div>
+</div>
+<div class="relative z-10 px-12 max-w-4xl">
+<span class="font-label text-secondary-container font-bold tracking-[0.2em] uppercase text-xs mb-4 block">Pioneering Architectural Excellence</span>
+<h1 class="text-[5rem] font-headline font-black leading-[0.95] text-on-primary tracking-tighter mb-8">
+                    BUILDING THE<br/>FUTURE WITH<br/>PRECISION.
+                </h1>
+<p class="text-on-primary/80 text-xl max-w-2xl font-light mb-10 leading-relaxed">
+                    Unshakable structural integrity meets brutalist aesthetic. We redefine landscapes through high-performance engineering and uncompromising reliability.
+                </p>
+<div class="flex gap-4">
+<button class="bg-secondary-container text-on-secondary-container font-headline font-bold uppercase px-10 py-5 mechanical-hover">
+                        Request a Quote
+                    </button>
+<button class="bg-transparent border-2 border-on-primary text-on-primary font-headline font-bold uppercase px-10 py-5 mechanical-hover">
+                        View Projects
+                    </button>
+</div>
+</div>
+</section>
+<!-- Services Section: Tonal Layering -->
+<section class="bg-surface-container-low py-32 px-12">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+<div class="max-w-2xl">
+<label class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem] mb-2 block">Core Expertise</label>
+<h2 class="text-5xl font-headline font-extrabold tracking-tighter text-primary uppercase">Specialized Structural Services</h2>
+</div>
+<p class="text-on-surface-variant max-w-xs text-sm leading-relaxed">
+                        From initial blueprinting to final structural delivery, we execute with industrial rigor.
+                    </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-0">
+<!-- Building -->
+<div class="bg-surface p-12 border-l border-outline-variant/20 hover:bg-surface-container-highest transition-colors group">
+<div class="mb-8">
+<span class="material-symbols-outlined text-5xl text-secondary" data-icon="architecture">architecture</span>
+</div>
+<h3 class="text-2xl font-headline font-bold uppercase mb-4 text-primary">Building</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8">Structural assembly of complex industrial and commercial environments with a focus on load-bearing precision.</p>
+<a class="font-label font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-secondary" href="#">
+                            Analyze details <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<!-- Renovation -->
+<div class="bg-surface p-12 border-l border-outline-variant/20 hover:bg-surface-container-highest transition-colors group">
+<div class="mb-8">
+<span class="material-symbols-outlined text-5xl text-secondary" data-icon="home_repair_service">home_repair_service</span>
+</div>
+<h3 class="text-2xl font-headline font-bold uppercase mb-4 text-primary">Renovation</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8">Structural reinforcement and aesthetic modernization of legacy architectural frameworks to meet current safety protocols.</p>
+<a class="font-label font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-secondary" href="#">
+                            Analyze details <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<!-- Civil Works -->
+<div class="bg-surface p-12 border-l border-r border-outline-variant/20 hover:bg-surface-container-highest transition-colors group">
+<div class="mb-8">
+<span class="material-symbols-outlined text-5xl text-secondary" data-icon="foundation">foundation</span>
+</div>
+<h3 class="text-2xl font-headline font-bold uppercase mb-4 text-primary">Civil Works</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8">Heavy-duty infrastructure development including foundational grading, sewage systems, and urban arterial pathways.</p>
+<a class="font-label font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-secondary" href="#">
+                            Analyze details <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Projects Grid: Bento Layout -->
+<section class="bg-surface py-32 px-12">
+<div class="max-w-7xl mx-auto">
+<div class="mb-20">
+<label class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem] mb-2 block">Site Archive</label>
+<h2 class="text-5xl font-headline font-extrabold tracking-tighter text-primary uppercase">Recent Project Highlights</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 h-[800px]">
+<div class="md:col-span-8 relative overflow-hidden bg-primary-container">
+<img class="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700" data-alt="Low angle view of a sleek glass and steel skyscraper reflecting the clear blue sky, emphasizing structural lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnfOU_3LsjvYebIbg78jlzKF2Zo9adl6-bTTPOT54g1e6Xrj2W9_C3xA4Qhk3YPVdRw1q9v7x4yZSI9HbDrKJLWKPmZvj5h6M9BNlZjBuQfsUTXYS1HUbs5t-VRykdmZmDSZ_pfT_Vu2aHtXZL8-FKriQ7C3xW4-SWDmnBuEtTZfeIHeVv8baqhZSV5ZBqHyFuwMri94krEp9UEY6HVATrbrxZdQhLkB7XCLBdezanCfaacEzArrz4Wkz1PRLkC5xZZOdLdeOCzV4"/>
+<div class="absolute bottom-0 left-0 p-10 bg-gradient-to-t from-primary/90 to-transparent w-full">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 font-label text-[0.6rem] font-bold uppercase mb-4 inline-block">COMPLETED</span>
+<h4 class="text-3xl font-headline font-black text-on-primary uppercase tracking-tighter">The Monolith Hub</h4>
+<p class="font-label text-on-primary/60 text-[0.7rem] uppercase mt-2 tracking-widest">Metropolitan District / 45,000 SQ FT</p>
+</div>
+</div>
+<div class="md:col-span-4 grid grid-rows-2 gap-8">
+<div class="relative overflow-hidden bg-primary-container">
+<img class="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700" data-alt="Interior of a modern concrete building under construction with exposed beams and geometric shadow patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVJoAKkq_9_9xx-BauM9D5f2kP-9Oz_O623GzQsRinX36OtxA1V9gtt0pGbfec8UdbVOvwt1FcWczbS1kWQBwdUXIgezzLefiYiPbcsYcoRvF1l2wwfjUonvb3SWLafmTehvxrBxyMPek1L8dvvJ5RDmzbree6R36lhMZ0cYzF79ORwlKrjQteBS4YvIvnb2Y6rLqRKDf0TtaK6H1gd_mm-HrzZsvH4SzP2tg2cB0kB6-hbX9p-lP2XVsvV5KLhmwApcFFX5SCoX0"/>
+<div class="absolute bottom-0 left-0 p-6">
+<h4 class="text-xl font-headline font-black text-on-primary uppercase tracking-tighter">Concrete Atrium</h4>
+</div>
+</div>
+<div class="relative overflow-hidden bg-secondary">
+<img class="w-full h-full object-cover opacity-70 hover:scale-105 transition-transform duration-700" data-alt="Aerial view of an industrial bridge construction project crossing a wide river with heavy equipment visible" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLAaCfJ2Dan9FDQuLiitwGJdBWHUQL8WR90CRCXtNOkybcgC824-L1W7QBIqwGSWLipuzf6uboAtwDOJAAcKIuqJFKV8_mbY2IDAbEww1j5KxQJFdFCjBDRapu__Fx8kI6Phick95ZLl5lRIkEpiOLKVRPQQ21HDwC6sJ9_DjxWvUnk9IMGHfZxr7Pur1sHYUo8PY0yaLHHKfQC1-yK3xQeUsi3t7PCq6dRpgTbw6r0RmTibUY2ztqz1EWfzhQfrnlm2T3kMdgdzk"/>
+<div class="absolute bottom-0 left-0 p-6">
+<h4 class="text-xl font-headline font-black text-on-primary uppercase tracking-tighter">Steel Viaduct</h4>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- About Snippet: Brutalist Layout -->
+<section class="bg-primary py-32 px-12 text-on-primary overflow-hidden relative">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-20">
+<div class="w-full md:w-1/2 relative">
+<div class="absolute -top-10 -left-10 text-[10rem] font-headline font-black text-on-primary/5 select-none leading-none">EST. 1994</div>
+<h2 class="text-6xl font-headline font-black tracking-tighter uppercase mb-8 leading-[0.9]">Reliability<br/>Through Rigor</h2>
+<p class="text-on-primary-container text-lg leading-relaxed mb-10 font-light">
+                        For over 30 years, STRUCTUR has operated as the backbone of urban development. We do not just build; we engineer permanence. Our methodology is rooted in the precision of brutalist architecture, ensuring every rivet and pour is a testament to quality.
+                    </p>
+<div class="grid grid-cols-2 gap-12 border-t border-on-primary/10 pt-10">
+<div>
+<span class="text-5xl font-headline font-black text-secondary-container">350+</span>
+<p class="font-label text-xs uppercase tracking-widest text-on-primary-container mt-2">Projects Delivered</p>
+</div>
+<div>
+<span class="text-5xl font-headline font-black text-secondary-container">1.2M</span>
+<p class="font-label text-xs uppercase tracking-widest text-on-primary-container mt-2">Square Feet Poured</p>
+</div>
+</div>
+</div>
+<div class="w-full md:w-1/2">
+<img class="w-full grayscale brightness-75 hover:grayscale-0 transition-all duration-500" data-alt="Professional construction manager in a safety vest and hardhat reviewing blueprints on a digital tablet at a site" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_jnBx8cQJq7gO_RU2NIfgU6HTBSdR4DKk9Q-rQ2OPUe_3kEKej8NuCXtVgldVz1bpeJCxJL6TjFSHDkdDvD1nMCSOfmX-fCr-aXeMiEnnwrnWsK7Bjn0lvALgEmMrbG2RtD-V44XD1eCeeB0gNCPcfi_sayX0P8pVDd7yHAE1W2AjP-f-ZAFz-UNQAkajRWVRcltz7Y0P3bZK1bihKAhH749XjhDJjiW0Nmwisfvl8WKcx7iCYADk7nbxMPq5LGl9qtbXkWIwgWk"/>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="bg-surface-container-low py-32 px-12">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-20">
+<label class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem] mb-2 block">Client Verification</label>
+<h2 class="text-5xl font-headline font-extrabold tracking-tighter text-primary uppercase">Built on Reputation</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+<div class="p-12 bg-surface-container-lowest relative border-l-8 border-secondary-container">
+<div class="flex gap-1 text-secondary-container mb-6">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-xl font-body text-on-surface leading-relaxed italic mb-8">
+                            "The structural integrity and speed of execution on the North-Eastern logistics hub was beyond standard industry expectations. STRUCTUR is our primary partner for all heavy-duty projects."
+                        </p>
+<div>
+<span class="font-headline font-bold uppercase text-primary text-sm">Marcus Vane</span>
+<p class="font-label text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Director, Vane Logistics Group</p>
+</div>
+</div>
+<div class="p-12 bg-surface-container-lowest relative border-l-8 border-primary">
+<div class="flex gap-1 text-secondary-container mb-6">
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-xl font-body text-on-surface leading-relaxed italic mb-8">
+                            "Technical excellence combined with rigorous safety protocols. Their renovation work on our heritage skyscraper preserved its soul while modernizing its entire framework."
+                        </p>
+<div>
+<span class="font-headline font-bold uppercase text-primary text-sm">Elena Petrova</span>
+<p class="font-label text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Chief Architect, Urban Rise</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact Banner -->
+<section class="bg-secondary-container py-24 px-12">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+<div class="text-on-secondary-container max-w-2xl">
+<h2 class="text-5xl font-headline font-black uppercase tracking-tighter mb-4">Ready to start the build?</h2>
+<p class="text-lg font-medium">Connect with our engineering leads for a technical consultation and precise quote.</p>
+</div>
+<button class="bg-primary text-on-primary font-headline font-black uppercase px-12 py-6 text-xl hover:translate-x-2 transition-transform">
+                    Contact Us Today
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-['Public_Sans'] text-[0.6875rem] uppercase tracking-[0.1em] rounded-none border-t-0 tonal-stacking-low flat no shadows grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 w-full">
+<div class="md:col-span-1">
+<div class="text-xl font-black text-slate-900 dark:text-slate-50 mb-6 font-headline">STRUCTUR</div>
+<p class="normal-case tracking-normal text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">Architectural Brutalism and high-end engineering. Building the foundations of the future with industrial precision.</p>
+<p class="text-slate-500 dark:text-slate-400">© 2024 STRUCTUR ARCHITECTURAL BRUTALISM. ALL RIGHTS RESERVED.</p>
+</div>
+<div>
+<h5 class="font-bold text-slate-900 dark:text-slate-50 mb-6">Navigation</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Sitemap</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Safety Protocols</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-slate-900 dark:text-slate-50 mb-6">Career Paths</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Careers</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">LinkedIn</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-slate-900 dark:text-slate-50 mb-6">Technical HQ</h5>
+<p class="normal-case tracking-normal text-slate-500 dark:text-slate-400 leading-relaxed">
+                100 Industrial Parkway<br/>
+                Steel District, NY 10001<br/>
+                T: +1 800 555 STRC
+            </p>
+</div>
+</footer>
+</body></html>

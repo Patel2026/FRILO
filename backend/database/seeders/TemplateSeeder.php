@@ -53,6 +53,41 @@ class TemplateSeeder extends Seeder
                 'price'       => 75000,
                 'features'    => ['Galerie des biens', 'Filtres de recherche', 'Demande de visite', 'Estimation en ligne'],
             ],
+            [
+                'sector_slug' => 'btp',
+                'name'        => 'Architectus',
+                'description' => 'Template BTP premium orienté grands chantiers, ingénierie et réalisations.',
+                'price'       => 75000,
+                'features'    => ['Hero chantier', 'Portfolio réalisations', 'Argumentaire expertise', 'Contact devis'],
+            ],
+            [
+                'sector_slug' => 'coaching',
+                'name'        => 'FRILO Africa',
+                'description' => 'Template conseil ancre PME/UEMOA avec offre d\'accompagnement et cas clients.',
+                'price'       => 65000,
+                'features'    => ['Offres de conseil', 'Cas clients', 'FAQ metier', 'Formulaire diagnostic'],
+            ],
+            [
+                'sector_slug' => 'coaching',
+                'name'        => 'Sacha Coach',
+                'description' => 'Template coaching personnel et leadership avec programmes, témoignages et prise de contact.',
+                'price'       => 50000,
+                'features'    => ['Programmes', 'Témoignages', 'À propos', 'Prise de rendez-vous'],
+            ],
+            [
+                'sector_slug' => 'avocats',
+                'name'        => 'Autorité Souveraine',
+                'description' => 'Template cabinet d\'avocats corporate, premium et panafricain.',
+                'price'       => 75000,
+                'features'    => ['Expertises', 'Positionnement haut de gamme', 'Témoignages', 'Contact consultation'],
+            ],
+            [
+                'sector_slug' => 'avocats',
+                'name'        => 'Sanctum Avocats',
+                'description' => 'Template cabinet juridique moderne, empathique et accessible.',
+                'price'       => 65000,
+                'features'    => ['Cabinet', 'Services', 'FAQ', 'Contact rassurant'],
+            ],
         ];
 
         foreach ($templates as $data) {

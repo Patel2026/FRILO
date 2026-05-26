@@ -64,25 +64,46 @@ export function buildPreviewUrl(baseUrl: string, path: string): string {
             return path;
         }
 
-        const base = new URL(baseUrl);
+        const isExternalBase = /^https?:\/\//i.test(baseUrl);
+        const normalizedBase = isExternalBase
+            ? baseUrl
+            : `https://preview.local${baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`}`;
+        const base = new URL(normalizedBase.endsWith('/') ? normalizedBase : `${normalizedBase}/`);
 
         if (!path || path === '/') {
-            return base.toString();
+            if (isExternalBase) {
+                return base.toString();
+            }
+
+            if (/\.[a-z0-9]+$/i.test(base.pathname)) {
+                return `${base.pathname}${base.search}${base.hash}`;
+            }
+
+            return `${base.pathname.endsWith('/') ? base.pathname : `${base.pathname}/`}index.html`;
         }
 
         if (path.startsWith('/')) {
-            base.pathname = path;
-            base.search = '';
-            base.hash = '';
-            return base.toString();
+            if (isExternalBase) {
+                base.pathname = path;
+                base.search = '';
+                base.hash = '';
+                return base.toString();
+            }
+
+            return path;
         }
 
-        return new URL(path, base).toString();
+        const resolved = new URL(path, base);
+
+        return isExternalBase
+            ? resolved.toString()
+            : `${resolved.pathname}${resolved.search}${resolved.hash}`;
     } catch {
         return baseUrl;
     }
 }
 
 export function hasLivePreview(previewUrl: string | undefined | null): boolean {
-    return typeof previewUrl === 'string' && /^https?:\/\//i.test(previewUrl);
+    return typeof previewUrl === 'string'
+        && (previewUrl.startsWith('/') || /^https?:\/\//i.test(previewUrl));
 }

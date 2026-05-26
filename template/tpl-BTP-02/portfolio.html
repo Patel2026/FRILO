@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Réalisations | ARCHITECTUS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="selection:bg-primary selection:text-on-primary font-body">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-xl flex justify-between items-center px-8 py-4 max-w-full mx-auto shadow-2xl shadow-slate-950/50">
+    <div class="text-2xl font-bold tracking-tighter text-slate-50 font-['Space_Grotesk']">ARCHITECTUS</div>
+    <div class="hidden md:flex gap-8 items-center font-['Space_Grotesk'] tracking-tight">
+        <a class="text-slate-400 hover:text-slate-100 transition-colors" href="index.html">Accueil</a>
+        <a class="text-slate-400 hover:text-slate-100 transition-colors" href="about.html">À propos</a>
+        <a class="text-slate-400 hover:text-slate-100 transition-colors" href="services.html">Services</a>
+        <a class="text-orange-500 font-bold border-b-2 border-orange-500 pb-1" href="portfolio.html">Réalisations</a>
+        <a class="text-slate-400 hover:text-slate-100 transition-colors" href="contact.html">Contact</a>
+    </div>
+    <div class="flex items-center gap-6">
+        <a href="contact.html" class="hidden md:block bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 py-2 rounded-md font-bold text-sm tracking-wide transition-all active:scale-95 duration-200">
+            Obtenir un Devis
+        </a>
+        <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30">
+            <img alt="User profile" data-alt="Professional architect headshot with neutral background and sharp lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2_qm7CJkWiIPz9AM-2q1x3oInl97T5J2d8FSRkNVl8FYTBdVonYXCsM0R0JqOZ8lHTAlTxzFbkl7_dnbHZKEw-5LNFB066lnJ0nAmNtbwzUnkN0Cq7bxYR336gh7QxE02WZAMwK-8ZrNTqMGAjo8C5X23G5wSxOQp7kYqT4U_oUxTaNcJLEqG_Hm_KPCt8kgZoNW0xVIY5d6ie9Zsadxizk8yaHp6aOitGJCdb8MxE13-t1oEbu1yk73ESrpX4IcNESWQJjXYPG0"/>
+        </div>
+    </div>
+</nav>
+
+<main class="pt-32 pb-20 px-8 max-w-7xl mx-auto">
+    <!-- Hero Section -->
+    <header class="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div class="max-w-2xl">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="h-px w-12 bg-primary"></div>
+                <span class="text-annotation text-xs font-bold uppercase tracking-[0.2em] text-primary">Capacités & Envergure</span>
+            </div>
+            <h1 class="text-blueprint text-6xl md:text-8xl font-bold leading-[0.9] text-on-background tracking-tighter">
+                REGISTRE <br/> <span class="text-primary-fixed-dim">DES RÉALISATIONS</span>
+            </h1>
+            <p class="mt-8 text-lg text-secondary/80 max-w-xl font-light leading-relaxed">
+                Le recueil définitif de l'excellence structurelle. Des tours définissant l'horizon aux infrastructures critiques, parcourez l'ingénierie de précision qui forge l'héritage d'Architectus.
+            </p>
+        </div>
+        <div class="flex flex-col items-end text-right">
+            <span class="text-blueprint text-5xl font-black text-surface-container-highest tracking-tighter leading-none">04/04</span>
+            <span class="text-annotation text-[10px] uppercase tracking-widest text-outline">Disciplines Actives</span>
+        </div>
+    </header>
+
+    <!-- Filters & Search -->
+    <section class="mb-12 flex flex-col md:flex-row gap-6 items-center justify-between">
+        <div class="flex flex-wrap gap-3">
+            <button class="px-6 py-2 rounded-sm bg-primary-container text-on-primary-container text-annotation text-xs font-bold uppercase tracking-wider">Tous Les Projets</button>
+            <button class="px-6 py-2 rounded-sm bg-surface-container-high text-on-surface text-annotation text-xs font-bold uppercase tracking-wider hover:bg-surface-container-highest transition-colors">Gratte-ciel</button>
+            <button class="px-6 py-2 rounded-sm bg-surface-container-high text-on-surface text-annotation text-xs font-bold uppercase tracking-wider hover:bg-surface-container-highest transition-colors">Ponts & Ouvrages d'art</button>
+            <button class="px-6 py-2 rounded-sm bg-surface-container-high text-on-surface text-annotation text-xs font-bold uppercase tracking-wider hover:bg-surface-container-highest transition-colors">Parcs Industriels</button>
+            <button class="px-6 py-2 rounded-sm bg-surface-container-high text-on-surface text-annotation text-xs font-bold uppercase tracking-wider hover:bg-surface-container-highest transition-colors">Infrastructures Santé</button>
+        </div>
+        <div class="relative w-full md:w-80 group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+            <input class="w-full bg-surface-container-low border-none pl-12 pr-4 py-3 text-annotation text-xs tracking-widest focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all" placeholder="RECHERCHER DANS LE REGISTRE..." type="text"/>
+        </div>
+    </section>
+
+    <!-- Bento Grid Projects -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <!-- Featured Project: Skyscraper -->
+        <div class="md:col-span-8 group relative overflow-hidden rounded-xl bg-surface-container-low transition-all">
+            <div class="aspect-[16/10] overflow-hidden">
+                <img alt="Skyscraper project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Ultra-modern glass skyscraper reflecting the blue sky at twilight with sharp geometric architectural lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5P0s7akPAnm9Fa04cith52CbK7QinMOBXV1-1AbpvddryB5WAvyG95orfuVGL9pTqc3ROx1pxWlh7lZUMD7yhLCTox5xHauNhXj-CrgdS8_TTP2_AhUdO4_WgiaO_9ejqRiry-02LREQui2FouAwalMJd8zTiDpFcaofdWJP-S54HD_knd9KGhEIQHlAd-TG_VEHFKE9RBqifiMt-SKoeyuZnmkyQD5RuANIA_w3Z3f6Nn5o04JU7aw8cBiVHOc87OxE6akbvPuI"/>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent opacity-90"></div>
+            <div class="absolute bottom-0 left-0 p-10 w-full flex justify-between items-end">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2 py-0.5 text-[10px] bg-primary text-on-primary font-black uppercase tracking-tighter">Gratte-ciel</span>
+                        <span class="text-tertiary text-xs font-mono">40.7128° N, 74.0060° W</span>
+                    </div>
+                    <h3 class="text-blueprint text-4xl font-bold tracking-tighter mb-2">TOURS NEO-PLAZA</h3>
+                    <p class="text-annotation text-xs text-secondary/60 tracking-wider">ACHEVÉ OCT 2023 • ENVERGURE 1.2MD$</p>
+                </div>
+                <button class="w-12 h-12 flex items-center justify-center bg-surface-container-highest rounded-full text-primary hover:bg-primary hover:text-on-primary transition-all">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+        <!-- Side Card: Bridge -->
+        <div class="md:col-span-4 group flex flex-col rounded-xl bg-surface-container-low overflow-hidden">
+            <div class="aspect-square overflow-hidden">
+                <img alt="Bridge project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Massive steel suspension bridge crossing a wide river during the blue hour with technical industrial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDibrMY1DCg-v1e2CrsXL5f3FLpqnqb9Pao01Ou86kh-NGHkBJlb93Ix8F5vpFUwfAgy8X7pYRW9wDYE1QFKOa4vVddaA4OKVUzRsy1sXDb12aBUIfYlcFK_nfmkkuuuam4n0jewjdM_jj4CKdpv0S07oadH_S117o_KHAVGtdudkhUC-7loMOq0uKjSi_ASzjLPAwdY2r-XyR-XflfnBH5sua-efEMkEawWYhRjdDOpifFJkOgci0_Zy5ul_uLOaGzhF_OoXk2n20"/>
+            </div>
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="text-annotation text-[10px] font-bold uppercase tracking-widest text-outline">Génie Civil / Infrastructure</span>
+                    <span class="text-tertiary font-mono text-xs">2022</span>
+                </div>
+                <h3 class="text-blueprint text-2xl font-bold tracking-tight mb-4">TRAVERSÉE DE L'IRON SPAN</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center text-annotation text-[10px] tracking-widest">
+                        <span class="text-outline">LOCALISATION</span>
+                        <span>OREGON, USA</span>
+                    </div>
+                    <div class="flex justify-between items-center text-annotation text-[10px] tracking-widest">
+                        <span class="text-outline">BUDGET GLOBAL</span>
+                        <span>450M$ - 600M$</span>
+                    </div>
+                    <div class="w-full h-1 bg-surface-container-highest mt-4 overflow-hidden">
+                        <div class="hazard-stripe h-full w-[85%]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Industrial Park -->
+        <div class="md:col-span-4 group rounded-xl bg-surface-container-low overflow-hidden">
+            <div class="aspect-[4/3] overflow-hidden relative">
+                <img alt="Industrial project" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Modern industrial logistics park with clean metallic facades and solar panel arrays on the roof" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG-xY-MfrgomCY-uephj7cBL-JhRqCgR-4ggfHzvgvbD6swo3hQ0A6jdqM5oXSTnN-RMPd03HWXpoVocIyf6K4-LZOiBSM7a86jPZx_-GB9RjpknBvnfzM2v8JrjqY4MeXOlwLInTfiGAiqJTMv7cXrA_7KjirG_eXbKuQT367g_p2kPFc-n0_0KpE-L4m4yD1UZdalt3w6vpZ61kJJLIFctoTvQGYOx0Lcv4Z3SVnd5xJmK7UqqLfhdyaJnMztw0soCz28l0Y87k"/>
+                <div class="absolute top-4 right-4 bg-surface-container-lowest/80 backdrop-blur px-3 py-1 rounded-sm text-annotation text-[10px] font-bold text-primary tracking-widest">INDUSTRIEL</div>
+            </div>
+            <div class="p-8">
+                <h3 class="text-blueprint text-xl font-bold mb-2">QUBIT LOGISTICS HUB</h3>
+                <p class="text-annotation text-[10px] text-outline tracking-widest mb-6 uppercase">ALLEMAGNE • MARS 2024</p>
+                <div class="flex items-center gap-4 text-tertiary">
+                    <span class="material-symbols-outlined text-sm">precision_manufacturing</span>
+                    <span class="text-annotation text-[10px] tracking-[0.2em] font-bold">ÉCHELLE DE PRÉCISION</span>
+                </div>
+            </div>
+        </div>
+        <!-- Healthcare -->
+        <div class="md:col-span-8 group relative overflow-hidden rounded-xl bg-surface-container-low h-full min-h-[400px]">
+            <img alt="Healthcare project" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Contemporary healthcare complex with white minimalist facade and large floor to ceiling windows at sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAkCHqaT48Ymd1D-x7JlrlfpO0ouDruqpkJT0KtGZqnKsxmgJNvZjPoJaQ3dvPxkYgZzUweF1AILokEbIS9oLk1_-pDgEL1n1LSBJhY_ktmBsbd52jm8ZtnWJL9bLBqZMozHrYyWHSUBzQ6eRGMnmTesXHU3Zicu7L-kaRfHZ3P6M-a-_5y_14d8x0oii8SevIPARb2vHKfGc5TwSq6Aesw4Byb5dU6OA2IpiHrfLOoSKgB7iGQpFC4d7Id9F0IzMCLCgA66cBLkg"/>
+            <div class="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/40 to-transparent"></div>
+            <div class="absolute inset-0 p-12 flex flex-col justify-center max-w-md">
+                <span class="text-annotation text-[10px] font-bold uppercase tracking-widest text-primary mb-4">Infrastructure Santé Mondiale</span>
+                <h3 class="text-blueprint text-4xl font-bold tracking-tighter mb-4 leading-none">CENTRE CHIRURGICAL ST. ANTHONY</h3>
+                <p class="text-secondary/70 text-sm leading-relaxed mb-8">
+                    Un environnement de soins critiques de 450 000 mètres carrés pensé pour un flux opérationnel optimal et une résilience technique de niveau militaire.
+                </p>
+                <div class="flex gap-8">
+                    <div>
+                        <p class="text-annotation text-[10px] text-outline tracking-widest uppercase">Valorisation</p>
+                        <p class="text-blueprint text-xl font-bold">210M$</p>
+                    </div>
+                    <div>
+                        <p class="text-annotation text-[10px] text-outline tracking-widest uppercase">Durée des Travaux</p>
+                        <p class="text-blueprint text-xl font-bold">18 MOIS</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination/Load More -->
+    <div class="mt-20 flex flex-col items-center">
+        <button class="group flex flex-col items-center gap-4">
+            <span class="text-annotation text-[10px] font-bold tracking-[0.3em] text-outline group-hover:text-primary transition-colors">CHARGER PLUS D'ARCHIVES</span>
+            <div class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center group-hover:border-primary transition-colors">
+                <span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+            </div>
+        </button>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="w-full border-t border-slate-800/50 bg-slate-950 px-12 py-20 grid grid-cols-1 md:grid-cols-4 gap-12">
+    <div class="col-span-1 md:col-span-1">
+        <div class="text-xl font-black text-slate-100 font-['Space_Grotesk'] mb-6">ARCHITECTUS</div>
+        <p class="text-slate-500 text-xs leading-relaxed max-w-xs lowercase italic">
+            Repousser les limites de l'intégrité structurelle à travers la précision itérative et l'anticipation architecturale.
+        </p>
+    </div>
+    <div>
+        <h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6 font-bold">Répertoire de Chantiers</h4>
+        <ul class="space-y-4">
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Gratte-ciel</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Ouvrages d'Art</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Usines et Pôles</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Santé & Sécurité</a></li>
+        </ul>
+    </div>
+    <div>
+        <h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6 font-bold">L'Entreprise</h4>
+        <ul class="space-y-4">
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Engagements Sécurité</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Bourse d'Emplois</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Mentions Légales</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors text-sm font-['Inter'] uppercase tracking-widest hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Gestion des Données</a></li>
+        </ul>
+    </div>
+    <div>
+        <h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6 font-bold">Siège Global</h4>
+        <p class="text-slate-500 text-sm font-['Inter'] tracking-widest uppercase leading-loose">
+            01 STEEL PLAZA<br/>
+            NIVEAU 88<br/>
+            NEW YORK, NY 10001
+        </p>
+    </div>
+    <div class="col-span-1 md:col-span-4 pt-12 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6">
+        <span class="text-slate-500 font-['Inter'] text-sm tracking-widest uppercase">© 2024 Architectus Global. L'Excellence en Ingénierie de Précision.</span>
+        <div class="flex gap-8">
+            <span class="material-symbols-outlined text-slate-500 hover:text-orange-500 cursor-pointer">public</span>
+            <span class="material-symbols-outlined text-slate-500 hover:text-orange-500 cursor-pointer">architecture</span>
+            <span class="material-symbols-outlined text-slate-500 hover:text-orange-500 cursor-pointer">layers</span>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

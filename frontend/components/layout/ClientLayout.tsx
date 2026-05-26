@@ -9,6 +9,8 @@ import { Footer } from './Footer';
 const EXCLUDED_PREFIXES = [
   '/login',
   '/register',
+  '/forgot-password',
+  '/reset-password',
   '/dashboard',
   '/commande',
   '/demo',

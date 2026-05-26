@@ -1,5 +1,6 @@
 @php
     $template = $template ?? null;
+    $localPreviewTemplates = $localPreviewTemplates ?? [];
     $previewPagesRaw = old('preview_pages_raw',
         collect($template?->preview_pages ?? [])
             ->map(function ($page) {
@@ -11,6 +12,18 @@
             ->implode("\n")
     );
     $previewGalleryRaw = old('preview_gallery_raw', implode("\n", $template?->preview_gallery ?? []));
+    $resolvedPreviewSource = old('preview_source',
+        \Illuminate\Support\Str::startsWith((string) ($template?->preview_url ?? ''), '/template-previews/')
+            ? 'local'
+            : 'external'
+    );
+    $resolvedLocalPreviewTemplate = old('local_preview_template');
+
+    if (!$resolvedLocalPreviewTemplate && $template?->preview_url) {
+        if (preg_match('#^/template-previews/([^/]+)/#', $template->preview_url, $matches) === 1) {
+            $resolvedLocalPreviewTemplate = $matches[1];
+        }
+    }
 @endphp
 
 <div class="mb-3">
@@ -64,26 +77,62 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">URL de prévisualisation</label>
-    <input type="url" name="preview_url" class="form-control"
-           value="{{ old('preview_url', $template?->preview_url) }}" placeholder="https://...">
-    <div class="form-text">Lien vers la démo live (site interactif affiché dans l'espace client).</div>
+    <label class="form-label d-block">Mode de prévisualisation</label>
+    <div class="d-flex flex-column gap-2">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="preview_source" id="preview_source_external" value="external"
+                   {{ $resolvedPreviewSource === 'external' ? 'checked' : '' }}>
+            <label class="form-check-label" for="preview_source_external">
+                Liens d'accès externes ou manuels
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="preview_source" id="preview_source_local" value="local"
+                   {{ $resolvedPreviewSource === 'local' ? 'checked' : '' }}>
+            <label class="form-check-label" for="preview_source_local">
+                Template HTML local préchargé depuis le dossier <code>template/</code>
+            </label>
+        </div>
+    </div>
+    @error('preview_source')<div class="text-danger small mt-2">{{ $message }}</div>@enderror
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Template HTML local préchargé</label>
+    <select name="local_preview_template" class="form-select @error('local_preview_template') is-invalid @enderror">
+        <option value="">-- Sélectionner un dossier template --</option>
+        @foreach($localPreviewTemplates as $localTemplate)
+            <option value="{{ $localTemplate['folder'] }}" {{ $resolvedLocalPreviewTemplate === $localTemplate['folder'] ? 'selected' : '' }}>
+                {{ $localTemplate['label'] }} — {{ $localTemplate['pages_count'] }} page(s)
+            </option>
+        @endforeach
+    </select>
+    @error('local_preview_template')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    <div class="form-text">Si ce mode est choisi, FRILO utilise automatiquement les fichiers HTML préchargés et leurs pages associées.</div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">URL de prévisualisation externe</label>
+    <input type="text" name="preview_url" class="form-control @error('preview_url') is-invalid @enderror"
+           value="{{ old('preview_url', $resolvedPreviewSource === 'external' ? $template?->preview_url : '') }}" placeholder="https://...">
+    @error('preview_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    <div class="form-text">Utilisé seulement si le mode <strong>Liens d'accès</strong> est sélectionné.</div>
 </div>
 
 <div class="mb-3">
     <label class="form-label">Pages de prévisualisation (une page par ligne)</label>
     <textarea name="preview_pages_raw" class="form-control @error('preview_pages_raw') is-invalid @enderror" rows="4"
-              placeholder="Accueil|/&#10;Services|/services&#10;Contact|/contact">{{ $previewPagesRaw }}</textarea>
+              placeholder="Accueil|/&#10;Services|/services&#10;Contact|/contact">{{ $resolvedPreviewSource === 'external' ? $previewPagesRaw : '' }}</textarea>
     @error('preview_pages_raw')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    <div class="form-text">Format: <code>Titre|/chemin</code>. Exemple: <code>Tarifs|/tarifs</code>.</div>
+    <div class="form-text">Utilisé seulement en mode liens. Format: <code>Titre|/chemin</code>.</div>
 </div>
 
 <div class="mb-3">
     <label class="form-label">Galerie d'aperçu (une URL d'image par ligne)</label>
     <textarea name="preview_gallery_raw" class="form-control @error('preview_gallery_raw') is-invalid @enderror" rows="4"
-              placeholder="https://.../home.jpg&#10;https://.../about.jpg">{{ $previewGalleryRaw }}</textarea>
+              placeholder="https://.../home.jpg&#10;https://.../about.jpg">{{ $resolvedPreviewSource === 'external' ? $previewGalleryRaw : '' }}</textarea>
     @error('preview_gallery_raw')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    <div class="form-text">Utilisée en fallback si la démo live n'est pas disponible.</div>
+    <div class="form-text">Fallback image uniquement pour le mode liens d'accès.</div>
 </div>
 
 <div class="form-check form-switch mb-0">

@@ -1,12 +1,29 @@
+*
+
+!.dockerignore
+!backend/
+!frontend/
+!docker/
+!template/
+!template/**
+
 .git
 .git/*
 .DS_Store
 
+backend/.env
 backend/vendor
 backend/node_modules
-frontend/node_modules
-frontend/.next
+backend/storage/logs
+backend/storage/framework/cache
+backend/storage/framework/sessions
+backend/storage/framework/testing
+backend/storage/framework/views
+backend/bootstrap/cache/*.php
 
-backend/.env
 frontend/.env
 frontend/.env.local
+frontend/node_modules
+frontend/.next
+frontend/playwright-report
+frontend/test-results

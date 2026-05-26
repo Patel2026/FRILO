@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, type LucideIcon, Utensils, Hammer, Heart, Scale, Users, Home } from 'lucide-react';
 import { businessService, Sector } from '@/services/business.service';
-import { cn } from '@/lib/utils';
 
 const IconMap: Record<string, LucideIcon> = { Utensils, Hammer, Heart, Scale, Users, Home };
 
@@ -29,26 +28,44 @@ export default function SectorsPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Hero */}
-      <div className="sq-section bg-black text-white">
-        <div className="sq-container text-center">
-          <p className="sq-label text-gray-500 mb-5">Secteurs</p>
-          <h1 className="sq-display text-white mb-6">
-            Votre métier,<br />votre modèle.
-          </h1>
-          <p className="text-gray-400 text-xl max-w-lg mx-auto">
-            Chaque secteur dispose de designs spécialement conçus pour ses besoins.
-          </p>
+      <div className="bg-black px-5 pb-14 pt-32 text-white md:pb-16 md:pt-36">
+        <div className="mx-auto grid max-w-7xl gap-10 sm:px-6 lg:grid-cols-[1fr_0.72fr] lg:items-end lg:px-8">
+          <div>
+            <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Secteurs</p>
+            <h1 className="max-w-3xl text-4xl font-black leading-[0.98] tracking-tight md:text-5xl lg:text-6xl">
+              Choisissez le point de départ de votre site.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/65 md:text-lg">
+              Commencez par le métier le plus proche du vôtre. FRILO adapte ensuite le modèle à votre activité, vos contenus et votre façon de vendre.
+            </p>
+          </div>
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 md:p-6">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">Pas sûr du secteur ?</p>
+            <p className="mt-3 text-xl font-black leading-tight">
+              Choisissez le plus proche, on ajuste le reste pendant la commande.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="pt-12 pb-20 md:pt-14 md:pb-24">
-        <div className="sq-container">
+      <div className="px-5 py-12 md:py-16">
+        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Métiers disponibles</p>
+              <h2 className="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 md:text-4xl">
+                Trouvez le modèle qui parle déjà à vos clients.
+              </h2>
+            </div>
+            <p className="max-w-lg text-sm leading-6 text-slate-500 md:max-w-md">
+              Chaque secteur sert de base claire : services, preuves, contact et présentation sont ensuite adaptés à votre entreprise.
+            </p>
+          </div>
+
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white h-48 animate-pulse" />
+                <div key={i} className="h-64 animate-pulse rounded-[1.35rem] bg-slate-100" />
               ))}
             </div>
           ) : error ? (
@@ -60,31 +77,33 @@ export default function SectorsPage() {
               <p className="text-sm text-gray-500">Aucun secteur actif disponible pour le moment.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100">
-              {sectors.map(sector => {
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {sectors.map((sector, index) => {
                 const Icon = IconMap[sector.icon] || Home;
                 return (
                   <Link
                     key={sector.id}
                     href={`/secteurs/${sector.slug}`}
-                    className="group bg-white p-10 flex flex-col gap-6 hover:bg-black transition-colors duration-300 card-hover"
+                    className="group flex min-h-64 flex-col rounded-[1.35rem] border border-slate-100 bg-slate-50 p-6 transition-colors duration-300 hover:border-slate-950 hover:bg-slate-950"
                   >
-                    <div className={cn(
-                      "w-12 h-12 rounded-xl flex items-center justify-center text-white bg-gradient-to-br flex-shrink-0",
-                      sector.gradient || 'from-blue-500 to-purple-600'
-                    )}>
-                      <Icon className="w-6 h-6" />
+                    <div className="mb-8 flex items-center justify-between gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-950 text-white transition-colors group-hover:bg-[oklch(57%_0.24_29)]">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-xs font-black text-slate-300 transition-colors group-hover:text-white/35">
+                        0{index + 1}
+                      </span>
                     </div>
-                    <div className="flex-grow">
-                      <h2 className="sq-subheading text-black group-hover:text-white transition-colors mb-2">
+                    <div className="flex flex-1 flex-col">
+                      <h2 className="text-2xl font-black leading-tight tracking-tight text-slate-950 transition-colors group-hover:text-white">
                         {sector.name}
                       </h2>
-                      <p className="text-gray-500 group-hover:text-gray-300 text-sm leading-relaxed transition-colors">
+                      <p className="mt-3 text-sm leading-6 text-slate-500 transition-colors group-hover:text-white/62">
                         {sector.description}
                       </p>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm font-bold text-black group-hover:text-white transition-colors">
-                      Voir les modèles <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      <div className="mt-auto flex items-center gap-2 pt-8 text-sm font-black text-slate-950 transition-colors group-hover:text-white">
+                        Voir les modèles <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </div>
                     </div>
                   </Link>
                 );

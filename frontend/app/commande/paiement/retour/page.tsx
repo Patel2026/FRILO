@@ -3,42 +3,66 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
-import { businessService, OrderPaymentResponse, PaymentStatus } from '@/services/business.service';
+import { AlertTriangle, ArrowRight, CheckCircle2, Loader2, RefreshCcw } from 'lucide-react';
 import axios from 'axios';
+import { businessService, OrderPaymentResponse, PaymentStatus } from '@/services/business.service';
+import { cn } from '@/lib/utils';
 
-const paymentStatusConfig: Record<PaymentStatus, { label: string; description: string; classes: string }> = {
+const paymentStatusConfig: Record<PaymentStatus, {
+  label: string;
+  title: string;
+  description: string;
+  classes: string;
+  tone: 'success' | 'warning' | 'danger' | 'neutral';
+}> = {
   awaiting_payment: {
     label: 'Paiement en attente',
-    description: 'La transaction est en cours de validation. Confirmez la demande sur votre téléphone si nécessaire.',
-    classes: 'bg-amber-50 text-amber-700 border-amber-100',
+    title: 'Nous vérifions votre paiement.',
+    description: 'La transaction peut prendre quelques instants. Si vous avez utilisé Mobile Money, confirmez la demande sur votre téléphone.',
+    classes: 'bg-amber-50 text-amber-700',
+    tone: 'warning',
   },
   paid: {
     label: 'Paiement confirmé',
-    description: 'Votre commande est bien enregistrée. Notre équipe peut démarrer le traitement.',
-    classes: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    title: 'Votre commande est confirmée.',
+    description: 'FRILO peut démarrer la préparation de votre site avec les informations déjà transmises.',
+    classes: 'bg-emerald-50 text-emerald-700',
+    tone: 'success',
   },
   failed: {
     label: 'Paiement échoué',
-    description: 'Le paiement a échoué. Vous pouvez relancer un paiement depuis le détail de la commande.',
-    classes: 'bg-red-50 text-red-700 border-red-100',
+    title: 'Le paiement n’a pas abouti.',
+    description: 'Vous pouvez relancer le paiement depuis le détail de la commande, sans recommencer votre demande.',
+    classes: 'bg-red-50 text-red-700',
+    tone: 'danger',
   },
   cancelled: {
     label: 'Paiement annulé',
-    description: 'Le paiement a été annulé avant confirmation.',
-    classes: 'bg-gray-100 text-gray-700 border-gray-200',
+    title: 'Le paiement a été annulé.',
+    description: 'Votre commande reste accessible. Vous pouvez reprendre le paiement depuis votre espace client.',
+    classes: 'bg-gray-100 text-gray-700',
+    tone: 'neutral',
   },
   refunded: {
     label: 'Paiement remboursé',
-    description: 'La transaction a été remboursée.',
-    classes: 'bg-blue-50 text-blue-700 border-blue-100',
+    title: 'Le paiement a été remboursé.',
+    description: 'Consultez la commande ou contactez FRILO si vous avez besoin d’un suivi.',
+    classes: 'bg-sky-50 text-sky-700',
+    tone: 'neutral',
   },
   expired: {
     label: 'Paiement expiré',
-    description: 'La session de paiement a expiré. Vous pouvez relancer un paiement.',
-    classes: 'bg-slate-100 text-slate-700 border-slate-200',
+    title: 'Le lien de paiement a expiré.',
+    description: 'Votre commande est conservée. Générez un nouveau paiement depuis son détail.',
+    classes: 'bg-slate-100 text-slate-700',
+    tone: 'warning',
   },
 };
+
+function getIcon(tone: 'success' | 'warning' | 'danger' | 'neutral') {
+  if (tone === 'success') return CheckCircle2;
+  return AlertTriangle;
+}
 
 function PaymentReturnContent() {
   const searchParams = useSearchParams();
@@ -63,11 +87,11 @@ function PaymentReturnContent() {
       setResult(response);
     } catch (requestError) {
       if (axios.isAxiosError(requestError) && requestError.response?.status === 401) {
-        setError('Reconnectez-vous pour consulter le statut de paiement.');
+        setError('Reconnectez-vous pour consulter le statut du paiement.');
       } else if (axios.isAxiosError(requestError) && typeof requestError.response?.data?.message === 'string') {
         setError(requestError.response.data.message);
       } else {
-        setError('Impossible de récupérer le statut de paiement pour le moment.');
+        setError('Impossible de récupérer le statut du paiement pour le moment.');
       }
     } finally {
       setLoading(false);
@@ -83,83 +107,118 @@ function PaymentReturnContent() {
     () => paymentStatusConfig[paymentStatus] ?? paymentStatusConfig.awaiting_payment,
     [paymentStatus]
   );
-  const isPaid = paymentStatus === 'paid';
-  const isFinalFailure = paymentStatus === 'failed' || paymentStatus === 'cancelled' || paymentStatus === 'expired';
+  const StatusIcon = getIcon(config.tone);
   const orderReference = Number.isInteger(orderId) && orderId > 0
     ? `#ORD-${String(orderId).padStart(5, '0')}`
-    : '#ORD-—';
+    : '#ORD-00000';
+  const canViewOrder = Number.isInteger(orderId) && orderId > 0;
+  const amount = result?.order.price;
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] px-4 py-12">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white border border-gray-100 rounded-2xl p-8 md:p-10">
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Paiement</p>
-          <h1 className="text-3xl font-black text-black tracking-tight mb-2">Retour FedaPay</h1>
-          <p className="text-sm text-gray-500 mb-8">Commande {orderReference}</p>
+    <main className="min-h-screen bg-neutral-50 px-4 py-6 text-black md:px-8 md:py-10">
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-[1180px] flex-col">
+        <header className="mb-10 flex items-center justify-between border-b border-gray-200 pb-5">
+          <Link href="/" className="text-xl font-black tracking-tight text-black">FRILO</Link>
+          <Link href="/dashboard/orders" className="text-sm font-black text-gray-500 transition-colors hover:text-black">
+            Mes commandes
+          </Link>
+        </header>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-14">
-              <Loader2 className="w-7 h-7 animate-spin text-gray-400" />
-            </div>
-          ) : error ? (
-            <div className="border border-red-100 bg-red-50 rounded-xl p-5 text-center">
-              <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-2" />
-              <p className="text-sm text-red-700">{error}</p>
-              <button
-                type="button"
-                onClick={fetchStatus}
-                className="mt-4 text-sm font-semibold text-black underline underline-offset-2"
-              >
-                Réessayer
-              </button>
-            </div>
-          ) : (
-            <div className={`border rounded-xl p-5 ${config.classes}`}>
-              <div className="flex items-center gap-2 mb-3">
-                {isPaid ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
-                <p className="font-bold">{config.label}</p>
+        <section className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+          <div>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Retour de paiement</p>
+
+            {loading ? (
+              <div className="border-y border-gray-200 py-12">
+                <Loader2 className="mb-5 h-8 w-8 animate-spin text-gray-400" />
+                <h1 className="text-3xl font-black tracking-tight text-black">Vérification du paiement.</h1>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-gray-500">
+                  Nous synchronisons le statut avec le prestataire de paiement.
+                </p>
               </div>
-              <p className="text-sm">{config.description}</p>
-            </div>
-          )}
+            ) : error ? (
+              <div className="border-y border-gray-200 py-12">
+                <AlertTriangle className="mb-5 h-9 w-9 text-red-500" />
+                <h1 className="text-3xl font-black tracking-tight text-black">Statut indisponible.</h1>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-gray-500">{error}</p>
+                <button
+                  type="button"
+                  onClick={fetchStatus}
+                  className="mt-7 inline-flex items-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                  Réessayer
+                </button>
+              </div>
+            ) : (
+              <div className="border-y border-gray-200 py-12">
+                <div className="mb-6 flex items-center gap-3">
+                  <span className={cn("inline-flex h-10 w-10 items-center justify-center rounded-full", config.classes)}>
+                    <StatusIcon className="h-5 w-5" />
+                  </span>
+                  <span className={cn("inline-flex rounded-full px-3 py-1.5 text-xs font-semibold", config.classes)}>
+                    {config.label}
+                  </span>
+                </div>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            {!loading && (
-              <button
-                type="button"
-                onClick={fetchStatus}
-                className="sq-btn sq-btn-outline-black text-sm py-2.5 px-4"
-              >
-                Actualiser le statut
-              </button>
+                <h1 className="max-w-3xl text-4xl font-black tracking-tight text-black md:text-5xl">{config.title}</h1>
+                <p className="mt-4 max-w-2xl text-base leading-7 text-gray-500">{config.description}</p>
+
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                  {canViewOrder && (
+                    <Link
+                      href={`/dashboard/orders/${orderId}`}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
+                    >
+                      Voir ma commande
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={fetchStatus}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-6 py-3 text-sm font-black text-gray-600 transition-colors hover:border-black hover:text-black"
+                  >
+                    <RefreshCcw className="h-4 w-4" />
+                    Actualiser
+                  </button>
+                </div>
+              </div>
             )}
-            {Number.isInteger(orderId) && orderId > 0 && (
-              <Link href={`/dashboard/orders/${orderId}`} className="sq-btn sq-btn-black text-sm py-2.5 px-4">
-                Voir la commande
-              </Link>
-            )}
-            <Link href="/dashboard/orders" className="text-sm font-semibold text-gray-500 hover:text-black transition-colors">
-              Retour au dashboard
-            </Link>
           </div>
 
-          {!loading && isFinalFailure && Number.isInteger(orderId) && orderId > 0 && (
-            <p className="mt-5 text-xs text-gray-500">
-              Besoin d&apos;aide ? Ouvrez la commande puis utilisez le contact support avec la référence {orderReference}.
+          <aside className="border-y border-gray-200 py-6">
+            <p className="mb-5 text-xs font-bold uppercase tracking-widest text-gray-400">Récapitulatif</p>
+            <dl className="divide-y divide-gray-100 text-sm">
+              <div className="flex items-center justify-between gap-6 py-4">
+                <dt className="font-semibold text-gray-500">Commande</dt>
+                <dd className="font-black text-black">{orderReference}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-6 py-4">
+                <dt className="font-semibold text-gray-500">Montant</dt>
+                <dd className="font-black text-black">{typeof amount === 'number' ? `${amount.toLocaleString('fr-FR')} FCFA` : 'En cours'}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-6 py-4">
+                <dt className="font-semibold text-gray-500">Prestataire</dt>
+                <dd className="font-black text-black">FedaPay</dd>
+              </div>
+            </dl>
+            <p className="mt-5 text-sm leading-6 text-gray-500">
+              Gardez cette page ouverte quelques instants si la confirmation Mobile Money vient d’être validée.
             </p>
-          )}
-        </div>
+          </aside>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
 
 export default function PaymentReturnPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#f7f7f7] px-4 py-12 flex items-center justify-center">
-        <Loader2 className="w-7 h-7 animate-spin text-gray-400" />
-      </div>
+      <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
+        <Loader2 className="h-7 w-7 animate-spin text-gray-400" />
+      </main>
     }>
       <PaymentReturnContent />
     </Suspense>

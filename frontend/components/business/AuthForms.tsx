@@ -18,26 +18,26 @@ interface AuthFormsProps {
   defaultMode?: 'login' | 'register';
 }
 
-const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300";
-const labelClass = "block text-xs font-bold text-black uppercase tracking-widest mb-2";
+const inputClass = "w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-slate-950";
+const labelClass = "mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950";
 
 export function AuthForms({ onSuccess, defaultMode = 'login' }: AuthFormsProps) {
   const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="mx-auto max-w-md">
 
       {/* Mode toggle */}
-      <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
+      <div className="mb-6 flex rounded-full bg-slate-100 p-1">
         {(['login', 'register'] as const).map(m => (
           <button
             key={m}
             type="button"
             onClick={() => { setMode(m); setError(null); }}
             className={cn(
-              "flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all",
-              mode === m ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-black"
+              "flex-1 rounded-full py-2.5 text-sm font-black transition-colors",
+              mode === m ? "bg-white text-slate-950 shadow-sm" : "text-slate-400 hover:text-slate-950"
             )}
           >
             {m === 'login' ? 'Connexion' : 'Inscription'}
@@ -46,8 +46,8 @@ export function AuthForms({ onSuccess, defaultMode = 'login' }: AuthFormsProps) 
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-4 mb-5">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="mb-5 flex items-start gap-2 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm leading-6 text-red-600">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           {error}
         </div>
       )}
@@ -82,18 +82,18 @@ function LoginForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void; o
         {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
       </div>
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-bold text-black uppercase tracking-widest">
+        <div className="mb-2 flex items-center justify-between gap-4">
+          <label className="text-xs font-black uppercase tracking-[0.14em] text-slate-950">
             Mot de passe
           </label>
-          <Link href="/forgot-password" className="text-xs text-gray-400 hover:text-black transition-colors">
+          <Link href="/forgot-password" className="text-xs font-semibold text-slate-400 transition-colors hover:text-slate-950">
             Mot de passe oublié ?
           </Link>
         </div>
         <input {...register('password')} type="password" placeholder="••••••••" className={inputClass} />
         {errors.password && <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>}
       </div>
-      <button type="submit" disabled={isSubmitting} className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50">
+      <button type="submit" disabled={isSubmitting} className="inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-sm font-black text-white transition-colors hover:bg-black disabled:opacity-50">
         {isSubmitting ? 'Connexion…' : 'Se connecter'}
       </button>
     </form>
@@ -173,7 +173,7 @@ function RegisterForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void
           </p>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3 md:gap-4">
         <div>
           <label className={labelClass}>Mot de passe</label>
           <input {...register('password')} type="password" placeholder="••••••••" className={inputClass} />
@@ -185,7 +185,7 @@ function RegisterForm({ onSuccess, onError }: { onSuccess: (u: AuthUser) => void
           {errors.password_confirmation && <p className="text-red-500 text-xs mt-1.5">{errors.password_confirmation.message}</p>}
         </div>
       </div>
-      <button type="submit" disabled={isSubmitting || loadingSectors || sectors.length === 0} className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50">
+      <button type="submit" disabled={isSubmitting || loadingSectors || sectors.length === 0} className="inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-sm font-black text-white transition-colors hover:bg-black disabled:opacity-50">
         {isSubmitting ? 'Création…' : 'Créer mon compte'}
       </button>
     </form>

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-25T00:00:00Z",
+  "title": "Design System: FRILO",
+  "extensions": {
+    "northStar": "The Trusted Counter",
+    "colorMeta": {
+      "frilo-blue": {
+        "role": "primary",
+        "displayName": "FRILO Blue",
+        "canonical": "#2563EB",
+        "usage": "Primary actions, links, selected states, and processing emphasis."
+      },
+      "frilo-purple": {
+        "role": "secondary",
+        "displayName": "FRILO Purple",
+        "canonical": "#7E22CE",
+        "usage": "Sparse brand accent and gradient partner."
+      },
+      "surface-muted": {
+        "role": "neutral",
+        "displayName": "Muted Surface",
+        "canonical": "#F8FAFC",
+        "usage": "Section breaks, dashboard backgrounds, and empty states."
+      }
+    },
+    "elevationMeta": {
+      "card-hover-lift": {
+        "boxShadow": "0 12px 40px rgba(0,0,0,0.08)",
+        "purpose": "Hover feedback on catalogue-style cards."
+      }
+    },
+    "motionMeta": {
+      "defaultTransition": "150ms to 200ms ease-out",
+      "rule": "Motion conveys state, feedback, loading, or reveal. It is not decorative."
+    },
+    "rules": [
+      "Use product density for dashboards, admin views, tables, and forms.",
+      "Never rely on color alone for order or payment state.",
+      "Avoid generic imported SaaS styling and decorative local-context cliches.",
+      "Use large display typography only for public marketing moments."
+    ]
+  }
+}

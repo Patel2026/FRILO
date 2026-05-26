@@ -5,12 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Sector;
 use App\Models\Template;
+use App\Support\LocalTemplatePreviewCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 
 class TemplateController extends Controller
 {
+    public function __construct(
+        private readonly LocalTemplatePreviewCatalog $localTemplatePreviewCatalog
+    ) {
+    }
+
     public function index()
     {
         $templates = Template::with('sector')
@@ -24,8 +31,9 @@ class TemplateController extends Controller
     public function create()
     {
         $sectors = Sector::active()->orderBy('name')->get();
+        $localPreviewTemplates = $this->localTemplatePreviewCatalog->all();
 
-        return view('admin.templates.create', compact('sectors'));
+        return view('admin.templates.create', compact('sectors', 'localPreviewTemplates'));
     }
 
     public function store(Request $request)
@@ -37,7 +45,9 @@ class TemplateController extends Controller
             'price' => ['required', 'integer', 'min:0'],
             'features_raw' => ['nullable', 'string'],
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'preview_url' => ['nullable', 'url', 'max:500'],
+            'preview_source' => ['required', 'in:external,local'],
+            'local_preview_template' => ['nullable', 'string', 'max:255'],
+            'preview_url' => ['nullable', 'string', 'max:500'],
             'preview_pages_raw' => ['nullable', 'string'],
             'preview_gallery_raw' => ['nullable', 'string'],
             'is_active' => ['boolean'],
@@ -45,10 +55,15 @@ class TemplateController extends Controller
 
         $data['slug'] = Str::slug($data['name']);
         $data['features'] = $this->parseFeatures($request->input('features_raw'));
-        $data['preview_pages'] = $this->parsePreviewPages($request->input('preview_pages_raw'));
-        $data['preview_gallery'] = $this->parsePreviewGallery($request->input('preview_gallery_raw'));
+        [$data['preview_url'], $data['preview_pages'], $data['preview_gallery']] = $this->resolvePreviewConfiguration(
+            $data['preview_source'],
+            $request->input('local_preview_template'),
+            $data['preview_url'] ?? null,
+            $request->input('preview_pages_raw'),
+            $request->input('preview_gallery_raw')
+        );
         $data['is_active'] = $request->boolean('is_active');
-        unset($data['features_raw'], $data['preview_pages_raw'], $data['preview_gallery_raw']);
+        unset($data['features_raw'], $data['preview_source'], $data['local_preview_template'], $data['preview_pages_raw'], $data['preview_gallery_raw']);
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('templates', 'public');
@@ -62,8 +77,9 @@ class TemplateController extends Controller
     public function edit(Template $template)
     {
         $sectors = Sector::active()->orderBy('name')->get();
+        $localPreviewTemplates = $this->localTemplatePreviewCatalog->all();
 
-        return view('admin.templates.edit', compact('template', 'sectors'));
+        return view('admin.templates.edit', compact('template', 'sectors', 'localPreviewTemplates'));
     }
 
     public function update(Request $request, Template $template)
@@ -75,17 +91,24 @@ class TemplateController extends Controller
             'price' => ['required', 'integer', 'min:0'],
             'features_raw' => ['nullable', 'string'],
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'preview_url' => ['nullable', 'url', 'max:500'],
+            'preview_source' => ['required', 'in:external,local'],
+            'local_preview_template' => ['nullable', 'string', 'max:255'],
+            'preview_url' => ['nullable', 'string', 'max:500'],
             'preview_pages_raw' => ['nullable', 'string'],
             'preview_gallery_raw' => ['nullable', 'string'],
             'is_active' => ['boolean'],
         ]);
 
         $data['features'] = $this->parseFeatures($request->input('features_raw'));
-        $data['preview_pages'] = $this->parsePreviewPages($request->input('preview_pages_raw'));
-        $data['preview_gallery'] = $this->parsePreviewGallery($request->input('preview_gallery_raw'));
+        [$data['preview_url'], $data['preview_pages'], $data['preview_gallery']] = $this->resolvePreviewConfiguration(
+            $data['preview_source'],
+            $request->input('local_preview_template'),
+            $data['preview_url'] ?? null,
+            $request->input('preview_pages_raw'),
+            $request->input('preview_gallery_raw')
+        );
         $data['is_active'] = $request->boolean('is_active');
-        unset($data['features_raw'], $data['preview_pages_raw'], $data['preview_gallery_raw']);
+        unset($data['features_raw'], $data['preview_source'], $data['local_preview_template'], $data['preview_pages_raw'], $data['preview_gallery_raw']);
 
         if ($request->hasFile('thumbnail')) {
             if ($template->thumbnail) {
@@ -165,5 +188,59 @@ class TemplateController extends Controller
         }
 
         return $urls;
+    }
+
+    private function validatePreviewUrl(?string $previewUrl): void
+    {
+        if ($previewUrl === null || trim($previewUrl) === '') {
+            return;
+        }
+
+        $value = trim($previewUrl);
+
+        if (Str::startsWith($value, '/')) {
+            return;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'preview_url' => 'La prévisualisation doit être une URL http(s) ou un chemin interne commençant par /.',
+        ]);
+    }
+
+    private function resolvePreviewConfiguration(
+        string $previewSource,
+        ?string $localPreviewTemplate,
+        ?string $previewUrl,
+        ?string $previewPagesRaw,
+        ?string $previewGalleryRaw
+    ): array {
+        if ($previewSource === 'local') {
+            $folder = trim((string) $localPreviewTemplate);
+            $match = $folder !== '' ? $this->localTemplatePreviewCatalog->find($folder) : null;
+
+            if ($match === null) {
+                throw ValidationException::withMessages([
+                    'local_preview_template' => 'Selectionne un template HTML local precharge valide.',
+                ]);
+            }
+
+            return [
+                $match['preview_url'],
+                $match['pages'],
+                [],
+            ];
+        }
+
+        $this->validatePreviewUrl($previewUrl);
+
+        return [
+            $previewUrl !== null ? trim($previewUrl) : null,
+            $this->parsePreviewPages($previewPagesRaw),
+            $this->parsePreviewGallery($previewGalleryRaw),
+        ];
     }
 }

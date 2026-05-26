@@ -170,6 +170,11 @@ export interface PaginatedResponse<T> {
     links: PaginationLinks;
 }
 
+export interface OrderListFilters {
+    status?: OrderStatus;
+    payment_status?: PaymentStatus;
+}
+
 export interface CreateOrderPayload {
     template_id: string | null;
     enterprise_name?: string;
@@ -285,11 +290,12 @@ export const businessService = {
         return response.data;
     },
 
-    async getOrders(page = 1, perPage = 10): Promise<PaginatedResponse<Order>> {
+    async getOrders(page = 1, perPage = 10, filters: OrderListFilters = {}): Promise<PaginatedResponse<Order>> {
         const response = await api.get('/orders', {
             params: {
                 page,
                 per_page: perPage,
+                ...filters,
             }
         });
 

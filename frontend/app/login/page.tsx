@@ -67,71 +67,71 @@ export default function LoginPage() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex">
-
-      {/* Left — Brand panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-black text-white flex-col justify-between p-16">
+    <div className="flex min-h-screen bg-white">
+      <div className="hidden bg-[oklch(7%_0.006_29)] p-16 text-white lg:flex lg:w-1/2 lg:flex-col lg:justify-between">
         <Link href="/" className="text-2xl font-black tracking-tight">FRILO</Link>
         <div>
-          <h2 className="sq-heading text-white mb-6">
-            Bienvenue<br />de retour.
+          <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Espace client</p>
+          <h2 className="max-w-xl text-5xl font-black leading-[0.98]">
+            Votre projet FRILO, au même endroit.
           </h2>
-          <p className="text-gray-400 text-lg">
-            Suivez vos commandes et gérez votre espace client depuis votre tableau de bord.
+          <p className="mt-6 max-w-md text-base leading-7 text-white/60">
+            Retrouvez l’avancement, les informations transmises et les prochaines actions liées à votre commande.
           </p>
         </div>
-        <p className="text-gray-600 text-sm">© {new Date().getFullYear()} FRILO. Tous droits réservés.</p>
+        <p className="text-sm text-white/30">© {new Date().getFullYear()} FRILO. Tous droits réservés.</p>
       </div>
 
-      {/* Right — Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 bg-white">
+      <div className="flex flex-1 flex-col justify-center bg-white px-6 py-10 md:px-16 lg:px-24">
+        <div className="mx-auto w-full max-w-sm">
+          <Link href="/" className="mb-12 inline-flex text-xl font-black lg:hidden">FRILO</Link>
 
-        {/* Mobile logo */}
-        <Link href="/" className="text-xl font-black mb-12 lg:hidden">FRILO</Link>
-
-        <div className="max-w-sm w-full mx-auto">
-          <h1 className="text-3xl font-black text-black tracking-tight mb-2">Connexion</h1>
-          <p className="text-gray-500 text-sm mb-10">
+          <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Connexion</p>
+          <h1 className="text-3xl font-black leading-tight text-slate-950">Accédez à votre espace.</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-500">
+            Utilisez l’adresse e-mail associée à votre commande FRILO.
+          </p>
+          <p className="mt-5 text-sm text-slate-500">
             Pas encore de compte ?{' '}
-            <Link href="/register" className="text-black font-semibold underline underline-offset-2">
+            <Link href="/register" className="font-black text-slate-950 underline underline-offset-4">
               S'inscrire
             </Link>
           </p>
 
           {error && (
-            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <div className="mt-8 flex items-start gap-2 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm leading-6 text-red-600">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
             <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
+              <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
                 Adresse e-mail
               </label>
               <input
                 {...register('email')}
                 type="email"
                 placeholder="vous@exemple.com"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
               />
               {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-bold text-black uppercase tracking-widest">
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-xs font-black uppercase tracking-[0.14em] text-slate-950">
                   Mot de passe
                 </label>
-                <Link href="/forgot-password" className="text-xs text-gray-400 hover:text-black transition-colors">
+                <Link href="/forgot-password" className="text-xs font-semibold text-slate-500 transition-colors hover:text-slate-950">
                   Mot de passe oublié ?
                 </Link>
               </div>
@@ -139,7 +139,7 @@ export default function LoginPage() {
                 {...register('password')}
                 type="password"
                 placeholder="••••••••"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
               />
               {errors.password && <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>}
             </div>
@@ -147,7 +147,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="sq-btn sq-btn-black w-full justify-center mt-2 disabled:opacity-50"
+              className="mt-2 inline-flex w-full justify-center rounded-full bg-slate-950 px-7 py-3.5 text-sm font-black text-white transition-colors hover:bg-black disabled:opacity-50"
             >
               {isSubmitting ? 'Connexion…' : 'Se connecter'}
             </button>

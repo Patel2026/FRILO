@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/preload-template-previews.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/preload-template-previews.mjs",
     "build": "next build",
+    "prestart": "node scripts/preload-template-previews.mjs",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit --incremental false",

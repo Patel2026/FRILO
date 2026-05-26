@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Réalisations | STRUCTUR</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<nav class="bg-slate-50 dark:bg-slate-950 rounded-none w-full top-0 sticky z-50 flex justify-between items-center px-12 py-6 max-w-none">
+    <div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter">STRUCTUR</div>
+    <div class="hidden md:flex gap-8 items-center">
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="index.html">Accueil</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="about.html">À propos</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="services.html">Services</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-orange-600 dark:text-orange-500 border-b-4 border-orange-600 dark:border-orange-500 pb-1" href="portfolio.html">Réalisations</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="contact.html">Contact</a>
+    </div>
+    <a href="contact.html" class="bg-primary text-on-primary px-6 py-3 font-headline font-bold uppercase tracking-tighter hover:translate-y-[-2px] transition-all duration-150 shadow-block block">
+        Demander un Devis
+    </a>
+</nav>
+
+<!-- Hero Section -->
+<header class="relative h-[614px] flex items-end px-12 pb-20 bg-primary overflow-hidden">
+    <div class="absolute inset-0 opacity-40">
+        <img alt="High-angle shot of a large-scale construction site with cranes and steel framework under a dramatic blue sky" class="w-full h-full object-cover" data-alt="High-angle shot of a large-scale construction site with cranes and steel framework under a dramatic blue sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-E2WMQAkMsQKCSjYdL9Uj2KeMRmb_16khif8VEISdgEuUzXOWtT94SO-eS0Osd9YN3zFdesKthj7UOFoY5ApaHfF1yhZeJBcU_FdpIqXPZbiUDnFneIrgWzCAdODTOcvEzSuEXwH_KKpmU-vfygTK4nRlCOqZvIo9FPphEesDrplYKpTAR21Xc0Zd-QaspiRZ0R8VXoxHd_6ipmbiyGFIjx__1JTlnS-QGX_vaA1iOpzk6BzNVgmLT6aXCxAbKkj3ccOXxYSoNzg"/>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-tr from-primary via-primary/60 to-transparent"></div>
+    <div class="relative z-10 max-w-4xl">
+        <p class="font-label text-[0.6875rem] uppercase tracking-[0.2em] text-secondary-container mb-4">L'EXCELLENCE ÉTABLIE</p>
+        <h1 class="font-headline text-5xl md:text-7xl font-black text-on-primary tracking-tighter leading-none mb-6">RÉALISATIONS</h1>
+        <p class="text-on-primary/80 max-w-xl text-lg font-light leading-relaxed">
+            Visualiser l'intégrité structurelle et la précision architecturale qui définissent notre héritage. Chaque projet est un témoignage de durabilité.
+        </p>
+    </div>
+</header>
+
+<!-- Filter Bar -->
+<section class="bg-surface-container-low border-b border-outline-variant/10 px-12 py-8 sticky top-[88px] z-40">
+    <div class="flex flex-wrap items-center justify-between gap-6">
+        <div class="flex gap-8">
+            <button class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-secondary border-b-2 border-secondary pb-1">Tous Les Projets</button>
+            <button class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-on-surface-variant hover:text-primary transition-colors">Résidentiel</button>
+            <button class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-on-surface-variant hover:text-primary transition-colors">Commercial</button>
+            <button class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-on-surface-variant hover:text-primary transition-colors">Industriel</button>
+        </div>
+        <div class="flex items-center gap-2 text-on-surface-variant">
+            <span class="material-symbols-outlined text-sm">filter_list</span>
+            <span class="font-label text-[0.6875rem] uppercase tracking-[0.1em]">Trier Par : Date D'Achèvement</span>
+        </div>
+    </div>
+</section>
+
+<!-- Project Grid -->
+<main class="p-12 space-y-24">
+    <!-- Project 1: Featured Large -->
+    <article class="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-surface-container-lowest group">
+        <div class="lg:col-span-8 relative aspect-[16/9] overflow-hidden">
+            <img alt="Brutalist concrete museum exterior with sharp angles and dramatic shadows during sunset" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Brutalist concrete museum exterior with sharp angles and dramatic shadows during sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoW9RecPHqf5emAHToWrTm8VnD5wvy-qYTcKT_xUpzwC64MDS3gy1nkuW6nRUc4q0c0c3Fa51iyw7JllcMsWXJUvMcdZ4mhQTkNQH4boKU8hhMLrThGK82LD8cAtBsbK1WsX0ZZl6yZTJEsIDD6zzzi9JhS4Kj85Dz7og1kSRIB79zG9uJyrxZsnYgHdd55_p8lwlBYTZHvi9AyAWUNYIJGHklp9wQ_Z8Exsxnf5Fx5kcy94FiVBsQgd4UEe9WUgs_C5vqcamLSq4"/>
+            <div class="absolute top-8 left-8">
+                <span class="bg-secondary-container text-on-secondary-container px-4 py-1 font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em]">Commercial</span>
+            </div>
+        </div>
+        <div class="lg:col-span-4 p-12 flex flex-col justify-between border-r border-b lg:border-b-0 border-outline-variant/20">
+            <div>
+                <span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-on-surface-variant">PROJET 082</span>
+                <h2 class="font-headline text-3xl font-black mt-2 mb-4 tracking-tighter uppercase">Le Centre D'Art Monolithe</h2>
+                <div class="flex items-center gap-2 text-on-surface-variant mb-8">
+                    <span class="material-symbols-outlined text-sm">location_on</span>
+                    <span class="font-label text-[0.6875rem] uppercase tracking-[0.1em]">Berlin, Allemagne</span>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <p class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-primary mb-1">Le Défi</p>
+                        <p class="text-sm text-on-surface-variant leading-relaxed">Intégration structurelle de panneaux de béton de 40 tonnes sans colonnes de soutien visibles.</p>
+                    </div>
+                    <div>
+                        <p class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-primary mb-1">La Réussite</p>
+                        <p class="text-sm text-on-surface-variant leading-relaxed">Réalisation d'un toit en porte-à-faux de 15 mètres grâce à une ingénierie de post-tension spécialisée.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="mt-12 flex items-center gap-2 group/btn">
+                <span class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em]">Voir Les Détails Techniques</span>
+                <span class="material-symbols-outlined group-hover/btn:translate-x-2 transition-transform">arrow_right_alt</span>
+            </button>
+        </div>
+    </article>
+
+    <!-- Project 2 & 3 Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <!-- Project 2 -->
+        <article class="bg-surface-container-low flex flex-col">
+            <div class="relative aspect-square overflow-hidden">
+                <img alt="Sleek glass and steel corporate skyscraper reflecting the morning sky" class="w-full h-full object-cover" data-alt="Sleek glass and steel corporate skyscraper reflecting the morning sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCy0tyy1_Fm4Jh2GkzGRf6ofm2w9kNLpDF1nkiGgQnCnoV8ub6zI1FgZ7BUbECfgnwy9RExml_t9iDu-9etLQYDio1jhvcyFiJH_04SkZtvpIGdI4TA91OF4KK2JsG_7qf9ATrFfwqalMKVwyXv3BFC9xCtIkYOoey9uzSZ_FvACiHdR4AGZzoLZ1FBYrBTaoiAXsDpMfdOeZ9ZwhZnoPvqq3MenZ17u7i6o9I8R8DMwYOZLs597PgVpyKTHLCGOdR2ErjTUZoq-Rk"/>
+                <div class="absolute inset-0 bg-primary/20 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span class="bg-surface px-8 py-3 font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em]">Explorer L'Étude De Cas</span>
+                </div>
+            </div>
+            <div class="p-10 border-l-4 border-secondary">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-on-surface-variant">Industriel</span>
+                        <h3 class="font-headline text-2xl font-black tracking-tighter uppercase">Logistique Dock Nord</h3>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="bg-surface p-4">
+                        <p class="font-label text-[0.5rem] uppercase tracking-[0.1em] text-on-surface-variant mb-1">Durée</p>
+                        <p class="font-headline text-sm font-bold">14 MOIS</p>
+                    </div>
+                    <div class="bg-surface p-4">
+                        <p class="font-label text-[0.5rem] uppercase tracking-[0.1em] text-on-surface-variant mb-1">Superficie</p>
+                        <p class="font-headline text-sm font-bold">22 300 M²</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- Project 3 (Before/After Focus) -->
+        <article class="bg-surface-container-low flex flex-col">
+            <div class="relative aspect-square grid grid-cols-2 gap-1 bg-primary">
+                <div class="relative overflow-hidden group/before">
+                    <img alt="Dilapidated brick warehouse with broken windows and overgrown weeds" class="w-full h-full object-cover grayscale opacity-60" data-alt="Dilapidated brick warehouse with broken windows and overgrown weeds" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg4q1MeavZHcSxnz2I6s_e4XTCTk2Fq0j9VcB-Y-45Snoxqit0hGwLKeXsK9i1T9pNQ0mYxgh-kAeR6W8-4ZhyGP0_fW0sEYvbj17EsdAG0NOw3oOiUcvoS6eTBCFB30N0VCg6apb62GlFWdIJySb5Oc1EIzdVJr6U8_zhfMdKLT7wkk8ckBQT7tVd-lG8H1IceJa-6Z4GJb0taa-sAovlEStNZMUmBmML38h3Yg3Rcj9tY3AkLqGwfYjezrDoqEouhd_tfMY330s"/>
+                    <div class="absolute bottom-4 left-4 bg-primary text-on-primary px-2 py-1 text-[0.5rem] font-bold uppercase tracking-widest">AVANT</div>
+                </div>
+                <div class="relative overflow-hidden group/after">
+                    <img alt="Modern luxury residential complex with clean lines, wood accents and large windows" class="w-full h-full object-cover" data-alt="Modern luxury residential complex with clean lines, wood accents and large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1DjNXiQiMHNZND37UsgaB4v9WB3QVkT1ylb-KFBLGHdflkeHG5ZXwJ8VUj7v1pO_-AJFgt40CmTgjWyEFB3eTNc-2_KR6lA1n9f3CGpZ177X8h8iNSGgGw5vaPsu_ZlRyFhY4qCTkKjQJgMTGSSgYjOblihSsKyLbKIxFx-Ff0-kvvexVevwKihiEQbu3D8nAvh3TBatNDXo9mDLMzDqTliBtL9tUPAoGFqQ_2aBLPzDMZUCew3ow3tWsMHrrNvwXl7jXoTZ-nig"/>
+                    <div class="absolute bottom-4 left-4 bg-secondary-container text-on-secondary-container px-2 py-1 text-[0.5rem] font-bold uppercase tracking-widest">APRÈS</div>
+                </div>
+            </div>
+            <div class="p-10 border-l-4 border-primary">
+                <span class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-on-surface-variant">Résidentiel</span>
+                <h3 class="font-headline text-2xl font-black tracking-tighter uppercase mb-4">Les Lofts de la Fonderie</h3>
+                <p class="text-sm text-on-surface-variant leading-relaxed">Restauration structurelle complète d'une ancienne fonderie en briques des années 1920 en 42 unités résidentielles premium avec ossatures métalliques apparentes.</p>
+            </div>
+        </article>
+    </div>
+
+    <!-- Project 4: Full-width Industrial -->
+    <article class="bg-primary text-on-primary flex flex-col lg:flex-row-reverse">
+        <div class="lg:w-1/2 aspect-video lg:aspect-auto">
+            <img alt="Detailed shot of industrial piping and steel structures in a modern processing plant" class="w-full h-full object-cover opacity-80" data-alt="Detailed shot of industrial piping and steel structures in a modern processing plant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_bGP6VhEbH65lbDXvMZoyYeVPMRiQJBzfaX1itPV5xJSpyGuQmmfRkrV_08yY7c9OdZYr4y75xtQ_yQ9PrKoAQtyy5IkCxkJ_GD9lARBYgPAID6vwMDqRZpesbqqAMRkVUmMKsJyRsSv-M1icc1XOQyvAYi6SJDct3sY3A4XVCGTRB-UD1C0mnVLIrJTTozB6q397NfzZtXpKfdYBe81o47we0puv-MzDtel6qv3Bi1J5jNHQJc5mJNqcyCvHbXLJhza4HqEL-_c"/>
+        </div>
+        <div class="lg:w-1/2 p-16 flex flex-col justify-center">
+            <span class="font-label text-[0.6875rem] uppercase tracking-[0.2em] text-secondary-container mb-6">FIABILITÉ À GRANDE ÉCHELLE</span>
+            <h2 class="font-headline text-4xl font-black tracking-tighter uppercase mb-8 leading-none">Extension du Pôle<br/>Pétro-Chimique</h2>
+            <div class="space-y-8">
+                <div class="flex gap-6 items-start">
+                    <span class="material-symbols-outlined text-secondary-container">engineering</span>
+                    <div>
+                        <p class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] mb-1">Ingénierie Lourde</p>
+                        <p class="text-sm text-on-primary/70">Fabrication sur mesure de tours de 80 m de haut avec une précision d'alignement de l'ordre de 2 mm.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6 items-start">
+                    <span class="material-symbols-outlined text-secondary-container">verified</span>
+                    <div>
+                        <p class="font-label text-[0.6875rem] font-bold uppercase tracking-[0.1em] mb-1">Bilan De Sécurité</p>
+                        <p class="text-sm text-on-primary/70">Terminé sans aucun incident ni accident sur 450 000 heures de travail d'installation à haut risque.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</main>
+
+<!-- Project Inquiry Section -->
+<section class="bg-surface-container-highest px-12 py-32 text-center">
+    <h2 class="font-headline text-4xl font-black tracking-tighter uppercase mb-6">UN PROJET EN TÊTE ?</h2>
+    <p class="max-w-2xl mx-auto text-on-surface-variant mb-12 font-light">
+        Notre équipe d'ingénierie est prête à analyser vos exigences. Nous sommes spécialisés dans les défis structurels complexes et les constructions architecturales de haute valeur.
+    </p>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <button class="bg-primary text-on-primary px-10 py-5 font-headline font-bold uppercase tracking-tighter shadow-block hover:translate-y-[-4px] transition-all">Démarrer Une Consultation</button>
+        <button class="bg-surface text-primary border-2 border-primary px-10 py-5 font-headline font-bold uppercase tracking-tighter hover:bg-primary-fixed transition-colors">Télécharger la Brochure</button>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-slate-100 dark:bg-slate-900 grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 w-full font-['Public_Sans'] text-[0.6875rem] uppercase tracking-[0.1em] text-slate-900 dark:text-slate-50">
+    <div class="space-y-6">
+        <div class="text-xl font-black text-slate-900 dark:text-slate-50">STRUCTUR</div>
+        <p class="text-slate-500 dark:text-slate-400 normal-case tracking-normal">En tête de l'industrie pour l'excellence brutalisme architecturale et la précision industrielle depuis 1994.</p>
+    </div>
+    <div class="space-y-4">
+        <h4 class="font-bold border-b border-outline-variant/30 pb-2">Liens</h4>
+        <div class="flex flex-col gap-2">
+            <a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Plan du site</a>
+            <a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Politique de Confidentialité</a>
+            <a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Protocoles de Sécurité</a>
+        </div>
+    </div>
+    <div class="space-y-4">
+        <h4 class="font-bold border-b border-outline-variant/30 pb-2">Carrières</h4>
+        <div class="flex flex-col gap-2">
+            <a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Postes Ouverts</a>
+            <a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Stages</a>
+            <a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">LinkedIn</a>
+        </div>
+    </div>
+    <div class="space-y-4">
+        <h4 class="font-bold border-b border-outline-variant/30 pb-2">Contact</h4>
+        <div class="text-slate-500 dark:text-slate-400 normal-case tracking-normal space-y-2">
+            <p>102nd Floor, Structural Tower</p>
+            <p>Chicago, IL 60601</p>
+            <p class="font-bold mt-4">+1 (555) 092-STRUCT</p>
+        </div>
+    </div>
+    <div class="md:col-span-4 pt-12 mt-12 border-t border-outline-variant/20 text-center">
+        <p class="text-slate-500 dark:text-slate-400">© 2024 STRUCTUR ARCHITECTURE BTP. TOUS DROITS RÉSERVÉS.</p>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,39 +1,166 @@
 "use client"
 
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Check, ChevronRight, Globe, ImageIcon, LayoutTemplate, MessageSquare, Plus, Shield, Smartphone, Star, Zap } from 'lucide-react';
+import {
+  ArrowRight,
+  BadgeCheck,
+  Check,
+  ChevronRight,
+  Eye,
+  MonitorSmartphone,
+  Plus,
+  ShieldCheck,
+} from 'lucide-react';
 import { SectorCard } from '@/components/business/SectorCard';
 import { TestimonialCard } from '@/components/business/TestimonialCard';
 import { TemplateCard } from '@/components/business/TemplateCard';
 import { usePublicPricing } from '@/hooks/usePublicPricing';
 import { formatPublicPrice } from '@/lib/publicPricing';
+import { hasLivePreview, parsePreviewGallery } from '@/lib/templatePreview';
 import { businessService, FaqItem, Sector, Template, TemplateReview } from '@/services/business.service';
 import { cn, parseFeatures } from '@/lib/utils';
 
-/* ── Data ──────────────────────────────────────────────────────────────── */
+const FEATURED_TEMPLATE_LIMIT = 6;
 
-// Squarespace "Tout sur une plateforme" equivalent
-const FEATURES = [
-  { icon: <LayoutTemplate className="w-6 h-6" />, title: "Design professionnel", desc: "Des templates modernes optimisés pour chaque secteur d'activité." },
-  { icon: <Smartphone className="w-6 h-6" />, title: "100% responsive", desc: "Parfait sur téléphone, tablette et ordinateur. Toujours." },
-  { icon: <Globe className="w-6 h-6" />, title: "Mise en ligne incluse", desc: "Votre site est hébergé et accessible dès la livraison." },
-  { icon: <ImageIcon className="w-6 h-6" />, title: "Galerie photos optimisée", desc: "Vos images mises en valeur, compressées et chargées rapidement." },
-  { icon: <MessageSquare className="w-6 h-6" />, title: "Formulaire de contact", desc: "Recevez des demandes directement dans votre boîte email." },
-  { icon: <Shield className="w-6 h-6" />, title: "Satisfait ou remboursé", desc: "Pas satisfait après révisions ? On vous rembourse, sans question." },
-  { icon: <Zap className="w-6 h-6" />, title: "Livraison en 48h", desc: "Nos experts intègrent votre contenu et mettent votre site en ligne." },
-  { icon: <Check className="w-6 h-6" />, title: "Support 7j/7", desc: "Une équipe locale disponible par chat et téléphone." },
-  { icon: <Star className="w-6 h-6" />, title: "Identité visuelle", desc: "Vos couleurs, votre logo, votre police. Un site qui vous ressemble." },
+const PROOF_POINTS = [
+  {
+    title: 'Une activité claire',
+    desc: "Vos services, vos horaires et votre contact sont compris sans chercher.",
+  },
+  {
+    title: 'Une image sérieuse',
+    desc: "Votre entreprise donne confiance avant le premier appel ou message WhatsApp.",
+  },
+  {
+    title: 'Un départ simple',
+    desc: "Vous choisissez un modèle, FRILO l'adapte à votre métier et à vos contenus.",
+  },
+  {
+    title: 'Un prix assumé',
+    desc: 'Le tarif est annoncé en FCFA avant la commande, sans frais cachés.',
+  },
 ];
 
-const SITE_PREVIEWS = [
-  { label: 'Restaurant', from: 'from-orange-400', to: 'to-red-500', url: 'le-gourmet.com' },
-  { label: 'Juridique', from: 'from-slate-700', to: 'to-slate-900', url: 'maitre-sow.com' },
-  { label: 'Coaching', from: 'from-violet-600', to: 'to-purple-800', url: 'votre-coach.com' },
-  { label: 'Santé', from: 'from-emerald-500', to: 'to-teal-700', url: 'clinique-ben.com' },
+const INCLUDED_FEATURES = [
+  { icon: MonitorSmartphone, title: 'Mobile impeccable', desc: 'Votre site reste clair sur téléphone, tablette et ordinateur.' },
+  { icon: Eye, title: 'Aperçus réels', desc: 'Vous choisissez avec des modèles visibles, pas avec une promesse abstraite.' },
+  { icon: ShieldCheck, title: 'Mise en ligne incluse', desc: "FRILO prépare le site, l'adapte et vous remet un lien exploitable." },
+  { icon: BadgeCheck, title: 'Support après livraison', desc: 'Vous gardez un interlocuteur pour les derniers réglages.' },
 ];
 
-/* ── Page ──────────────────────────────────────────────────────────────── */
+const STEPS = [
+  {
+    title: 'Choisissez un modèle',
+    desc: 'Parcourez les styles par secteur et ouvrez les aperçus qui ressemblent à votre activité.',
+  },
+  {
+    title: 'Envoyez vos informations',
+    desc: "Nom, activité, couleurs, textes, images. Le formulaire va droit au nécessaire.",
+  },
+  {
+    title: 'Recevez votre site',
+    desc: "L'équipe adapte le modèle, met votre contenu en place et vous accompagne jusqu'à la publication.",
+  },
+];
+
+function getTemplatePrice(template: Template): number {
+  return typeof template.price === 'string' ? parseInt(template.price, 10) : template.price;
+}
+
+function selectFeaturedTemplates(templates: Template[]): Template[] {
+  const rankedTemplates = [...templates].sort((left, right) => {
+    const livePreviewDelta = Number(hasLivePreview(right.preview_url)) - Number(hasLivePreview(left.preview_url));
+
+    if (livePreviewDelta !== 0) {
+      return livePreviewDelta;
+    }
+
+    const galleryDelta = parsePreviewGallery(right.preview_gallery).length - parsePreviewGallery(left.preview_gallery).length;
+
+    if (galleryDelta !== 0) {
+      return galleryDelta;
+    }
+
+    const priceDelta = getTemplatePrice(right) - getTemplatePrice(left);
+
+    if (priceDelta !== 0) {
+      return priceDelta;
+    }
+
+    return left.name.localeCompare(right.name, 'fr');
+  });
+
+  const featured: Template[] = [];
+  const seenIds = new Set<number>();
+  const seenSectors = new Set<number>();
+
+  const pushTemplate = (template: Template, options?: { requireNewSector?: boolean }) => {
+    if (featured.length >= FEATURED_TEMPLATE_LIMIT || seenIds.has(template.id)) {
+      return;
+    }
+
+    if (options?.requireNewSector && template.sector_id && seenSectors.has(template.sector_id)) {
+      return;
+    }
+
+    featured.push(template);
+    seenIds.add(template.id);
+
+    if (template.sector_id) {
+      seenSectors.add(template.sector_id);
+    }
+  };
+
+  for (const template of rankedTemplates) {
+    if (hasLivePreview(template.preview_url)) {
+      pushTemplate(template, { requireNewSector: true });
+    }
+  }
+
+  for (const template of rankedTemplates) {
+    pushTemplate(template, { requireNewSector: true });
+  }
+
+  for (const template of rankedTemplates) {
+    pushTemplate(template);
+  }
+
+  return featured;
+}
+
+function HomeSection({
+  eyebrow,
+  title,
+  children,
+  action,
+  className,
+}: {
+  eyebrow: string;
+  title: string;
+  children: ReactNode;
+  action?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn('py-12 md:py-16', className)}>
+      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl">
+            <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-slate-500">{eyebrow}</p>
+            <h2 className="text-3xl font-black leading-[1.02] tracking-tight text-slate-950 md:text-4xl lg:text-5xl">
+              {title}
+            </h2>
+          </div>
+          {action}
+        </div>
+        {children}
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const { pricing } = usePublicPricing();
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -43,7 +170,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [activePreview, setActivePreview] = useState(0);
 
   useEffect(() => {
     async function loadData() {
@@ -57,14 +183,12 @@ export default function Home() {
 
       try {
         setCatalogError(null);
-        const sectorsData = await businessService.getSectors();
+        const [sectorsData, templatesData] = await Promise.all([
+          businessService.getSectors(),
+          businessService.getTemplates(),
+        ]);
         setSectors(sectorsData);
-        if (sectorsData.length > 0) {
-          const t1 = await businessService.getTemplates(sectorsData[0].slug);
-          setFeaturedTemplates(t1.slice(0, 3));
-        } else {
-          setFeaturedTemplates([]);
-        }
+        setFeaturedTemplates(selectFeaturedTemplates(templatesData));
       } catch {
         setSectors([]);
         setFeaturedTemplates([]);
@@ -73,539 +197,375 @@ export default function Home() {
         setLoading(false);
       }
     }
+
     loadData();
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => setActivePreview(p => (p + 1) % SITE_PREVIEWS.length), 3500);
-    return () => clearInterval(timer);
-  }, []);
-
-  const preview = SITE_PREVIEWS[activePreview];
   const startingPriceLabel = formatPublicPrice(pricing.starting_price, pricing.currency_label);
 
   return (
-    <div className="flex flex-col">
-
-      {/* ══════════════════════════════════════════════════════════════════
-          1. HERO — Squarespace : fond sombre, titre géant, carousel
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="relative bg-[#0d0d0d] text-white overflow-hidden">
-        <div className="sq-container pt-28 md:pt-32 pb-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-14 items-center pb-14 md:pb-16">
-
-            {/* Copy */}
-            <div>
-              <p className="sq-label mb-6 text-gray-400">
-                Livraison 48h · Dès {startingPriceLabel}
-              </p>
-              <h1 className="sq-display text-white mb-8">
-                Votre<br />
-                site<br />
-                <span className="text-gradient">vitrine.</span>
-              </h1>
-              <p className="text-gray-400 text-xl max-w-md mb-10 leading-relaxed">
-                Clé en main, livré par nos experts en 48h.
-                Vous choisissez le modèle, on s'occupe de tout.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/templates" className="sq-btn sq-btn-white">
-                  Voir les modèles <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link href="/#how-it-works" className="sq-btn sq-btn-outline-white">
-                  Comment ça marche
-                </Link>
-              </div>
-            </div>
-
-            {/* Preview browser */}
-            <div className="relative">
-              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#1a1a1a]">
-                {/* Chrome */}
-                <div className="px-4 py-3 flex items-center gap-2 border-b border-white/5">
-                  <div className="flex gap-1.5">
-                    {['bg-white/10', 'bg-white/10', 'bg-white/10'].map((c, i) => (
-                      <div key={i} className={cn("w-3 h-3 rounded-full", c)} />
-                    ))}
-                  </div>
-                  <div className="flex-1 mx-3 bg-white/5 rounded px-3 py-1.5 text-xs text-gray-500">
-                    {preview.url}
-                  </div>
-                </div>
-                {/* Animated preview */}
-                <div className={cn("h-52 bg-gradient-to-br px-8 py-8 flex flex-col justify-end transition-all duration-700", preview.from, preview.to)}>
-                  <div className="space-y-2.5 mb-5">
-                    <div className="h-5 w-3/5 bg-white/30 rounded" />
-                    <div className="h-3 w-2/5 bg-white/20 rounded" />
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="h-9 w-28 bg-white rounded-lg" />
-                    <div className="h-9 w-24 bg-white/20 rounded-lg border border-white/30" />
-                  </div>
-                </div>
-                {/* Content */}
-                <div className="bg-white p-4 grid grid-cols-3 gap-3">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
-                      <div className="h-14 bg-gray-100" />
-                      <div className="p-2 space-y-1.5">
-                        <div className="h-2 bg-gray-200 rounded w-full" />
-                        <div className="h-2 bg-gray-100 rounded w-2/3" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sector tabs */}
-              <div className="flex gap-2 mt-5 flex-wrap justify-center">
-                {SITE_PREVIEWS.map((p, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActivePreview(i)}
-                    className={cn(
-                      "text-xs px-3.5 py-1.5 rounded-full font-semibold transition-all",
-                      activePreview === i ? "bg-white text-black" : "bg-white/10 text-gray-400 hover:bg-white/20"
-                    )}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Fade to white */}
-        <div className="h-12 md:h-14 bg-gradient-to-b from-transparent to-white" />
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          2. STATS — Squarespace : grands chiffres, fond blanc, séparation sobre
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-10 md:py-12 bg-white border-b border-gray-100">
-        <div className="sq-container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
-            {[
-              { value: '48h', label: 'Délai de livraison garanti' },
-              { value: pricing.starting_price.toLocaleString('fr-FR'), label: `${pricing.currency_label} — prix de départ` },
-              { value: '6', label: 'Secteurs professionnels' },
-              { value: '100%', label: 'Satisfait ou remboursé' },
-            ].map((s, i) => (
-              <div key={i}>
-                <div className="text-5xl font-black tracking-tight text-black leading-none mb-2">{s.value}</div>
-                <div className="text-sm text-gray-500 leading-snug">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          3. SECTEURS — Squarespace "Développez votre activité" : cartes scrollables
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="sq-container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-5">
-            <div>
-              <p className="sq-label mb-4">Catalogue</p>
-              <h2 className="sq-heading text-black">
-                Votre secteur,<br />votre modèle.
-              </h2>
-            </div>
-            <Link href="/secteurs" className="text-sm font-bold text-black flex items-center gap-1 hover:gap-2 transition-all self-start md:self-end shrink-0">
-              Tous les secteurs <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[...Array(6)].map((_, i) => <div key={i} className="h-40 rounded-2xl bg-gray-100 animate-pulse" />)}
-            </div>
-          ) : catalogError ? (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center">
-              <p className="text-sm text-amber-800">{catalogError}</p>
-            </div>
-          ) : sectors.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-10 text-center">
-              <p className="text-sm text-gray-500">Aucun secteur actif disponible pour le moment.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {sectors.slice(0, 6).map((sector) => (
-                <SectorCard key={sector.id} name={sector.name} slug={sector.slug} description={sector.description} icon={sector.icon} gradient={sector.gradient} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          4. FEATURES GRID — Squarespace "Tout sur une plateforme" : grille 3×3
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-16 md:py-20 bg-[#f7f7f7]">
-        <div className="sq-container">
-          <div className="mb-10 md:mb-12">
-            <p className="sq-label mb-4">Inclus dans chaque commande</p>
-            <h2 className="sq-heading text-black max-w-xl">
-              Tout sur<br />une plateforme.
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-200">
-            {FEATURES.map(({ icon, title, desc }) => (
-              <div key={title} className="bg-white p-8 flex flex-col gap-4 card-hover">
-                <div className="w-11 h-11 bg-black rounded-xl flex items-center justify-center text-white flex-shrink-0">
-                  {icon}
-                </div>
-                <div>
-                  <h3 className="font-bold text-black text-base mb-1">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          5. HOW IT WORKS — Squarespace "Lancez-vous" : fond sombre, numéros géants
-      ══════════════════════════════════════════════════════════════════ */}
-      <section id="how-it-works" className="py-16 md:py-20 bg-black text-white">
-        <div className="sq-container">
-          <div className="mb-10 md:mb-12">
-            <p className="sq-label mb-4 text-gray-500">Processus</p>
-            <h2 className="sq-heading text-white">
-              3 étapes,<br />c'est tout.
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/5">
-            {[
-              { num: '01', title: 'Choisissez votre modèle', desc: 'Parcourez notre catalogue par secteur. Chaque modèle est présenté avec un aperçu complet et la liste des fonctionnalités incluses.', detail: 'Restaurants, BTP, Santé, Avocats…' },
-              { num: '02', title: 'Remplissez le formulaire', desc: 'Nom d\'entreprise, description, logo, couleurs. Notre formulaire guidé prend environ 2 minutes.', detail: '~2 minutes' },
-              { num: '03', title: 'Recevez votre site', desc: 'Nos experts créent votre site de A à Z et vous envoient le lien par email. Vous pouvez demander des révisions.', detail: 'Sous 24 à 48h' },
-            ].map(({ num, title, desc, detail }) => (
-              <div key={num} className="bg-black p-10 flex flex-col gap-8">
-                <span className="text-8xl font-black text-white/10 leading-none">{num}</span>
-                <div className="flex flex-col gap-3">
-                  <h3 className="sq-subheading text-white">{title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
-                  <span className="text-xs font-semibold text-frilo-blue border border-frilo-blue/30 px-3 py-1.5 rounded-full self-start mt-2">
-                    {detail}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 md:mt-12">
-            <Link href="/templates" className="sq-btn sq-btn-white">
-              Choisir mon modèle <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          6. FEATURE SPLIT — Squarespace : visuel + texte côte à côte
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-16 md:py-20 bg-white overflow-hidden">
-        <div className="sq-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div>
-              <p className="sq-label mb-6">Notre promesse</p>
-              <h2 className="sq-heading text-black mb-8">
-                Un site pro<br />sans les maux<br />de tête.
-              </h2>
-              <p className="text-gray-500 text-lg mb-10 max-w-md leading-relaxed">
-                Vous nous donnez vos informations, on crée votre site de A à Z.
-                Pas besoin de maîtriser le design ou le code.
-              </p>
-              <ul className="space-y-4">
-                {['Contenu intégré par nos soins', 'Mise en ligne incluse', 'Design adapté à votre identité', 'Responsive mobile et tablette', '30 jours de support inclus'].map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-black flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Browser visual */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gray-50 rounded-3xl -rotate-2 scale-105" />
-              <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-                <div className="bg-gray-50 px-4 py-3 flex items-center gap-2 border-b border-gray-100">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-300" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-300" />
-                    <div className="w-3 h-3 rounded-full bg-green-300" />
-                  </div>
-                  <div className="flex-1 mx-3 bg-white rounded px-3 py-1 text-xs text-gray-400 border border-gray-100">votre-entreprise.com</div>
-                </div>
-                <div className="flex items-center justify-between px-5 py-3 border-b border-gray-50">
-                  <div className="h-4 w-16 bg-black rounded" />
-                  <div className="flex gap-2">
-                    <div className="h-2 w-8 bg-gray-200 rounded" />
-                    <div className="h-2 w-8 bg-gray-200 rounded" />
-                    <div className="h-8 w-20 bg-black rounded-lg" />
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-orange-400 to-red-500 px-8 py-10">
-                  <div className="h-6 w-3/4 bg-white/30 rounded mb-3" />
-                  <div className="h-4 w-1/2 bg-white/20 rounded mb-6" />
-                  <div className="flex gap-2">
-                    <div className="h-9 w-24 bg-white rounded-lg" />
-                    <div className="h-9 w-20 bg-white/20 rounded-lg border border-white/30" />
-                  </div>
-                </div>
-                <div className="p-5 grid grid-cols-2 gap-3">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="rounded-xl bg-gray-50 p-3">
-                      <div className="h-14 bg-gray-200 rounded-lg mb-2" />
-                      <div className="h-2 bg-gray-300 rounded w-full mb-1.5" />
-                      <div className="h-2 bg-gray-200 rounded w-2/3" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="absolute -bottom-4 -right-4 bg-black text-white rounded-2xl px-5 py-3 flex items-center gap-3 shadow-xl">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Check className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold">Site livré !</div>
-                  <div className="text-xs text-gray-400">Il y a 23 heures</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          7. TEMPLATES — Squarespace : grille des modèles
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-16 md:py-20 bg-[#f7f7f7]">
-        <div className="sq-container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-5">
-            <div>
-              <p className="sq-label mb-4">Modèles</p>
-              <h2 className="sq-heading text-black">
-                Prêts à être<br />personnalisés.
-              </h2>
-            </div>
-            <Link href="/templates" className="text-sm font-bold text-black flex items-center gap-1 hover:gap-2 transition-all self-start md:self-end shrink-0">
-              Voir tout <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[...Array(3)].map((_, i) => <div key={i} className="h-80 rounded-2xl bg-gray-200 animate-pulse" />)}
-            </div>
-          ) : catalogError ? (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center">
-              <p className="text-sm text-amber-800">{catalogError}</p>
-            </div>
-          ) : featuredTemplates.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-10 text-center">
-              <p className="text-sm text-gray-500">Aucun modèle mis en avant pour le moment.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {featuredTemplates.map((template) => {
-                const features = parseFeatures(template.features);
-                const price = typeof template.price === 'string' ? parseInt(template.price) : template.price;
-                return (
-                  <TemplateCard key={template.id} id={String(template.id)} name={template.name} sectorName={template.sector?.name} price={price} features={features} image={template.full_thumbnail_url} />
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          8. PRICING — Fond blanc, cartes épurées Squarespace-style
-      ══════════════════════════════════════════════════════════════════ */}
-      <section id="pricing" className="py-16 md:py-20 bg-white">
-        <div className="sq-container">
-          <div className="mb-10 md:mb-12">
-            <p className="sq-label mb-4">Tarifs</p>
-            <h2 className="sq-heading text-black mb-4">
-              {pricing.section_title.split('\n').map((line, index) => (
-                <span key={`${line}-${index}`}>
-                  {line}
-                  {index < pricing.section_title.split('\n').length - 1 && <br />}
-                </span>
-              ))}
-            </h2>
-            <p className="text-gray-500 text-lg max-w-md">{pricing.section_description}</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl">
-            {/* Standard */}
-            <div className="rounded-2xl border border-gray-200 p-8">
-              <p className="sq-label text-gray-400 mb-5">{pricing.standard.name}</p>
-              <div className="flex items-baseline gap-1.5 mb-1">
-                <span className="text-5xl font-black text-black tracking-tight">{pricing.standard.price.toLocaleString('fr-FR')}</span>
-                <span className="text-gray-400 text-sm font-medium">{pricing.currency_label}</span>
-              </div>
-              <p className="text-gray-400 text-xs mb-8">{pricing.standard.billing_label}</p>
-              <ul className="space-y-3 mb-8">
-                {pricing.standard.features.map(f => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-black flex-shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/templates" className="sq-btn sq-btn-outline-black w-full justify-center text-sm">
-                {pricing.standard.cta_label}
+    <div className="flex flex-col bg-white text-slate-950">
+      <section className="relative isolate overflow-hidden bg-[oklch(9%_0.006_270)] pt-28 text-[oklch(98%_0.004_270)] md:pt-32">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_18%,oklch(57%_0.24_29/0.26),transparent_24%),linear-gradient(135deg,oklch(5%_0.004_270)_0%,oklch(10%_0.006_270)_58%,oklch(17%_0.02_270)_100%)]" />
+        <div className="absolute right-0 top-28 hidden h-24 w-3 bg-[oklch(57%_0.24_29)] lg:block" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 pb-10 sm:px-6 md:pb-12 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:px-8">
+          <div className="max-w-2xl">
+            <p className="mb-5 inline-flex rounded-full border border-[oklch(98%_0.004_270/0.28)] bg-[oklch(98%_0.004_270/0.08)] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-[oklch(86%_0.004_270)]">
+              Site vitrine en 48h · dès {startingPriceLabel}
+            </p>
+            <h1 className="max-w-[11ch] text-4xl font-black leading-[0.94] tracking-tight text-[oklch(98%_0.004_270)] md:max-w-none md:text-5xl lg:text-6xl">
+              Votre entreprise mérite mieux qu'un simple profil WhatsApp.
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-[oklch(82%_0.006_270)] md:text-lg">
+              FRILO transforme vos informations en site vitrine clair, crédible et prêt à rassurer vos clients. Vous choisissez le style, nous installons le sérieux.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link href="/templates" className="inline-flex items-center justify-center gap-2 rounded-full bg-[oklch(57%_0.24_29)] px-6 py-3 text-sm font-black text-[oklch(98%_0.004_270)] transition-colors hover:bg-[oklch(51%_0.24_29)]">
+                Voir ce que mon site peut devenir <ArrowRight className="h-4 w-4" />
               </Link>
-            </div>
-
-            {/* Premium */}
-            <div className="rounded-2xl bg-black text-white p-8 relative overflow-hidden">
-              {pricing.premium.badge_label && (
-                <span className="absolute top-5 right-5 text-xs font-bold bg-white text-black px-3 py-1 rounded-full">{pricing.premium.badge_label}</span>
-              )}
-              <p className="sq-label text-gray-500 mb-5">{pricing.premium.name}</p>
-              <div className="flex items-baseline gap-1.5 mb-1">
-                <span className="text-5xl font-black text-white tracking-tight">{pricing.premium.price.toLocaleString('fr-FR')}</span>
-                <span className="text-gray-500 text-sm font-medium">{pricing.currency_label}</span>
-              </div>
-              <p className="text-gray-500 text-xs mb-8">{pricing.premium.billing_label}</p>
-              <ul className="space-y-3 mb-8">
-                {pricing.premium.features.map(f => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm text-gray-300">
-                    <Check className="w-4 h-4 text-white flex-shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/templates" className="sq-btn sq-btn-white w-full justify-center text-sm">
-                {pricing.premium.cta_label}
+              <Link href="/#how-it-works" className="inline-flex items-center justify-center gap-2 rounded-full border border-[oklch(98%_0.004_270/0.34)] px-6 py-3 text-sm font-black text-[oklch(98%_0.004_270)] transition-colors hover:bg-[oklch(98%_0.004_270/0.09)]">
+                Comprendre la commande
               </Link>
             </div>
           </div>
 
-          <p className="text-gray-400 text-sm mt-8">
-            {pricing.custom_note || 'Projet spécifique ?'}{' '}
-            <Link href="/contact" className="text-black font-semibold underline underline-offset-2">Contactez-nous.</Link>
-          </p>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          9. TÉMOIGNAGES — Squarespace : cartes blanches sur fond clair
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-16 md:py-20 bg-[#f7f7f7]">
-        <div className="sq-container">
-          <div className="mb-10 md:mb-12">
-            <p className="sq-label mb-4">Avis clients</p>
-            <h2 className="sq-heading text-black">Ils nous font<br />confiance.</h2>
-          </div>
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {[...Array(3)].map((_, index) => (
-                <div key={index} className="h-72 rounded-2xl bg-white border border-gray-100 animate-pulse" />
-              ))}
-            </div>
-          ) : testimonials.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {testimonials.map((testimonial) => (
-                <TestimonialCard
-                  key={testimonial.id}
-                  rating={testimonial.rating}
-                  content={testimonial.content}
-                  reviewerName={testimonial.reviewer_name}
-                  reviewerRole={testimonial.reviewer_role}
-                  templateName={testimonial.template?.name ?? null}
+          <div className="relative min-h-[520px] text-[oklch(10%_0.006_270)]">
+            <div className="absolute -right-2 top-8 h-40 w-4 bg-[oklch(57%_0.24_29)]" />
+            <div className="relative ml-auto max-w-[620px] overflow-hidden rounded-[2rem] border border-[oklch(98%_0.004_270/0.76)] bg-[oklch(98%_0.004_270)] shadow-[0_35px_100px_rgba(0,0,0,0.42)]">
+              <div className="relative aspect-[0.92] min-h-[460px] md:aspect-[1.05]">
+                <img
+                  src="/image/client-satisfait-frilo.jpg"
+                  alt="Client souriant devant son ordinateur après avoir obtenu une présence en ligne professionnelle."
+                  className="h-full w-full object-cover object-[58%_42%] grayscale contrast-110"
                 />
-              ))}
+                <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72),rgba(0,0,0,0.12),rgba(0,0,0,0.02))]" />
+                <div className="absolute left-5 top-5 rounded-full bg-[oklch(98%_0.004_270)] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[oklch(10%_0.006_270)]">
+                  Client satisfait
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+                  <div className="max-w-md rounded-[1.35rem] bg-[oklch(98%_0.004_270)] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+                    <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Après FRILO</p>
+                    <p className="mt-2 text-2xl font-black leading-tight tracking-tight text-[oklch(10%_0.006_270)]">
+                      "Ils ont compris mon activité avant même de m'appeler."
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-10 text-center">
-              <p className="text-sm text-gray-500">
-                Les premiers avis verifies apparaitront ici apres validation par notre equipe.
-              </p>
-            </div>
-          )}
+
+          </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          10. FAQ — Squarespace : fond blanc, accordéon sobre
-      ══════════════════════════════════════════════════════════════════ */}
-      <section id="faq" className="py-16 md:py-20 bg-white">
-        <div className="sq-container max-w-3xl">
-          <div className="mb-10 md:mb-12">
-            <p className="sq-label mb-4">FAQ</p>
-            <h2 className="sq-heading text-black">Questions<br />fréquentes.</h2>
+      <section className="relative z-10 border-b border-slate-100 bg-white pb-10 pt-8 md:-mt-6">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-center lg:px-8">
+          <div className="lg:-translate-y-8">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Pourquoi ça rassure</p>
+            <h2 className="mt-3 max-w-md text-3xl font-black leading-[1.02] tracking-tight text-slate-950 md:text-4xl">
+              Ce que vos clients voient avant de vous écrire.
+            </h2>
           </div>
-          {loading ? (
-            <div className="space-y-4">
-              {[...Array(4)].map((_, index) => (
-                <div key={index} className="h-16 rounded-2xl bg-gray-100 animate-pulse" />
-              ))}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {PROOF_POINTS.map((proof, index) => (
+              <div key={proof.title} className="grid grid-cols-[2.5rem_1fr] gap-4 rounded-2xl bg-slate-50 p-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-sm font-black text-white">
+                  {index + 1}
+                </div>
+                <div>
+                  <h3 className="text-base font-black tracking-tight text-slate-950">{proof.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-slate-500">{proof.desc}</p>
+                </div>
+              </div>
+            ))}
+            <div className="rounded-2xl bg-slate-950 p-5 text-white sm:col-span-2">
+              <p className="max-w-2xl text-xl font-black leading-tight tracking-tight">
+                Le client ne voit pas un template. Il voit une entreprise organisée.
+              </p>
             </div>
-          ) : homeFaqs.length > 0 ? (
-            <div className="divide-y divide-gray-100">
-              {homeFaqs.map((faq) => (
-                <div key={faq.id} className="py-6">
-                  <button
-                    className="w-full text-left flex items-center justify-between gap-4 group"
-                    onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                  >
-                    <span className="font-semibold text-black text-sm group-hover:text-gray-600 transition-colors">{faq.question}</span>
-                    <Plus className={cn("w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200", openFaq === faq.id && "rotate-45")} />
-                  </button>
-                  {openFaq === faq.id && (
-                    <p className="text-gray-500 text-sm leading-relaxed mt-4 pr-8 whitespace-pre-line">{faq.answer}</p>
-                  )}
+          </div>
+        </div>
+      </section>
+
+      <HomeSection
+        eyebrow="Modèles"
+        title="Choisissez le style que vos clients verront en premier."
+        action={(
+          <Link href="/templates" className="inline-flex items-center gap-1 text-sm font-black text-slate-950 hover:text-slate-600">
+            Tout le catalogue <ChevronRight className="h-4 w-4" />
+          </Link>
+        )}
+      >
+        {loading ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {[...Array(FEATURED_TEMPLATE_LIMIT)].map((_, i) => (
+              <div key={i} className="h-80 animate-pulse rounded-2xl bg-slate-100" />
+            ))}
+          </div>
+        ) : catalogError ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center">
+            <p className="text-sm text-amber-800">{catalogError}</p>
+          </div>
+        ) : featuredTemplates.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center">
+            <p className="text-sm text-slate-500">Aucun modèle mis en avant pour le moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {featuredTemplates.map((template) => (
+              <TemplateCard
+                key={template.id}
+                id={String(template.id)}
+                name={template.name}
+                sectorName={template.sector?.name}
+                price={getTemplatePrice(template)}
+                features={parseFeatures(template.features)}
+                image={template.full_thumbnail_url}
+                hasLivePreview={hasLivePreview(template.preview_url)}
+                previewScreens={parsePreviewGallery(template.preview_gallery).length}
+              />
+            ))}
+          </div>
+        )}
+      </HomeSection>
+
+      <HomeSection eyebrow="Commande" title="Trois étapes, pas un projet interminable." className="bg-slate-50" action={(
+        <Link href="/templates" className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800">
+          Commencer <ArrowRight className="h-4 w-4" />
+        </Link>
+      )}>
+        <div id="how-it-works" className="grid gap-4 md:grid-cols-3">
+          {STEPS.map((step, index) => (
+            <article key={step.title} className="rounded-3xl border border-slate-200 bg-white p-6">
+              <span className="text-sm font-black text-slate-400">0{index + 1}</span>
+              <h3 className="mt-5 text-xl font-black tracking-tight text-slate-950">{step.title}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-500">{step.desc}</p>
+            </article>
+          ))}
+        </div>
+      </HomeSection>
+
+      <HomeSection eyebrow="Image de marque" title="Votre entreprise paraît prête avant même le premier appel.">
+        <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+          <div className="max-w-xl">
+            <p className="text-base leading-7 text-slate-600">
+              Une bonne page d'accueil ne décore pas votre activité. Elle rassure, explique, montre vos services et donne à vos clients une raison simple de vous contacter.
+            </p>
+            <div className="mt-6 grid gap-3">
+              {INCLUDED_FEATURES.map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="flex gap-4 rounded-2xl border border-slate-100 p-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-950">{title}</h3>
+                    <p className="mt-1 text-sm leading-5 text-slate-500">{desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-10 text-center">
-              <p className="text-sm text-gray-500">La FAQ publique sera publiée ici dès qu'elle sera configurée dans le backoffice.</p>
+          </div>
+
+          <div className="rounded-[2rem] bg-slate-950 p-4 text-white md:p-6">
+            <div className="rounded-[1.35rem] bg-white p-5 text-slate-950">
+              <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Ce que le client voit</p>
+                  <h3 className="mt-1 text-2xl font-black tracking-tight">Une activité claire, crédible, joignable.</h3>
+                </div>
+                <div className="hidden rounded-full bg-slate-950 px-3 py-1 text-xs font-bold text-white sm:block">En ligne</div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {['Vos services', 'Vos preuves', 'Votre contact'].map((item) => (
+                  <div key={item} className="rounded-2xl bg-slate-50 p-4">
+                    <div className="mb-8 h-20 rounded-xl bg-[linear-gradient(135deg,#dbeafe,#f8fafc)]" />
+                    <p className="text-sm font-black">{item}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
-          <p className="text-gray-400 text-sm mt-10">
-            Une autre question ?{' '}
-            <Link href="/contact" className="text-black font-semibold underline underline-offset-2">Écrivez-nous.</Link>
-          </p>
+          </div>
+        </div>
+      </HomeSection>
+
+      <HomeSection
+        eyebrow="Secteurs"
+        title="Des modèles pour les métiers que vos clients reconnaissent."
+        className="bg-slate-50"
+        action={(
+          <Link href="/secteurs" className="inline-flex items-center gap-1 text-sm font-black text-slate-950 hover:text-slate-600">
+            Tous les secteurs <ChevronRight className="h-4 w-4" />
+          </Link>
+        )}
+      >
+        {loading ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-40 animate-pulse rounded-2xl bg-white" />
+            ))}
+          </div>
+        ) : catalogError ? (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center">
+            <p className="text-sm text-amber-800">{catalogError}</p>
+          </div>
+        ) : sectors.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
+            <p className="text-sm text-slate-500">Aucun secteur actif disponible pour le moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {sectors.slice(0, 6).map((sector) => (
+              <SectorCard
+                key={sector.id}
+                name={sector.name}
+                slug={sector.slug}
+                description={sector.description}
+                icon={sector.icon}
+                gradient={sector.gradient}
+              />
+            ))}
+          </div>
+        )}
+      </HomeSection>
+
+      <HomeSection eyebrow="Tarifs" title={pricing.section_title.replace(/\n/g, ' ')}>
+        <div className="grid max-w-4xl grid-cols-1 gap-5 md:grid-cols-2">
+          {[
+            { plan: pricing.standard, dark: false },
+            { plan: pricing.premium, dark: true },
+          ].map(({ plan, dark }) => (
+            <article key={plan.name} className={cn('rounded-3xl border p-6 md:p-7', dark ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 bg-white text-slate-950')}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className={cn('text-xs font-black uppercase tracking-[0.16em]', dark ? 'text-white/50' : 'text-slate-400')}>{plan.name}</p>
+                  <div className="mt-4 flex items-end gap-2">
+                    <span className="text-4xl font-black tracking-tight">{plan.price.toLocaleString('fr-FR')}</span>
+                    <span className={cn('pb-1 text-sm font-semibold', dark ? 'text-white/45' : 'text-slate-400')}>{pricing.currency_label}</span>
+                  </div>
+                  <p className={cn('mt-1 text-sm', dark ? 'text-white/45' : 'text-slate-500')}>{plan.billing_label}</p>
+                </div>
+                {plan.badge_label && (
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-950">{plan.badge_label}</span>
+                )}
+              </div>
+              <ul className="mt-6 space-y-3">
+                {plan.features.map((feature) => (
+                  <li key={feature} className={cn('flex gap-3 text-sm', dark ? 'text-white/75' : 'text-slate-600')}>
+                    <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/templates"
+                className={cn('mt-7 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-black transition-colors', dark ? 'bg-white text-slate-950 hover:bg-slate-100' : 'bg-slate-950 text-white hover:bg-slate-800')}
+              >
+                {plan.cta_label}
+              </Link>
+            </article>
+          ))}
+        </div>
+        <p className="mt-6 text-sm text-slate-500">
+          {pricing.custom_note || 'Projet spécifique ?'}{' '}
+          <Link href="/contact" className="font-black text-slate-950 underline underline-offset-4">Contactez-nous.</Link>
+        </p>
+      </HomeSection>
+
+      <HomeSection eyebrow="Avis" title="La confiance se construit dans les détails." className="bg-slate-50">
+        {loading ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="h-64 animate-pulse rounded-2xl bg-white" />
+            ))}
+          </div>
+        ) : testimonials.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {testimonials.map((testimonial) => (
+              <TestimonialCard
+                key={testimonial.id}
+                rating={testimonial.rating}
+                content={testimonial.content}
+                reviewerName={testimonial.reviewer_name}
+                reviewerRole={testimonial.reviewer_role}
+                templateName={testimonial.template?.name ?? null}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
+            <p className="text-sm text-slate-500">
+              Les premiers avis verifies apparaitront ici apres validation par notre equipe.
+            </p>
+          </div>
+        )}
+      </HomeSection>
+
+      <section className="bg-white px-5 py-12 md:py-16">
+        <div className="mx-auto grid max-w-7xl gap-8 sm:px-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-start lg:px-8">
+          <div className="rounded-[1.6rem] bg-slate-950 p-6 text-white md:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Questions</p>
+            <h2 className="mt-4 max-w-md text-3xl font-black leading-[1.02] tracking-tight md:text-4xl">
+              Les réponses avant de commander.
+            </h2>
+            <p className="mt-5 max-w-sm text-sm leading-6 text-white/65">
+              Délais, prix, contenu, propriété du site : les points sensibles doivent être clairs avant paiement.
+            </p>
+            <Link href="/contact" className="mt-7 inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 transition-colors hover:bg-slate-100">
+              Poser une question
+            </Link>
+          </div>
+
+          <div className="rounded-[1.6rem] border border-slate-100 bg-slate-50 p-3">
+            {loading ? (
+              <div className="space-y-3">
+                {[...Array(4)].map((_, index) => (
+                  <div key={index} className="h-16 animate-pulse rounded-2xl bg-white" />
+                ))}
+              </div>
+            ) : homeFaqs.length > 0 ? (
+              <div className="divide-y divide-slate-100 rounded-[1.25rem] bg-white">
+                {homeFaqs.map((faq) => (
+                  <div key={faq.id} className="px-5 py-4">
+                    <button
+                      className="group flex w-full items-center justify-between gap-4 text-left"
+                      onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                    >
+                      <span className="text-sm font-black text-slate-950 transition-colors group-hover:text-[oklch(57%_0.24_29)]">{faq.question}</span>
+                      <Plus className={cn('h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200', openFaq === faq.id && 'rotate-45 text-[oklch(57%_0.24_29)]')} />
+                    </button>
+                    {openFaq === faq.id && (
+                      <p className="mt-3 whitespace-pre-line pr-8 text-sm leading-6 text-slate-500">{faq.answer}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-[1.25rem] border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
+                <p className="text-sm text-slate-500">La FAQ publique sera publiée ici dès qu'elle sera configurée dans le backoffice.</p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          11. CTA FINAL — Squarespace : fond noir, titre géant, minimaliste
-      ══════════════════════════════════════════════════════════════════ */}
-      <section className="py-24 md:py-28 bg-black text-white text-center">
-        <div className="sq-container">
-          <h2 className="sq-display text-white mb-8">
-            Prêt à lancer<br />votre site ?
-          </h2>
-          <p className="text-gray-400 text-xl mb-10 max-w-lg mx-auto leading-relaxed">
-            Des centaines d'entrepreneurs ont déjà confié leur présence en ligne à FRILO.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/templates" className="sq-btn sq-btn-white">
-              Voir les modèles <ArrowRight className="w-4 h-4" />
+      <section className="bg-slate-950 px-5 py-12 text-white md:py-16">
+        <div className="mx-auto flex max-w-5xl flex-col items-start gap-7 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-2xl">
+            <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-white/45">Prêt quand vous l'êtes</p>
+            <h2 className="text-3xl font-black leading-tight tracking-tight md:text-5xl">Donnez à votre entreprise le site qu'elle mérite.</h2>
+            <p className="mt-4 text-sm leading-6 text-white/60 md:text-base">
+              Parcourez les modèles, choisissez celui qui ressemble à votre ambition, puis laissez FRILO l'adapter.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
+            <Link href="/templates" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-slate-950 hover:bg-slate-100">
+              Voir les modèles <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/contact" className="sq-btn sq-btn-outline-white">
+            <Link href="/contact" className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-black text-white hover:bg-white/10">
               Parler à un expert
             </Link>
           </div>
-          <p className="text-gray-600 text-sm mt-10">
-            Dès {startingPriceLabel} · Paiement unique · Satisfait ou remboursé
-          </p>
         </div>
       </section>
-
     </div>
   );
 }

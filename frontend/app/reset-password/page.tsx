@@ -4,19 +4,29 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Lock, Mail } from 'lucide-react';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import { authService, resetPasswordSchema, ResetPasswordPayload } from '@/services/auth.service';
+import { z } from 'zod';
+import { authService, ResetPasswordPayload } from '@/services/auth.service';
 
 type ResetFormValues = Omit<ResetPasswordPayload, 'token'>;
+
+const resetPasswordFormSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  password_confirmation: z.string().min(8),
+}).refine((data) => data.password === data.password_confirmation, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["password_confirmation"],
+});
 
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
-      </div>
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent" />
+      </main>
     }>
       <ResetPasswordPageContent />
     </Suspense>
@@ -35,7 +45,7 @@ function ResetPasswordPageContent() {
   const hasValidResetParams = useMemo(() => token !== '' && prefilledEmail !== '', [token, prefilledEmail]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, setValue } = useForm<ResetFormValues>({
-    resolver: zodResolver(resetPasswordSchema.omit({ token: true })),
+    resolver: zodResolver(resetPasswordFormSchema),
     defaultValues: {
       email: prefilledEmail,
       password: '',
@@ -104,119 +114,129 @@ function ResetPasswordPageContent() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
-      </div>
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent" />
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-black text-white flex-col justify-between p-16">
-        <Link href="/" className="text-2xl font-black tracking-tight">FRILO</Link>
-        <div>
-          <h2 className="sq-heading text-white mb-6">
-            Nouveau<br />mot de passe.
-          </h2>
-          <p className="text-gray-400 text-lg">
-            Choisissez un mot de passe sécurisé pour protéger votre espace client.
-          </p>
-        </div>
-        <p className="text-gray-600 text-sm">© {new Date().getFullYear()} FRILO. Tous droits réservés.</p>
-      </div>
+    <main className="min-h-screen bg-white px-6 py-8 md:px-10">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[1180px] flex-col">
+        <header className="mb-10 flex items-center justify-between border-b border-gray-200 pb-5">
+          <Link href="/" className="text-xl font-black tracking-tight text-black">FRILO</Link>
+          <Link href="/login" className="text-sm font-black text-gray-500 transition-colors hover:text-black">
+            Connexion
+          </Link>
+        </header>
 
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 bg-white">
-        <Link href="/" className="text-xl font-black mb-12 lg:hidden">FRILO</Link>
-
-        <div className="max-w-sm w-full mx-auto">
-          <h1 className="text-3xl font-black text-black tracking-tight mb-2">Réinitialiser le mot de passe</h1>
-          <p className="text-gray-500 text-sm mb-10">
-            Vous pourrez vous reconnecter juste après avec votre nouveau mot de passe.
-          </p>
-
-          {!hasValidResetParams && (
-            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Lien invalide. Demandez un nouveau lien de réinitialisation.
-            </div>
-          )}
-
-          {error && (
-            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-6">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              {success}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
-                Adresse e-mail
-              </label>
-              <input
-                {...register('email')}
-                type="email"
-                placeholder="vous@exemple.com"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
-              />
-              {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
-                Nouveau mot de passe
-              </label>
-              <input
-                {...register('password')}
-                type="password"
-                placeholder="••••••••"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
-              />
-              {errors.password && <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
-                Confirmer le mot de passe
-              </label>
-              <input
-                {...register('password_confirmation')}
-                type="password"
-                placeholder="••••••••"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
-              />
-              {errors.password_confirmation && (
-                <p className="text-red-500 text-xs mt-1.5">{errors.password_confirmation.message}</p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting || !hasValidResetParams}
-              className="sq-btn sq-btn-black w-full justify-center disabled:opacity-50"
-            >
-              {isSubmitting ? 'Réinitialisation…' : 'Réinitialiser mon mot de passe'}
-            </button>
-          </form>
-
-          <p className="text-xs text-gray-500 mt-6 text-center">
-            <Link href="/forgot-password" className="underline underline-offset-2 hover:text-black transition-colors">
+        <section className="grid flex-1 gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center">
+          <div className="max-w-2xl">
+            <Link href="/forgot-password" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition-colors hover:text-black">
+              <ArrowLeft className="h-4 w-4" />
               Demander un nouveau lien
             </Link>
-            {' · '}
-            <Link href="/login" className="underline underline-offset-2 hover:text-black transition-colors">
-              Retour à la connexion
-            </Link>
-          </p>
-        </div>
+            <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">
+              Sécurité
+            </p>
+            <h1 className="text-4xl font-black leading-tight text-black md:text-5xl">
+              Créez un nouveau mot de passe.
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-gray-500">
+              Choisissez un mot de passe fiable pour reprendre l’accès à votre espace client FRILO.
+            </p>
+          </div>
+
+          <div className="border-y border-gray-200 py-6">
+            {!hasValidResetParams && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl bg-red-50 px-4 py-3 text-red-700">
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <p className="text-sm font-semibold">Lien invalide. Demandez un nouveau lien de réinitialisation.</p>
+              </div>
+            )}
+
+            {error && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl bg-red-50 px-4 py-3 text-red-700">
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <p className="text-sm font-semibold">{error}</p>
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-emerald-700">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <p className="text-sm font-semibold">{success}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div>
+                <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
+                  Adresse e-mail
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    {...register('email')}
+                    type="email"
+                    placeholder="vous@exemple.com"
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 pl-11 text-sm text-black outline-none transition-colors placeholder:text-gray-300 focus:border-black"
+                  />
+                </div>
+                {errors.email && <p className="mt-2 text-xs font-semibold text-red-500">{errors.email.message}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
+                  Nouveau mot de passe
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    {...register('password')}
+                    type="password"
+                    placeholder="Mot de passe"
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 pl-11 text-sm text-black outline-none transition-colors placeholder:text-gray-300 focus:border-black"
+                  />
+                </div>
+                {errors.password && <p className="mt-2 text-xs font-semibold text-red-500">{errors.password.message}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
+                  Confirmation
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    {...register('password_confirmation')}
+                    type="password"
+                    placeholder="Confirmez le mot de passe"
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 pl-11 text-sm text-black outline-none transition-colors placeholder:text-gray-300 focus:border-black"
+                  />
+                </div>
+                {errors.password_confirmation && (
+                  <p className="mt-2 text-xs font-semibold text-red-500">{errors.password_confirmation.message}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting || !hasValidResetParams}
+                className="inline-flex w-full justify-center rounded-full bg-black px-7 py-3.5 text-sm font-black text-white transition-colors hover:bg-gray-900 disabled:opacity-50"
+              >
+                {isSubmitting ? 'Réinitialisation en cours' : 'Réinitialiser mon mot de passe'}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-gray-500">
+              <Link href="/login" className="font-black text-black underline underline-offset-4">
+                Retour à la connexion
+              </Link>
+            </p>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

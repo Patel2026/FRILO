@@ -93,85 +93,87 @@ export default function RegisterPage() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex">
-
-      {/* Left — Brand panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-black text-white flex-col justify-between p-16">
+    <div className="flex min-h-screen bg-white">
+      <div className="hidden bg-[oklch(7%_0.006_29)] p-16 text-white lg:flex lg:w-1/2 lg:flex-col lg:justify-between">
         <Link href="/" className="text-2xl font-black tracking-tight">FRILO</Link>
         <div>
-          <h2 className="sq-heading text-white mb-6">
-            Votre site,<br />en 48h.
+          <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Nouveau client</p>
+          <h2 className="max-w-xl text-5xl font-black leading-[0.98]">
+            Préparez votre commande sans repartir de zéro.
           </h2>
-          <p className="text-gray-400 text-lg">
-            Créez votre compte et commandez votre site vitrine professionnel dès aujourd'hui.
+          <p className="mt-6 max-w-md text-base leading-7 text-white/60">
+            Votre compte conserve vos informations principales et facilite les prochaines étapes avec l’équipe FRILO.
           </p>
         </div>
-        <p className="text-gray-600 text-sm">© {new Date().getFullYear()} FRILO. Tous droits réservés.</p>
+        <p className="text-sm text-white/30">© {new Date().getFullYear()} FRILO. Tous droits réservés.</p>
       </div>
 
-      {/* Right — Form */}
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-24 py-16 bg-white">
+      <div className="flex flex-1 flex-col justify-center bg-white px-6 py-7 md:px-16 lg:px-24">
+        <div className="mx-auto w-full max-w-sm md:max-w-lg">
+          <Link href="/" className="mb-7 inline-flex text-xl font-black lg:hidden">FRILO</Link>
 
-        {/* Mobile logo */}
-        <Link href="/" className="text-xl font-black mb-12 lg:hidden">FRILO</Link>
-
-        <div className="max-w-sm w-full mx-auto">
-          <h1 className="text-3xl font-black text-black tracking-tight mb-2">Créer un compte</h1>
-          <p className="text-gray-500 text-sm mb-10">
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Inscription</p>
+          <h1 className="text-3xl font-black leading-tight text-slate-950 md:text-4xl">Créez votre compte.</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Renseignez vos informations principales. Vous pourrez compléter votre projet ensuite.
+          </p>
+          <p className="mt-4 text-sm text-slate-500">
             Déjà inscrit ?{' '}
-            <Link href="/login" className="text-black font-semibold underline underline-offset-2">
+            <Link href="/login" className="font-black text-slate-950 underline underline-offset-4">
               Se connecter
             </Link>
           </p>
 
           {error && (
-            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <div className="mt-8 flex items-start gap-2 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm leading-6 text-red-600">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+              <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
                 Nom complet
               </label>
               <input
                 {...register('name')}
                 type="text"
-                placeholder="Jean Dupont"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
+                placeholder="Votre nom"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
               />
               {errors.name && <p className="text-red-500 text-xs mt-1.5">{errors.name.message}</p>}
-            </div>
+              </div>
 
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
+              <div>
+              <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
                 Adresse e-mail
               </label>
               <input
                 {...register('email')}
                 type="email"
                 placeholder="vous@exemple.com"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
               />
               {errors.email && <p className="text-red-500 text-xs mt-1.5">{errors.email.message}</p>}
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
+              <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
                 Domaine d&apos;activité
               </label>
               <select
                 {...register('sector_id', { valueAsNumber: true })}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors focus:border-black"
                 defaultValue=""
               >
                 <option value="" disabled>
@@ -183,6 +185,11 @@ export default function RegisterPage() {
                   </option>
                 ))}
               </select>
+              {!loadingSectors && sectors.length > 0 && (
+                <p className="mt-1.5 hidden text-xs leading-5 text-slate-400 sm:block">
+                  Ce choix aide FRILO à adapter les modèles et les questions utiles.
+                </p>
+              )}
               {errors.sector_id && <p className="text-red-500 text-xs mt-1.5">{errors.sector_id.message}</p>}
               {!loadingSectors && sectors.length === 0 && (
                 <p className="text-amber-600 text-xs mt-1.5">
@@ -191,46 +198,48 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
-                Mot de passe
-              </label>
-              <input
-                {...register('password')}
-                type="password"
-                placeholder="••••••••"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
-              />
-              {errors.password && <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>}
-            </div>
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
+              <div>
+                <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
+                  Mot de passe
+                </label>
+                <input
+                  {...register('password')}
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                />
+                {errors.password && <p className="text-red-500 text-xs mt-1.5">{errors.password.message}</p>}
+              </div>
 
-            <div>
-              <label className="block text-xs font-bold text-black uppercase tracking-widest mb-2">
-                Confirmer le mot de passe
-              </label>
-              <input
-                {...register('password_confirmation')}
-                type="password"
-                placeholder="••••••••"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-black transition-colors placeholder-gray-300"
-              />
-              {errors.password_confirmation && (
-                <p className="text-red-500 text-xs mt-1.5">{errors.password_confirmation.message}</p>
-              )}
+              <div>
+                <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
+                  Confirmation
+                </label>
+                <input
+                  {...register('password_confirmation')}
+                  type="password"
+                  placeholder="••••••••"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                />
+                {errors.password_confirmation && (
+                  <p className="text-red-500 text-xs mt-1.5">{errors.password_confirmation.message}</p>
+                )}
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting || loadingSectors || sectors.length === 0}
-              className="sq-btn sq-btn-black w-full justify-center mt-2 disabled:opacity-50"
+              className="mt-2 inline-flex w-full justify-center rounded-full bg-slate-950 px-7 py-3.5 text-sm font-black text-white transition-colors hover:bg-black disabled:opacity-50"
             >
-              {isSubmitting ? 'Création…' : 'Créer mon compte'}
+              {isSubmitting ? 'Création…' : 'Créer mon espace'}
             </button>
           </form>
 
-          <p className="text-xs text-gray-400 text-center mt-8 leading-relaxed">
+          <p className="mt-5 text-center text-xs leading-relaxed text-slate-400">
             En créant un compte, vous acceptez nos{' '}
-            <Link href="/cgu" className="underline underline-offset-2 hover:text-black transition-colors">
+            <Link href="/cgu" className="underline underline-offset-4 transition-colors hover:text-slate-950">
               conditions d'utilisation
             </Link>.
           </p>

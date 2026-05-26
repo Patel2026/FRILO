@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact Us | ARCHITECTUS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#31394d",
+                        "outline-variant": "#5a4136",
+                        "on-primary": "#561f00",
+                        "surface": "#0b1326",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "tertiary-fixed-dim": "#89ceff",
+                        "secondary": "#b9c7e0",
+                        "primary": "#ffb693",
+                        "on-background": "#dae2fd",
+                        "on-surface-variant": "#e2bfb0",
+                        "on-primary-container": "#572000",
+                        "surface-variant": "#2d3449",
+                        "surface-container-low": "#131b2e",
+                        "primary-fixed-dim": "#ffb693",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "on-error": "#690005",
+                        "secondary-container": "#3c4a5e",
+                        "on-tertiary-fixed-variant": "#004c6e",
+                        "surface-tint": "#ffb693",
+                        "secondary-fixed": "#d5e3fd",
+                        "on-tertiary-container": "#00354f",
+                        "on-error-container": "#ffdad6",
+                        "tertiary": "#89ceff",
+                        "on-tertiary": "#00344d",
+                        "outline": "#a98a7d",
+                        "on-tertiary-fixed": "#001e2f",
+                        "on-primary-fixed": "#351000",
+                        "surface-dim": "#0b1326",
+                        "surface-container-high": "#222a3d",
+                        "inverse-on-surface": "#283044",
+                        "tertiary-fixed": "#c9e6ff",
+                        "tertiary-container": "#03a3e7",
+                        "surface-container-lowest": "#060e20",
+                        "inverse-surface": "#dae2fd",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "surface-container-highest": "#2d3449",
+                        "primary-container": "#ff6b00",
+                        "error": "#ffb4ab",
+                        "background": "#0b1326",
+                        "surface-container": "#171f33",
+                        "inverse-primary": "#a04100",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "primary-fixed": "#ffdbcc",
+                        "on-surface": "#dae2fd",
+                        "on-secondary-container": "#abb9d2",
+                        "on-secondary": "#233144"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-xl shadow-2xl shadow-slate-950/50 flex justify-between items-center px-8 py-4 max-w-full mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-slate-50 font-['Space_Grotesk']">
+            ARCHITECTUS
+        </div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="#">Home</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="#">About</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="#">Services</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="#">Projects</a>
+<a class="text-orange-500 font-bold border-b-2 border-orange-500 pb-1 font-['Space_Grotesk'] tracking-tight" href="#">Contact</a>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary-container px-6 py-2 rounded-md font-bold hover:scale-95 transition-all duration-200">
+            Get a Quote
+        </button>
+</nav>
+<main class="pt-32 pb-20">
+<!-- Hero Section -->
+<header class="max-w-7xl mx-auto px-8 mb-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
+<div>
+<span class="font-label uppercase tracking-widest text-primary text-xs mb-4 block">Precision Logistics</span>
+<h1 class="font-headline text-5xl md:text-7xl font-bold text-on-background leading-none tracking-tighter">
+                    Global Engineering <br/><span class="text-tertiary">Hubs</span>
+</h1>
+</div>
+<div class="lg:pb-2 max-w-md">
+<p class="text-on-surface-variant font-body text-lg leading-relaxed">
+                    Connect with our project coordination teams and regional leadership. We maintain a presence in strategic industrial centers to ensure operational excellence.
+                </p>
+</div>
+</header>
+<!-- Multi-Department Inquiry & Contact Info -->
+<section class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Contact Form (Bento Style Card) -->
+<div class="lg:col-span-7 bg-surface-container-low rounded-xl p-10 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none"></div>
+<h2 class="font-headline text-3xl font-bold mb-8">Direct Inquiry</h2>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Full Name</label>
+<input class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all" placeholder="Johnathan Sterling" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Corporate Email</label>
+<input class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all" placeholder="j.sterling@firm.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Department Inquiry Type</label>
+<select class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all appearance-none">
+<option>General Information</option>
+<option>Project Tendering &amp; Estimating</option>
+<option>Careers &amp; Talent Acquisition</option>
+<option>Supply Chain Partnership</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Brief Message</label>
+<textarea class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all" placeholder="Outline your inquiry requirements..." rows="4"></textarea>
+</div>
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-bold py-4 rounded-md uppercase tracking-widest text-sm hover:opacity-90 transition-opacity">
+                        Dispatch Inquiry
+                    </button>
+</form>
+</div>
+<!-- Key Department Contacts -->
+<div class="lg:col-span-5 space-y-8">
+<!-- Tendering -->
+<div class="bg-surface-container-high p-8 rounded-xl group transition-all hover:bg-surface-container-highest">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-tertiary mb-2 block">Estimating</span>
+<h3 class="font-headline text-xl font-bold mb-4">Tendering Office</h3>
+<p class="text-sm text-on-surface-variant mb-6">For project bids, RFP submissions, and technical pre-qualifications.</p>
+<div class="space-y-2 font-body text-on-surface">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">mail</span>
+<span>tenders@architectus.global</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">call</span>
+<span>+1 (800) 555-0192</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-surface-bright group-hover:text-primary transition-colors text-4xl" data-weight="fill">architecture</span>
+</div>
+</div>
+<!-- Careers -->
+<div class="bg-surface-container-high p-8 rounded-xl group transition-all hover:bg-surface-container-highest">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-tertiary mb-2 block">People &amp; Culture</span>
+<h3 class="font-headline text-xl font-bold mb-4">Human Resources</h3>
+<p class="text-sm text-on-surface-variant mb-6">Inquiries regarding open site positions and executive leadership roles.</p>
+<div class="space-y-2 font-body text-on-surface">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">work</span>
+<span>careers@architectus.global</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-surface-bright group-hover:text-primary transition-colors text-4xl" data-weight="fill">engineering</span>
+</div>
+</div>
+<!-- Partnership Card -->
+<div class="bg-surface-container-lowest p-8 rounded-xl border-l-4 border-primary">
+<h3 class="font-headline text-xl font-bold mb-2">Partnership Inquiries</h3>
+<p class="text-sm text-on-surface-variant mb-4">Are you a subcontractor or vendor looking to join our preferred supply chain?</p>
+<a class="text-primary font-label text-xs uppercase font-bold tracking-widest flex items-center gap-2 hover:gap-4 transition-all" href="#">
+                        Vendor Portal Access <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Map Section -->
+<section class="max-w-7xl mx-auto px-8 mt-32">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-low">
+<!-- Locations Sidebar -->
+<div class="lg:col-span-1 p-8 space-y-10 bg-surface-container-high">
+<h2 class="font-headline text-2xl font-bold">Global Presence</h2>
+<div class="space-y-8">
+<div>
+<h4 class="font-label text-xs uppercase tracking-widest text-primary mb-3">Headquarters</h4>
+<p class="text-on-surface font-bold leading-tight">Chicago Industrial Park</p>
+<p class="text-on-surface-variant text-sm mt-1">1200 Skyway Plaza<br/>Chicago, IL 60601</p>
+</div>
+<div>
+<h4 class="font-label text-xs uppercase tracking-widest text-tertiary mb-3">European Operations</h4>
+<p class="text-on-surface font-bold leading-tight">London Office</p>
+<p class="text-on-surface-variant text-sm mt-1">45 Canary Wharf<br/>London, E14 5AB</p>
+</div>
+<div>
+<h4 class="font-label text-xs uppercase tracking-widest text-tertiary mb-3">MENA Region</h4>
+<p class="text-on-surface font-bold leading-tight">Dubai Logistics Hub</p>
+<p class="text-on-surface-variant text-sm mt-1">Level 20, Burj Gate<br/>Sheikh Zayed Rd, Dubai</p>
+</div>
+</div>
+</div>
+<!-- Map Visual -->
+<div class="lg:col-span-3 h-[500px] relative">
+<img class="w-full h-full object-cover grayscale opacity-60" data-alt="Technical architectural map rendering with geometric data overlays and dark navy blue color palette for corporate construction headquarters" data-location="Chicago" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3s791FZ6cYZwq3HVeTQDU68NTAGFwOLJmACrA_whqIhKwPgiJdDpGYEAgI2ra_tw1UwBE5fmSrfMP4jmsgn_5kuaorK2f1Q8wFlJCYIn7oxCjH5FTIAMfNcNmtp9elh9Fvet57BIaKNlXYT29bauMRPpJjEWuJ9tfhLmc3QH0mI6GqGSbgXEe7SsIXOqjUf4BaYPAQmkXlbDl2vXWZAZyViXiGifWmsoHEu68JN365SGzknq17h-m92c26sy2ExgSjLRu-B-Eh5w"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-high/60 to-transparent pointer-events-none"></div>
+<!-- Pulsing Point HQ -->
+<div class="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+<div class="absolute w-8 h-8 bg-primary/20 rounded-full animate-ping"></div>
+<div class="w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(255,182,147,0.8)]"></div>
+<div class="ml-4 bg-surface-container-highest/90 backdrop-blur-md px-4 py-2 rounded shadow-xl border border-primary/20">
+<span class="text-xs font-label uppercase font-bold text-on-surface">Main Office</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-800/50 bg-slate-950 grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20">
+<div class="md:col-span-1">
+<div class="text-xl font-black text-slate-100 font-['Space_Grotesk'] mb-6">ARCHITECTUS</div>
+<p class="text-slate-500 font-['Inter'] text-sm leading-relaxed lowercase">
+                Defining the landscape of modern structural engineering through digital precision and material excellence.
+            </p>
+</div>
+<div class="md:col-span-1">
+<h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6">Resources</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div class="md:col-span-1">
+<h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6">Operations</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Safety Protocols</a></li>
+<li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Careers</a></li>
+</ul>
+</div>
+<div class="md:col-span-1">
+<h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6">Precision Engineering</h4>
+<p class="text-slate-500 font-['Inter'] text-xs tracking-widest uppercase leading-loose">
+                © 2024 Architectus Global. Precision Engineering Excellence.
+            </p>
+</div>
+</footer>
+</body></html>

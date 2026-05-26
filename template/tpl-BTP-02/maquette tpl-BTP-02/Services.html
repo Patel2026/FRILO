@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#31394d",
+                        "outline-variant": "#5a4136",
+                        "on-primary": "#561f00",
+                        "surface": "#0b1326",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "tertiary-fixed-dim": "#89ceff",
+                        "secondary": "#b9c7e0",
+                        "primary": "#ffb693",
+                        "on-background": "#dae2fd",
+                        "on-surface-variant": "#e2bfb0",
+                        "on-primary-container": "#572000",
+                        "surface-variant": "#2d3449",
+                        "surface-container-low": "#131b2e",
+                        "primary-fixed-dim": "#ffb693",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "on-error": "#690005",
+                        "secondary-container": "#3c4a5e",
+                        "on-tertiary-fixed-variant": "#004c6e",
+                        "surface-tint": "#ffb693",
+                        "secondary-fixed": "#d5e3fd",
+                        "on-tertiary-container": "#00354f",
+                        "on-error-container": "#ffdad6",
+                        "tertiary": "#89ceff",
+                        "on-tertiary": "#00344d",
+                        "outline": "#a98a7d",
+                        "on-tertiary-fixed": "#001e2f",
+                        "on-primary-fixed": "#351000",
+                        "surface-dim": "#0b1326",
+                        "surface-container-high": "#222a3d",
+                        "inverse-on-surface": "#283044",
+                        "tertiary-fixed": "#c9e6ff",
+                        "tertiary-container": "#03a3e7",
+                        "surface-container-lowest": "#060e20",
+                        "inverse-surface": "#dae2fd",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "surface-container-highest": "#2d3449",
+                        "primary-container": "#ff6b00",
+                        "error": "#ffb4ab",
+                        "background": "#0b1326",
+                        "surface-container": "#171f33",
+                        "inverse-primary": "#a04100",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "primary-fixed": "#ffdbcc",
+                        "on-surface": "#dae2fd",
+                        "on-secondary-container": "#abb9d2",
+                        "on-secondary": "#233144"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Manrope"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(19, 27, 46, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .milled-gradient {
+            background: linear-gradient(135deg, #ffb693 0%, #ff6b00 100%);
+        }
+        .hazard-stripe {
+            background: repeating-linear-gradient(
+                45deg,
+                #ff6b00,
+                #ff6b00 10px,
+                #572000 10px,
+                #572000 20px
+            );
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-xl shadow-2xl shadow-slate-950/50 flex justify-between items-center px-8 py-4 max-w-full mx-auto font-['Space_Grotesk'] tracking-tight">
+<div class="text-2xl font-bold tracking-tighter text-slate-50">ARCHITECTUS</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 hover:text-slate-100 transition-colors" href="#">Home</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors" href="#">About</a>
+<a class="text-orange-500 font-bold border-b-2 border-orange-500 pb-1" href="#">Services</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors" href="#">Projects</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors" href="#">Contact</a>
+</div>
+<button class="milled-gradient px-6 py-2 rounded-md font-bold text-on-primary active:scale-95 duration-200 transition-all uppercase text-sm tracking-widest font-label">
+            Get a Quote
+        </button>
+</nav>
+<main class="pt-32 pb-24">
+<!-- Hero Section: Asymmetric & High Contrast -->
+<header class="px-8 md:px-20 mb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+<div class="lg:col-span-8">
+<span class="font-label text-tertiary text-sm tracking-[0.2em] uppercase mb-4 block">Core Competencies</span>
+<h1 class="font-headline text-5xl md:text-7xl font-bold leading-[1.1] tracking-tighter text-on-background">
+                    ENGINEERING <br/>
+<span class="text-primary">STRUCTURAL</span> <br/>
+                    SOVEREIGNTY.
+                </h1>
+</div>
+<div class="lg:col-span-4 pb-4">
+<p class="text-secondary text-lg leading-relaxed border-l-2 border-primary/30 pl-6">
+                    Translating architectural vision into indestructible reality through precision logistics and modular steel innovation.
+                </p>
+</div>
+</header>
+<!-- Services Bento Grid -->
+<section class="px-8 md:px-20 space-y-32">
+<!-- Service 01: Industrial Infrastructure -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+<div class="lg:col-span-5 order-2 lg:order-1">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-16 h-16 rounded-sm bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="factory">factory</span>
+</div>
+<span class="font-label text-outline text-4xl font-black opacity-20">01</span>
+</div>
+<h2 class="font-headline text-4xl font-bold mb-6 text-on-surface">Industrial Infrastructure</h2>
+<p class="text-secondary mb-10 text-lg leading-relaxed">
+                        We specialize in high-capacity logistics hubs, automated manufacturing plants, and heavy-duty energy facilities. Our approach integrates BIM Level 3 modeling with accelerated structural assembly.
+                    </p>
+<div class="space-y-6 mb-12">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-tertiary mt-1" data-icon="precision_manufacturing">precision_manufacturing</span>
+<div>
+<h4 class="font-bold text-on-surface">Precision Fabrication</h4>
+<p class="text-sm text-on-surface-variant">Off-site steel milling with 0.5mm tolerance accuracy.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-tertiary mt-1" data-icon="bolt">bolt</span>
+<div>
+<h4 class="font-bold text-on-surface">Energy Integration</h4>
+<p class="text-sm text-on-surface-variant">Built-in smart grids and sustainable thermal management.</p>
+</div>
+</div>
+</div>
+<button class="bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label uppercase tracking-widest text-sm px-8 py-4 rounded-md transition-all flex items-center gap-3">
+                        Request Case Study
+                        <span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="lg:col-span-7 order-1 lg:order-2">
+<div class="aspect-[16/10] bg-surface-container-low rounded-xl overflow-hidden relative group">
+<div class="absolute inset-0 bg-gradient-to-tr from-surface-container-lowest/80 to-transparent z-10"></div>
+<img alt="Industrial Facility" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100" data-alt="Massive modern industrial factory exterior with complex steel piping and large glass panels at sunset with technical lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsUxBhzY7Y0gcR3vztUAIQA7wplrf3SreyzzJ3UNWJDMrAercWu7cAq6TcoNJot-2KM6-IIafmun9a_pQDcd1Ee8hIlfTW9COaA_ISXHK3l4XstGg-qbKPeASMyjQqbRROkqn1POiVGVx-OT7NDOoD4GwElsbd937r5SWbVnQvFORn9pn-vgE0PZ-GbCGEAEsgztfY4kk5dVj0bzLJc-oT2-oEw6LkPTd25jyecBjlXLV5fytMO1fEp_baHCeSRio1fuwPjxW6QrY"/>
+<div class="absolute bottom-6 left-6 z-20">
+<div class="bg-surface-container-highest/90 backdrop-blur-md px-4 py-2 rounded-sm flex items-center gap-4">
+<span class="font-label text-tertiary text-xs uppercase tracking-tighter">Site Status</span>
+<div class="w-24 h-1 bg-surface-container-lowest rounded-full overflow-hidden">
+<div class="hazard-stripe w-[85%] h-full"></div>
+</div>
+<span class="font-label text-primary text-xs font-bold">85% COMPLETE</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Service 02: Commercial Development -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+<div class="lg:col-span-7">
+<div class="grid grid-cols-2 gap-4">
+<div class="aspect-[4/5] bg-surface-container-low rounded-xl overflow-hidden relative translate-y-12">
+<img alt="Commercial Tower" class="w-full h-full object-cover" data-alt="Futuristic skyscraper with geometric glass facade reflecting a clear blue sky during daytime with architectural precision" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnwgNdCDLkF2p8-iZ1ln-nWh3P74REasP3b-kt-giLvIQhVDRfuER-ty8kPsVIc9-rLLEOX7xHnuskNtbRB0nlU0vqhjQqB9YVQo2AwSE6mqYp_bj7Eus6QfRLmVhd3hSzrucjhKVs_i7-QMnvEEOJ7HaVmn6vzxltg1UMLAPa-fn0e4_7_fOt-_WouQKpw-0TOFtc6g-DZaz2g9MmSKxuTui4EzCYRja1Yc-ZAoUGB2DSKw82eAs2qKYMcInnk38KZfG9klGftWk"/>
+</div>
+<div class="aspect-[4/5] bg-surface-container-low rounded-xl overflow-hidden relative">
+<img alt="Office Interior" class="w-full h-full object-cover" data-alt="Spacious minimalist office lobby with polished concrete floors and exposed structural steel beams with warm ambient light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDamV3DWqWF5u5YAgb8UN4ysYUhsYhkWYthvBXrTeVHyEyT-y0lmLTWZz5eXyOqg-v3T4yfS5z1_C9rc6O8z-TLXcmUG8t1K1nNg_jlWXVsyZZWkELqZ8_yzLSq-UoOvZP-Cn5f_jOw5JLcKdjyD_t_oKYj6DiPTKyytaDwUNVXVqAlw3qu4s5C-4CqOIKT1LjD_w61Ycr7GrLY4oGgq3qCmwbMda4Yhr5YbBbrcitL2QNnhodvDEEyNoUO7XDfBEpBFIhi_IEZeVw"/>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-16 h-16 rounded-sm bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="apartment">apartment</span>
+</div>
+<span class="font-label text-outline text-4xl font-black opacity-20">02</span>
+</div>
+<h2 class="font-headline text-4xl font-bold mb-6 text-on-surface">Commercial Development</h2>
+<p class="text-secondary mb-10 text-lg leading-relaxed">
+                        Redefining the skyline with LEED-certified commercial hubs. From Grade-A office towers to luxury retail environments, we deliver spaces that prioritize human-centric design without compromising structural integrity.
+                    </p>
+<ul class="space-y-4 mb-12">
+<li class="flex items-center gap-3 text-on-surface-variant font-label text-sm uppercase tracking-wider">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                            Carbon-Neutral Materials
+                        </li>
+<li class="flex items-center gap-3 text-on-surface-variant font-label text-sm uppercase tracking-wider">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                            Biophilic Design Integration
+                        </li>
+<li class="flex items-center gap-3 text-on-surface-variant font-label text-sm uppercase tracking-wider">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                            Accelerated Core Construction
+                        </li>
+</ul>
+<button class="bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label uppercase tracking-widest text-sm px-8 py-4 rounded-md transition-all flex items-center gap-3">
+                        Request Case Study
+                        <span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Service 03: Civil Engineering -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+<div class="lg:col-span-5 order-2 lg:order-1">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-16 h-16 rounded-sm bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="architecture">architecture</span>
+</div>
+<span class="font-label text-outline text-4xl font-black opacity-20">03</span>
+</div>
+<h2 class="font-headline text-4xl font-bold mb-6 text-on-surface">Civil Engineering</h2>
+<p class="text-secondary mb-10 text-lg leading-relaxed">
+                        Connecting communities through resilient infrastructure. Our civil division handles complex bridge systems, high-speed transit arteries, and urban water management systems built for the next century.
+                    </p>
+<div class="bg-surface-container-low p-8 rounded-lg border-l-4 border-tertiary">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xs font-label text-tertiary uppercase tracking-widest">Global Impact Score</span>
+<span class="text-2xl font-headline font-bold text-on-surface">A+</span>
+</div>
+<p class="text-sm text-on-surface-variant italic leading-relaxed">
+                            "The precision in their transit node execution reduced municipal downtime by 40% compared to industry benchmarks."
+                        </p>
+</div>
+<button class="mt-12 bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label uppercase tracking-widest text-sm px-8 py-4 rounded-md transition-all flex items-center gap-3">
+                        Request Case Study
+                        <span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="lg:col-span-7 order-1 lg:order-2">
+<div class="relative">
+<div class="aspect-square bg-surface-container-low rounded-full overflow-hidden border-8 border-surface-container-high relative">
+<img alt="Civil Engineering" class="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all duration-500" data-alt="Aerial view of a complex highway interchange with symmetric concrete curves and technical urban planning at twilight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJHznw4g2rMs59pM6pP1dLvxouInt-WbaeLtuUWK6veLUXfH_44MPbRlqzMkDonfWb4FVVhRtTBWHi2BTeZJEM-0x2LHTTlt4QNpfzHK5R5YPe5jyowyRI8_1xg6TdXgs_2puuzLAM4KLibhqerk-EOIeF5wMMlGxIOcremlSlbYl5CSNxPsVkK6E541CBh-Hn4WZ-OJyPnpRj_RlBEw7Pw1H8YTAnuQoIxSiTOzhTsQg9ttRaXyoAckAg62EdwEU6CvalL8jmbtg"/>
+</div>
+<!-- Technical Overlay Labels -->
+<div class="absolute top-10 right-0 bg-surface-container-highest p-4 rounded shadow-2xl border border-outline-variant/20 hidden md:block">
+<p class="font-label text-[10px] text-tertiary uppercase mb-1">Coordinates</p>
+<p class="font-mono text-sm">40.7128° N, 74.0060° W</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Stats Section -->
+<section class="mt-32 px-8 md:px-20">
+<div class="bg-surface-container-low p-12 rounded-xl grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-outline-variant/10">
+<div class="space-y-2">
+<p class="font-label text-xs text-outline uppercase tracking-widest">Active Sites</p>
+<p class="font-headline text-4xl font-bold text-on-surface">142</p>
+</div>
+<div class="space-y-2">
+<p class="font-label text-xs text-outline uppercase tracking-widest">Steel Tonnage</p>
+<p class="font-headline text-4xl font-bold text-on-surface">8.4M</p>
+</div>
+<div class="space-y-2">
+<p class="font-label text-xs text-outline uppercase tracking-widest">Safety Hours</p>
+<p class="font-headline text-4xl font-bold text-on-surface">400K+</p>
+</div>
+<div class="space-y-2">
+<p class="font-label text-xs text-outline uppercase tracking-widest">Certifications</p>
+<p class="font-headline text-4xl font-bold text-on-surface">ISO-9</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 w-full border-t border-slate-800/50 grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 font-['Inter'] text-sm tracking-widest uppercase">
+<div class="col-span-1 md:col-span-1">
+<div class="text-xl font-black text-slate-100 mb-6">ARCHITECTUS</div>
+<p class="text-slate-500 normal-case tracking-normal max-w-xs">
+                Global leaders in architectural precision and industrial infrastructure development.
+            </p>
+</div>
+<div class="space-y-4">
+<h4 class="text-orange-500 font-bold mb-6">Capabilities</h4>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Industrial</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Commercial</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Civil</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Residential</a>
+</div>
+<div class="space-y-4">
+<h4 class="text-orange-500 font-bold mb-6">Company</h4>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">About Us</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Careers</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Safety Protocols</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Sustainability</a>
+</div>
+<div class="space-y-4">
+<h4 class="text-orange-500 font-bold mb-6">Legal</h4>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Privacy Policy</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Terms of Service</a>
+<a class="block text-slate-500 hover:text-orange-500 transition-colors hover:underline decoration-orange-500 decoration-2 underline-offset-4" href="#">Cookies</a>
+</div>
+<div class="col-span-full pt-12 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500">
+<span>© 2024 Architectus Global. Precision Engineering Excellence.</span>
+<div class="flex gap-6">
+<span class="material-symbols-outlined cursor-pointer hover:text-orange-500" data-icon="share">share</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-orange-500" data-icon="public">public</span>
+</div>
+</div>
+</footer>
+</body></html>

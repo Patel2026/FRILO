@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>STRUCTUR | Ingénierie & BTP</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar Component -->
+<nav class="bg-slate-50 dark:bg-slate-950 rounded-none w-full top-0 sticky z-50 tonal-shift bg-slate-100 dark:bg-slate-900 flat no shadows flex justify-between items-center px-12 py-6 w-full max-w-none">
+    <div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter font-headline">STRUCTUR</div>
+    <div class="hidden md:flex gap-10 items-center">
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-orange-600 dark:text-orange-500 border-b-4 border-orange-600 dark:border-orange-500 pb-1 hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="index.html">Accueil</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="about.html">À propos</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="services.html">Services</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="portfolio.html">Réalisations</a>
+        <a class="font-['Work_Sans'] font-bold uppercase tracking-tighter text-slate-600 dark:text-slate-400 font-medium hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="contact.html">Contact</a>
+    </div>
+    <a href="contact.html" class="bg-secondary-container text-on-secondary-container font-headline font-bold uppercase px-8 py-3 mechanical-hover active:translate-y-1 block text-center">
+        Demander un Devis
+    </a>
+</nav>
+
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[870px] flex items-center overflow-hidden">
+    <div class="absolute inset-0 z-0">
+        <img class="w-full h-full object-cover grayscale-[30%] contrast-[110%]" data-alt="Modern construction site with massive yellow cranes against a dramatic blue sky at dusk, low angle shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPB0Vl0OO2gaJhr_SAiRHNXe3XRFOHr6eoe7UqbMN93UvKLN_A2q3QPt4vATEuYdK9gdJqjrQwE9ajvpmTG72v1Lfto_l3OPo4nasmZ9GUGnRLT1FUChpbO1A6LrSfjyiDMKRws3-WUCfmOFT04nQRf6bV8IQ1hjU-LW8yteLBtb5HPrrLt7nnePUD03guchPGBqrTWpDCOUBopet-8fsKDqimRrklZ7fKr1RM50QhVfsRE3zpSLyCrhOHW7bhK3wq0Wqapj_0d_o"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-transparent"></div>
+    </div>
+    <div class="relative z-10 px-12 max-w-4xl">
+        <span class="font-label text-secondary-container font-bold tracking-[0.2em] uppercase text-xs mb-4 block">L'Excellence Architecturale</span>
+        <h1 class="text-[5rem] font-headline font-black leading-[0.95] text-on-primary tracking-tighter mb-8">
+            CONSTRUIRE<br/>L'AVENIR AVEC<br/>PRÉCISION.
+        </h1>
+        <p class="text-on-primary/80 text-xl max-w-2xl font-light mb-10 leading-relaxed">
+            L'intégrité structurelle inébranlable rencontre l'esthétique brutaliste. Nous redéfinissons les paysages grâce à une ingénierie de haute performance et une fiabilité sans compromis.
+        </p>
+        <div class="flex gap-4">
+            <button class="bg-secondary-container text-on-secondary-container font-headline font-bold uppercase px-10 py-5 mechanical-hover">
+                Demander un Devis
+            </button>
+            <button class="bg-transparent border-2 border-on-primary text-on-primary font-headline font-bold uppercase px-10 py-5 mechanical-hover">
+                Voir Nos Réalisations
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section: Tonal Layering -->
+<section class="bg-surface-container-low py-32 px-12">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+            <div class="max-w-2xl">
+                <label class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem] mb-2 block">Notre Expertise Spécialisée</label>
+                <h2 class="text-5xl font-headline font-extrabold tracking-tighter text-primary uppercase">Services Structurels Spécialisés</h2>
+            </div>
+            <p class="text-on-surface-variant max-w-xs text-sm leading-relaxed">
+                De la conception initiale à la livraison finale, nous exécutons chaque étape avec une rigueur industrielle.
+            </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
+            <!-- Building -->
+            <div class="bg-surface p-12 border-l border-outline-variant/20 hover:bg-surface-container-highest transition-colors group">
+                <div class="mb-8">
+                    <span class="material-symbols-outlined text-5xl text-secondary" data-icon="architecture">architecture</span>
+                </div>
+                <h3 class="text-2xl font-headline font-bold uppercase mb-4 text-primary">Construction</h3>
+                <p class="text-on-surface-variant leading-relaxed mb-8">Assemblage structurel d'environnements industriels et commerciaux complexes en mettant l'accent sur la précision des charges porteuses.</p>
+                <a class="font-label font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-secondary" href="services.html">
+                    Analyser en détail <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                </a>
+            </div>
+            <!-- Renovation -->
+            <div class="bg-surface p-12 border-l border-outline-variant/20 hover:bg-surface-container-highest transition-colors group">
+                <div class="mb-8">
+                    <span class="material-symbols-outlined text-5xl text-secondary" data-icon="home_repair_service">home_repair_service</span>
+                </div>
+                <h3 class="text-2xl font-headline font-bold uppercase mb-4 text-primary">Rénovation</h3>
+                <p class="text-on-surface-variant leading-relaxed mb-8">Renforcement structurel et modernisation esthétique des anciens cadres architecturaux pour répondre aux protocoles de sécurité actuels.</p>
+                <a class="font-label font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-secondary" href="services.html">
+                    Analyser en détail <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                </a>
+            </div>
+            <!-- Civil Works -->
+            <div class="bg-surface p-12 border-l border-r border-outline-variant/20 hover:bg-surface-container-highest transition-colors group">
+                <div class="mb-8">
+                    <span class="material-symbols-outlined text-5xl text-secondary" data-icon="foundation">foundation</span>
+                </div>
+                <h3 class="text-2xl font-headline font-bold uppercase mb-4 text-primary">Génie Civil</h3>
+                <p class="text-on-surface-variant leading-relaxed mb-8">Développement d'infrastructures lourdes comprenant le nivellement des fondations, les systèmes d'égouts et les artères urbaines.</p>
+                <a class="font-label font-bold text-xs tracking-widest uppercase flex items-center gap-2 group-hover:text-secondary" href="services.html">
+                    Analyser en détail <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Grid: Bento Layout -->
+<section class="bg-surface py-32 px-12">
+    <div class="max-w-7xl mx-auto">
+        <div class="mb-20">
+            <label class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem] mb-2 block">Archives de Chantier</label>
+            <h2 class="text-5xl font-headline font-extrabold tracking-tighter text-primary uppercase">Nos Réalisations Récentes</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 h-[800px]">
+            <div class="md:col-span-8 relative overflow-hidden bg-primary-container">
+                <img class="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700" data-alt="Low angle view of a sleek glass and steel skyscraper reflecting the clear blue sky, emphasizing structural lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnfOU_3LsjvYebIbg78jlzKF2Zo9adl6-bTTPOT54g1e6Xrj2W9_C3xA4Qhk3YPVdRw1q9v7x4yZSI9HbDrKJLWKPmZvj5h6M9BNlZjBuQfsUTXYS1HUbs5t-VRykdmZmDSZ_pfT_Vu2aHtXZL8-FKriQ7C3xW4-SWDmnBuEtTZfeIHeVv8baqhZSV5ZBqHyFuwMri94krEp9UEY6HVATrbrxZdQhLkB7XCLBdezanCfaacEzArrz4Wkz1PRLkC5xZZOdLdeOCzV4"/>
+                <div class="absolute bottom-0 left-0 p-10 bg-gradient-to-t from-primary/90 to-transparent w-full">
+                    <span class="bg-secondary-container text-on-secondary-container px-3 py-1 font-label text-[0.6rem] font-bold uppercase mb-4 inline-block">TERMINÉ</span>
+                    <h4 class="text-3xl font-headline font-black text-on-primary uppercase tracking-tighter">Le Hub Monolithe</h4>
+                    <p class="font-label text-on-primary/60 text-[0.7rem] uppercase mt-2 tracking-widest">Quartier Métropolitain / 4 180 M²</p>
+                </div>
+            </div>
+            <div class="md:col-span-4 grid grid-rows-2 gap-8">
+                <div class="relative overflow-hidden bg-primary-container">
+                    <img class="w-full h-full object-cover opacity-80 hover:scale-105 transition-transform duration-700" data-alt="Interior of a modern concrete building under construction with exposed beams and geometric shadow patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVJoAKkq_9_9xx-BauM9D5f2kP-9Oz_O623GzQsRinX36OtxA1V9gtt0pGbfec8UdbVOvwt1FcWczbS1kWQBwdUXIgezzLefiYiPbcsYcoRvF1l2wwfjUonvb3SWLafmTehvxrBxyMPek1L8dvvJ5RDmzbree6R36lhMZ0cYzF79ORwlKrjQteBS4YvIvnb2Y6rLqRKDf0TtaK6H1gd_mm-HrzZsvH4SzP2tg2cB0kB6-hbX9p-lP2XVsvV5KLhmwApcFFX5SCoX0"/>
+                    <div class="absolute bottom-0 left-0 p-6">
+                        <h4 class="text-xl font-headline font-black text-on-primary uppercase tracking-tighter">Atrium en Béton</h4>
+                    </div>
+                </div>
+                <div class="relative overflow-hidden bg-secondary">
+                    <img class="w-full h-full object-cover opacity-70 hover:scale-105 transition-transform duration-700" data-alt="Aerial view of an industrial bridge construction project crossing a wide river with heavy equipment visible" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLAaCfJ2Dan9FDQuLiitwGJdBWHUQL8WR90CRCXtNOkybcgC824-L1W7QBIqwGSWLipuzf6uboAtwDOJAAcKIuqJFKV8_mbY2IDAbEww1j5KxQJFdFCjBDRapu__Fx8kI6Phick95ZLl5lRIkEpiOLKVRPQQ21HDwC6sJ9_DjxWvUnk9IMGHfZxr7Pur1sHYUo8PY0yaLHHKfQC1-yK3xQeUsi3t7PCq6dRpgTbw6r0RmTibUY2ztqz1EWfzhQfrnlm2T3kMdgdzk"/>
+                    <div class="absolute bottom-0 left-0 p-6">
+                        <h4 class="text-xl font-headline font-black text-on-primary uppercase tracking-tighter">Viaduc en Acier</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Snippet: Brutalist Layout -->
+<section class="bg-primary py-32 px-12 text-on-primary overflow-hidden relative">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-20">
+        <div class="w-full md:w-1/2 relative">
+            <div class="absolute -top-10 -left-10 text-[10rem] font-headline font-black text-on-primary/5 select-none leading-none">EST. 1994</div>
+            <h2 class="text-6xl font-headline font-black tracking-tighter uppercase mb-8 leading-[0.9]">La Fiabilité<br/>Par La Rigueur</h2>
+            <p class="text-on-primary-container text-lg leading-relaxed mb-10 font-light">
+                Depuis plus de 30 ans, STRUCTUR est l'épine dorsale du développement urbain. Nous ne nous contentons pas de construire ; nous concevons la pérennité. Notre méthodologie est enracinée dans la précision architecturale brutaliste, garantissant que chaque composant est un témoignage de qualité.
+            </p>
+            <div class="grid grid-cols-2 gap-12 border-t border-on-primary/10 pt-10">
+                <div>
+                    <span class="text-5xl font-headline font-black text-secondary-container">350+</span>
+                    <p class="font-label text-xs uppercase tracking-widest text-on-primary-container mt-2">Projets Livrés</p>
+                </div>
+                <div>
+                    <span class="text-5xl font-headline font-black text-secondary-container">1.2M</span>
+                    <p class="font-label text-xs uppercase tracking-widest text-on-primary-container mt-2">Mètres Carrés Coulés</p>
+                </div>
+            </div>
+        </div>
+        <div class="w-full md:w-1/2">
+            <img class="w-full grayscale brightness-75 hover:grayscale-0 transition-all duration-500" data-alt="Professional construction manager in a safety vest and hardhat reviewing blueprints on a digital tablet at a site" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_jnBx8cQJq7gO_RU2NIfgU6HTBSdR4DKk9Q-rQ2OPUe_3kEKej8NuCXtVgldVz1bpeJCxJL6TjFSHDkdDvD1nMCSOfmX-fCr-aXeMiEnnwrnWsK7Bjn0lvALgEmMrbG2RtD-V44XD1eCeeB0gNCPcfi_sayX0P8pVDd7yHAE1W2AjP-f-ZAFz-UNQAkajRWVRcltz7Y0P3bZK1bihKAhH749XjhDJjiW0Nmwisfvl8WKcx7iCYADk7nbxMPq5LGl9qtbXkWIwgWk"/>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="bg-surface-container-low py-32 px-12">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-20">
+            <label class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem] mb-2 block">Vérification Client</label>
+            <h2 class="text-5xl font-headline font-extrabold tracking-tighter text-primary uppercase">Bâti Sur Notre Réputation</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div class="p-12 bg-surface-container-lowest relative border-l-8 border-secondary-container">
+                <div class="flex gap-1 text-secondary-container mb-6">
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                </div>
+                <p class="text-xl font-body text-on-surface leading-relaxed italic mb-8">
+                    "L'intégrité structurelle et la vitesse d'exécution sur le pôle logistique du Nord-Est ont dépassé les attentes habituelles de l'industrie. STRUCTUR est notre partenaire de choix pour tous les chantiers lourds."
+                </p>
+                <div>
+                    <span class="font-headline font-bold uppercase text-primary text-sm">Marcus Vane</span>
+                    <p class="font-label text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Directeur, Groupe Logistique Vane</p>
+                </div>
+            </div>
+            <div class="p-12 bg-surface-container-lowest relative border-l-8 border-primary">
+                <div class="flex gap-1 text-secondary-container mb-6">
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="material-symbols-outlined" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                </div>
+                <p class="text-xl font-body text-on-surface leading-relaxed italic mb-8">
+                    "Excellence technique combinée à des protocoles de sécurité rigoureux. Leur travail de rénovation sur notre gratte-ciel historique a préservé son âme tout en modernisant l'entièreté de sa structure."
+                </p>
+                <div>
+                    <span class="font-headline font-bold uppercase text-primary text-sm">Elena Petrova</span>
+                    <p class="font-label text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Architecte en Chef, Urban Rise</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Banner -->
+<section class="bg-secondary-container py-24 px-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+        <div class="text-on-secondary-container max-w-2xl">
+            <h2 class="text-5xl font-headline font-black uppercase tracking-tighter mb-4">Prêt à démarrer le chantier ?</h2>
+            <p class="text-lg font-medium">Échangez avec nos responsables techniques pour une consultation et un devis précis.</p>
+        </div>
+        <button class="bg-primary text-on-primary font-headline font-black uppercase px-12 py-6 text-xl hover:translate-x-2 transition-transform">
+            Contactez-Nous Aujourd'hui
+        </button>
+    </div>
+</section>
+</main>
+
+<!-- Footer Component -->
+<footer class="bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-50 font-['Public_Sans'] text-[0.6875rem] uppercase tracking-[0.1em] rounded-none border-t-0 tonal-stacking-low flat no shadows grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 w-full">
+    <div class="md:col-span-1">
+        <div class="text-xl font-black text-slate-900 dark:text-slate-50 mb-6 font-headline">STRUCTUR</div>
+        <p class="normal-case tracking-normal text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">Le Brutalisme Architectural et l'ingénierie de haut niveau. Nous bâtissons les fondations de l'avenir avec une précision industrielle.</p>
+        <p class="text-slate-500 dark:text-slate-400">© 2024 STRUCTUR ARCHITECTURE BTP. TOUS DROITS RÉSERVÉS.</p>
+    </div>
+    <div>
+        <h5 class="font-bold text-slate-900 dark:text-slate-50 mb-6">Navigation</h5>
+        <ul class="space-y-4">
+            <li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Plan du site</a></li>
+            <li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Politique de Confidentialité</a></li>
+            <li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Protocoles de Sécurité</a></li>
+        </ul>
+    </div>
+    <div>
+        <h5 class="font-bold text-slate-900 dark:text-slate-50 mb-6">Carrières</h5>
+        <ul class="space-y-4">
+            <li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">Nous Rejoindre</a></li>
+            <li><a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-150" href="#">LinkedIn</a></li>
+        </ul>
+    </div>
+    <div>
+        <h5 class="font-bold text-slate-900 dark:text-slate-50 mb-6">Siège Technique</h5>
+        <p class="normal-case tracking-normal text-slate-500 dark:text-slate-400 leading-relaxed">
+            100 Industrial Parkway<br/>
+            Steel District, NY 10001<br/>
+            T: +1 800 555 STRC
+        </p>
+    </div>
+</footer>
+</body>
+</html>

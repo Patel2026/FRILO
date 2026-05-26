@@ -110,6 +110,48 @@ class OrderApiTest extends TestCase
         $this->assertCount(1, $response->json('data'));
     }
 
+    public function test_orders_index_can_filter_by_order_and_payment_status(): void
+    {
+        $user = User::factory()->create();
+        $template = $this->createTemplate();
+
+        Order::create([
+            'user_id' => $user->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Pending->value,
+            'payment_status' => PaymentStatus::AwaitingPayment->value,
+            'price' => 50000,
+        ]);
+
+        Order::create([
+            'user_id' => $user->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Processing->value,
+            'payment_status' => PaymentStatus::Paid->value,
+            'price' => 75000,
+        ]);
+
+        Order::create([
+            'user_id' => $user->id,
+            'template_id' => $template->id,
+            'status' => OrderStatus::Completed->value,
+            'payment_status' => PaymentStatus::Paid->value,
+            'price' => 75000,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/orders?status=processing')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.status', OrderStatus::Processing->value);
+
+        $this->getJson('/api/orders?payment_status=awaiting_payment')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.payment_status', PaymentStatus::AwaitingPayment->value);
+    }
+
     public function test_orders_summary_returns_status_counts_for_authenticated_user_only(): void
     {
         $userA = User::factory()->create();

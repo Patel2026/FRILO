@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mes Programmes | Sacha Coach</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="tailwind-config.js"></script>
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body class="bg-surface text-slate-800 antialiased selection:bg-accent selection:text-white flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-primary/5 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-serif font-bold text-xl">S</div>
+                <span class="font-serif font-bold text-2xl text-primary tracking-tight">Sacha.</span>
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Accueil</a>
+                <a href="about.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Mon Parcours</a>
+                <a href="services.html" class="text-primary font-medium text-sm tracking-wide">Coaching</a>
+                <a href="contact.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Contact</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4">
+                <a href="contact.html" class="btn-primary px-6 py-2.5 text-sm tracking-wide shadow-soft hover:shadow-soft-hover">
+                    Séance Découverte
+                </a>
+            </div>
+
+            <button class="md:hidden text-primary">
+                <span class="material-symbols-outlined text-3xl">menu</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-32 pb-24">
+        
+        <!-- En-tête -->
+        <section class="max-w-4xl mx-auto px-6 text-center mb-24 animate-fade-in relative">
+            <div class="absolute top-0 right-10 w-24 h-24 bg-accent/10 rounded-full blur-2xl -z-10"></div>
+            <span class="inline-block py-1 px-4 rounded-full bg-primary/5 text-xs font-semibold text-primary uppercase tracking-widest mb-6">L'Offre de Coaching</span>
+            <h1 class="text-5xl md:text-6xl font-serif font-bold text-primary mb-6 leading-tight">Des parcours pour <br><span class="italic text-accent">chaque stade d'évolution.</span></h1>
+            <p class="text-lg text-slate-600 font-light max-w-2xl mx-auto leading-relaxed">
+                Le coaching ne se vend pas à l'heure, il s'évalue à la transformation vécue. C'est pourquoi je propose des programmes immersifs et engageants.
+            </p>
+        </section>
+
+        <!-- Liste des Programmes -->
+        <section class="max-w-7xl mx-auto px-6 mb-24 space-y-16">
+            
+            <!-- Programme 1: Renaissance -->
+            <div class="card-soft p-10 md:p-14 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-primary/5 to-transparent"></div>
+                <div class="grid lg:grid-cols-2 gap-12 items-center relative z-10">
+                    <div>
+                        <div class="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center mb-6 shadow-soft">
+                            <span class="material-symbols-outlined text-2xl">autorenew</span>
+                        </div>
+                        <h2 class="text-3xl font-serif font-bold text-primary mb-4">Programme "Renaissance"</h2>
+                        <span class="inline-block mb-6 text-sm font-semibold text-accent uppercase tracking-widest">Coaching de Vie / 3 Mois</span>
+                        <p class="text-slate-600 font-light leading-relaxed mb-6">
+                            Vous sentez que vous tournez en rond. Vous avez "coché toutes les cases" mais le sentiment d'accomplissement n'est pas là. Ce programme intensif de 12 semaines est conçu pour faire le tri entre vos désirs profonds et les attentes de la société.
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-3 text-slate-600 font-light text-sm">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span> 6 séances bimensuelles de 1h30
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-600 font-light text-sm">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span> Exercices d'introspection profonds entre les séances
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-600 font-light text-sm">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span> Test d'Analyse des valeurs fondamentales
+                            </li>
+                        </ul>
+                        <div class="flex items-center justify-between mt-8 border-t border-slate-100 pt-6">
+                            <span class="text-2xl font-serif font-bold text-primary">600k <span class="text-sm text-slate-400 font-sans font-light">FCFA</span></span>
+                            <a href="contact.html?prog=renaissance" class="btn-secondary px-6 py-2">Postuler</a>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block relative">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80" alt="Introspection" class="w-full aspect-square object-cover rounded-[2rem] shadow-none group-hover:shadow-soft-hover transition-all duration-500 delay-100 filter grayscale group-hover:grayscale-0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programme 2: Ascension (Focus) -->
+            <div class="bg-gradient-primary rounded-[3rem] p-10 md:p-14 relative overflow-hidden text-white shadow-2xl transform lg:scale-[1.02]">
+                <div class="absolute -top-40 -left-40 w-96 h-96 border-[40px] border-white/5 rounded-full"></div>
+                <div class="grid lg:grid-cols-2 gap-12 items-center relative z-10">
+                    <div class="hidden lg:block relative">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80" alt="Executive" class="w-full aspect-square object-cover rounded-[2rem] shadow-soft-hover box-border border-4 border-white/10">
+                    </div>
+                    <div>
+                        <div class="absolute top-0 right-0 bg-accent text-white px-4 py-1 text-xs font-bold uppercase tracking-widest rounded-bl-xl rounded-tr-xl">Le plus demandé</div>
+                        <div class="w-14 h-14 bg-white text-primary rounded-2xl flex items-center justify-center mb-6 shadow-soft">
+                            <span class="material-symbols-outlined text-2xl">trending_up</span>
+                        </div>
+                        <h2 class="text-3xl font-serif font-bold mb-4">Programme "Ascension"</h2>
+                        <span class="inline-block mb-6 text-sm font-semibold text-accent uppercase tracking-widest">Coaching Carrière / 6 Mois</span>
+                        <p class="text-white/80 font-light leading-relaxed mb-6">
+                            Conçu exclusivement pour les cadres supérieurs, dirigeants et entrepreneurs. Un accompagnement en profondeur pour briser le plafond de verre, assumer votre leadership et équilibrer performance et santé mentale.
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-3 text-white/90 font-light text-sm">
+                                <span class="material-symbols-outlined text-accent text-lg">check_circle</span> 12 séances de coaching stratégique (1h)
+                            </li>
+                            <li class="flex items-center gap-3 text-white/90 font-light text-sm">
+                                <span class="material-symbols-outlined text-accent text-lg">check_circle</span> Accès Whatsapp "Hotline Mentale" en semaine
+                            </li>
+                            <li class="flex items-center gap-3 text-white/90 font-light text-sm">
+                                <span class="material-symbols-outlined text-accent text-lg">check_circle</span> Travail sur le Personal Branding
+                            </li>
+                        </ul>
+                        <div class="flex items-center justify-between mt-8 border-t border-white/20 pt-6">
+                            <span class="text-2xl font-serif font-bold text-white">1.5M <span class="text-sm font-sans font-light opacity-60">FCFA</span></span>
+                            <a href="contact.html?prog=ascension" class="btn-primary px-6 py-2 border-none">Réserver cet accompagnement</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programme 3: Clarté -->
+            <div class="card-soft p-10 md:p-14 relative overflow-hidden group">
+                <div class="grid lg:grid-cols-2 gap-12 items-center relative z-10">
+                    <div>
+                        <div class="w-14 h-14 border border-primary/20 text-primary rounded-2xl flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-2xl">wb_incandescent</span>
+                        </div>
+                        <h2 class="text-3xl font-serif font-bold text-primary mb-4">Session "Clarté Intensive"</h2>
+                        <span class="inline-block mb-6 text-sm font-semibold text-slate-500 uppercase tracking-widest">Intervention Flash / 3 Heures</span>
+                        <p class="text-slate-600 font-light leading-relaxed mb-6">
+                            Vous n'avez pas besoin de mois d'introspection, vous avez une décision critique à prendre *maintenant*. Démissionner, accepter un poste, s'associer. Un huis-clos de 3 heures pour démêler la situation.
+                        </p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-3 text-slate-600 font-light text-sm">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span> 1 session continue de 3h (en ligne ou Cotonou)
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-600 font-light text-sm">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span> Grilles de décision pondérées
+                            </li>
+                        </ul>
+                        <div class="flex items-center justify-between mt-8 border-t border-slate-100 pt-6">
+                            <span class="text-2xl font-serif font-bold text-primary">150k <span class="text-sm text-slate-400 font-sans font-light">FCFA</span></span>
+                            <a href="contact.html?prog=clarte" class="btn-secondary px-6 py-2">Bloquer un créneau</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer Personnalisé (Minimisé) -->
+    <footer class="bg-white py-12 border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-slate-500 font-light">
+            <span class="font-serif font-bold text-2xl text-primary tracking-tight mb-4 block">Sacha.</span>
+            <div class="flex justify-center gap-6 mb-6">
+                <a href="about.html" class="hover:text-accent transition-colors font-medium">Mon Parcours</a>
+                <a href="services.html" class="hover:text-accent transition-colors font-medium text-primary border-b border-primary">Programmes</a>
+                <a href="contact.html" class="hover:text-accent transition-colors font-medium">Contact</a>
+            </div>
+            <p>&copy; 2026 Sacha Coaching. Tous droits réservés.</p>
+        </div>
+    </footer>
+</body>
+</html>

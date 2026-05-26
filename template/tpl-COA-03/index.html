@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sacha Coach | Révélez votre vrai potentiel</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="tailwind-config.js"></script>
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body class="bg-surface text-slate-800 antialiased selection:bg-accent selection:text-white">
+
+    <!-- Navbar Minimaliste -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-primary/5 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-serif font-bold text-xl">S</div>
+                <span class="font-serif font-bold text-2xl text-primary tracking-tight">Sacha.</span>
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-primary font-medium text-sm tracking-wide">Accueil</a>
+                <a href="about.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Mon Parcours</a>
+                <a href="services.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Coaching</a>
+                <a href="contact.html" class="text-slate-600 hover:text-accent transition-colors text-sm font-medium tracking-wide">Contact</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4">
+                <a href="contact.html" class="btn-primary px-6 py-2.5 text-sm tracking-wide shadow-soft hover:shadow-soft-hover">
+                    Séance Découverte
+                </a>
+            </div>
+
+            <button class="md:hidden text-primary">
+                <span class="material-symbols-outlined text-3xl">menu</span>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <!-- 1. Hero Section "Mindset" -->
+        <section class="relative min-h-[90vh] flex items-center pt-24 overflow-hidden">
+            <!-- Cercles décoratifs -->
+            <div class="absolute top-20 -left-64 w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl -z-10"></div>
+            <div class="absolute bottom-10 right-0 w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl -z-10"></div>
+            
+            <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center w-full">
+                <div class="relative z-10 py-10">
+                    <span class="inline-block py-1.5 px-4 rounded-full bg-white border border-primary/10 text-xs font-semibold text-primary uppercase tracking-widest mb-6 shadow-sm">
+                        Executive & Life Coach • Cotonou, Bénin
+                    </span>
+                    
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-tight mb-6 text-primary">
+                        Devenez l'architecte de <span class="italic text-accent">votre propre vie.</span>
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-lg leading-relaxed font-light">
+                        Libérez-vous du syndrome de l'imposteur, clarifiez votre vision professionnelle et trouvez enfin votre équilibre.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-5">
+                        <a href="contact.html" class="btn-primary px-8 py-4 text-base shadow-soft">
+                            Osez faire le premier pas <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="relative z-10 hidden lg:block">
+                    <div class="relative w-full aspect-[4/5] max-w-md mx-auto">
+                        <!-- Cadre -->
+                        <div class="absolute inset-0 border border-primary/20 rounded-[3rem] translate-x-6 translate-y-6"></div>
+                        <!-- Image -->
+                        <div class="absolute inset-0 rounded-[3rem] overflow-hidden shadow-soft-hover animate-float">
+                            <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80" alt="Sacha Coach" class="w-full h-full object-cover">
+                        </div>
+                        <!-- Badge -->
+                        <div class="absolute -bottom-6 -left-10 bg-white p-5 rounded-2xl shadow-soft-hover border border-slate-100 flex items-center gap-4 animate-float" style="animation-delay: 1s;">
+                            <div class="w-12 h-12 rounded-full bg-accent/20 text-accent flex items-center justify-center">
+                                <span class="material-symbols-outlined">psychology</span>
+                            </div>
+                            <div>
+                                <p class="font-serif font-bold text-primary text-xl leading-none">Certifié ICF</p>
+                                <p class="text-xs text-slate-500 mt-1">International Coaching Federation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Section Identification (Pain points) -->
+        <section class="py-24 bg-white border-y border-primary/5 relative">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <p class="font-serif text-3xl md:text-4xl text-primary max-w-4xl mx-auto leading-relaxed mb-16">
+                    "Malgré vos compétences, quelque chose vous retient."
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-8 text-left">
+                    <div class="card-soft p-8">
+                        <span class="material-symbols-outlined text-accent text-4xl mb-6">pause_circle</span>
+                        <h3 class="text-xl font-serif font-bold text-primary mb-3">Plafonnement de carrière</h3>
+                        <p class="text-slate-600 font-light leading-relaxed">
+                            Vous travaillez dur, mais vous sentez que vous n'évoluez plus. Le plafond de verre semble infranchissable dans votre environnement actuel.
+                        </p>
+                    </div>
+                    
+                    <div class="card-soft p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full"></div>
+                        <span class="material-symbols-outlined text-primary text-4xl mb-6">psychology_alt</span>
+                        <h3 class="text-xl font-serif font-bold text-primary mb-3">Syndrome de l'imposteur</h3>
+                        <p class="text-slate-600 font-light leading-relaxed">
+                            Cette petite voix qui vous dit que vous n'êtes pas légitime, que votre succès n'est qu'une question de chance.
+                        </p>
+                    </div>
+
+                    <div class="card-soft p-8">
+                        <span class="material-symbols-outlined text-accent text-4xl mb-6">battery_0_bar</span>
+                        <h3 class="text-xl font-serif font-bold text-primary mb-3">Déséquilibre de Vie</h3>
+                        <p class="text-slate-600 font-light leading-relaxed">
+                            Le stress professionnel empiète sur votre vie personnelle. L'épuisement (burn-out) vous guette si vous ne changez rien.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Introduction du Coach (Personal Branding) -->
+        <section class="py-24 bg-surface relative">
+            <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-12 gap-16 items-center">
+                <div class="md:col-span-5 relative">
+                    <div class="circle-wrapper aspect-square max-w-sm mx-auto shadow-soft-hover">
+                        <img src="https://images.unsplash.com/photo-1506803682981-6e718a9dd3ee?auto=format&fit=crop&w=800&q=80" alt="Le Coach" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                
+                <div class="md:col-span-7">
+                    <span class="text-accent font-bold tracking-widest text-xs uppercase mb-4 block">Faisons connaissance</span>
+                    <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-8 leading-tight">Bonjour, je suis Sacha.</h2>
+                    
+                    <div class="text-lg text-slate-600 mb-6 font-light leading-relaxed space-y-4">
+                        <p>J'ai passé 10 ans en tant que cadre dirigeant dans de grandes institutions à Dakar et Cotonou. Extérieurement, j'avais tout réussi. Intérieurement, j'étais épuisé, vide de sens et convaincu que mon potentiel n'était exploité qu'à 20%.</p>
+                        <p>Le coaching n'est pas une théorie pour moi. C'est la méthode rigoureuse qui m'a permis de me réaligner, de vaincre mes doutes et de construire une vie intentionnelle.</p>
+                        <p>Aujourd'hui, j'accompagne les professionnels de l'Afrique de l'Ouest et de la diaspora à faire de même.</p>
+                    </div>
+                    
+                    <p class="signature mb-8">Sacha</p>
+                    
+                    <a href="about.html" class="btn-secondary px-8 py-3">Découvrir mon parcours complet</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Aperçu des Piliers d'Accompagnement -->
+        <section class="py-24 bg-gradient-primary text-white text-center rounded-[3rem] mx-4 md:mx-10 my-10 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-[500px] h-[500px] border-[40px] border-white/5 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+            
+            <div class="max-w-5xl mx-auto px-6 relative z-10">
+                <span class="text-accent font-bold tracking-widest text-xs uppercase mb-4 block">Mes Domaines d'Intervention</span>
+                <h2 class="text-4xl font-serif font-bold mb-16 text-white">Où souhaitez-vous investir votre énergie ?</h2>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+                    <!-- Service 1 -->
+                    <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10 hover:bg-white/20 transition-colors">
+                        <div class="w-14 h-14 bg-accent text-white rounded-full flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-2xl">person</span>
+                        </div>
+                        <h3 class="text-2xl font-serif font-bold mb-3">Life Coaching</h3>
+                        <p class="text-white/70 font-light mb-6 leading-relaxed">
+                            Reconstruction de la confiance en soi, définition d'objectifs de vie clairs et dépassement des croyances limitantes.
+                        </p>
+                        <a href="services.html" class="inline-flex items-center gap-2 text-accent font-medium hover:text-white transition-colors">En savoir plus <span class="material-symbols-outlined text-sm">trending_flat</span></a>
+                    </div>
+
+                    <!-- Service 2 -->
+                    <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10 hover:bg-white/20 transition-colors transform lg:-translate-y-4 shadow-xl">
+                        <div class="w-14 h-14 bg-white text-primary rounded-full flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-2xl">work</span>
+                        </div>
+                        <h3 class="text-2xl font-serif font-bold mb-3">Coaching Carrière</h3>
+                        <p class="text-white/70 font-light mb-6 leading-relaxed">
+                            Préparation à la promotion, prise de fonction managériale ou gestion d'une reconversion professionnelle ambitieuse.
+                        </p>
+                        <a href="services.html" class="inline-flex items-center gap-2 text-white font-medium hover:text-accent transition-colors">En savoir plus <span class="material-symbols-outlined text-sm">trending_flat</span></a>
+                    </div>
+
+                    <!-- Service 3 -->
+                    <div class="bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/10 hover:bg-white/20 transition-colors">
+                        <div class="w-14 h-14 bg-accent text-white rounded-full flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+                        </div>
+                        <h3 class="text-2xl font-serif font-bold mb-3">Diaspora Retour</h3>
+                        <p class="text-white/70 font-light mb-6 leading-relaxed">
+                            Accompagnement psychologique et structurel pour se réadapter au marché de l'emploi en Afrique de l'Ouest après des années à l'étranger.
+                        </p>
+                        <a href="services.html" class="inline-flex items-center gap-2 text-accent font-medium hover:text-white transition-colors">En savoir plus <span class="material-symbols-outlined text-sm">trending_flat</span></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Témoignages Émotionnels -->
+        <section class="py-24 bg-surface">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-serif font-bold text-primary mb-4">Mots de ceux qui ont osé.</h2>
+                    <p class="text-slate-500 font-light">Leurs victoires sont ma plus grande fierté.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-10">
+                    <!-- Avis 1 -->
+                    <div class="card-soft p-10 relative">
+                        <span class="material-symbols-outlined text-primary/10 text-6xl absolute top-6 right-6">format_quote</span>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://images.unsplash.com/photo-1531123897727-8f129e1bfa82?auto=format&fit=crop&w=150&q=80" alt="Client" class="w-16 h-16 rounded-full object-cover shadow-sm">
+                            <div>
+                                <h4 class="font-serif font-bold text-xl text-primary leading-tight">Yasmine Touré</h4>
+                                <p class="text-sm text-slate-500">Directrice Marketing, Cotonou</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 font-light leading-relaxed italic text-lg">
+                            "J'étais paralysée par le doute lors de ma nomination au conseil de direction. En 3 mois avec Sacha, j'ai trouvé ma voix. Je ne m'excuse plus de prendre ma place. L'impact a été immédiat sur ma vie professionnelle... et personnelle."
+                        </p>
+                    </div>
+
+                    <!-- Avis 2 -->
+                    <div class="card-soft p-10 relative">
+                        <span class="material-symbols-outlined text-primary/10 text-6xl absolute top-6 right-6">format_quote</span>
+                        <div class="flex items-center gap-4 mb-6">
+                            <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&w=150&q=80" alt="Client" class="w-16 h-16 rounded-full object-cover shadow-sm">
+                            <div>
+                                <h4 class="font-serif font-bold text-xl text-primary leading-tight">Cédric K.</h4>
+                                <p class="text-sm text-slate-500">Repreneur d'Entreprise, Abidjan</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 font-light leading-relaxed italic text-lg">
+                            "Reprendre l'entreprise familiale m'étouffait sous la pression. Le coaching n'a pas changé l'entreprise, il a changé la façon dont *je* gère la pression. Un espace neutre indispensable pour tout dirigeant."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Appel à l'action (Clarity Call) -->
+        <section class="py-24 bg-surface-alt border-y border-primary/5">
+            <div class="max-w-4xl mx-auto px-6 text-center">
+                <span class="material-symbols-outlined text-accent text-5xl mb-6">self_improvement</span>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-primary mb-6">La clarté n'attend que vous.</h2>
+                <p class="text-xl text-slate-600 mb-10 font-light leading-relaxed max-w-2xl mx-auto">
+                    Réservez votre séance "Clarté" de 20 minutes (100% offerte). C'est une conversation informelle pour faire le point sur votre situation et voir si nous sommes faits pour travailler ensemble.
+                </p>
+                <div class="flex justify-center">
+                    <a href="contact.html" class="btn-primary px-10 py-5 text-lg shadow-soft-hover">
+                        Programmer mon appel offert
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Personnalisé -->
+    <footer class="bg-white py-12 border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8 mb-12 text-center md:text-left text-sm text-slate-600">
+            
+            <div class="md:col-span-1">
+                <a href="index.html" class="flex items-center justify-center md:justify-start gap-2 mb-4">
+                    <span class="font-serif font-bold text-2xl text-primary tracking-tight">Sacha.</span>
+                </a>
+                <p class="font-light leading-relaxed max-w-xs mx-auto md:mx-0">
+                    Osez révéler la meilleure version de vous-même. Un esprit clair mène toujours aux bonnes décisions.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-primary text-base mb-4">Parcours</h4>
+                <ul class="space-y-3 font-light">
+                    <li><a href="about.html" class="hover:text-accent transition-colors">Mon histoire</a></li>
+                    <li><a href="services.html" class="hover:text-accent transition-colors">Découvrir le Coaching</a></li>
+                    <li><a href="#" class="hover:text-accent transition-colors">Blog (Mentalité)</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-primary text-base mb-4">Programmes</h4>
+                <ul class="space-y-3 font-light">
+                    <li><a href="#" class="hover:text-accent transition-colors">Renouveau Carrière</a></li>
+                    <li><a href="#" class="hover:text-accent transition-colors">Équilibre de Vie</a></li>
+                    <li><a href="#" class="hover:text-accent transition-colors">Mentorat Leadership</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-serif font-bold text-primary text-base mb-4">Restons connectés</h4>
+                <div class="flex justify-center md:justify-start gap-4 mb-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-surface border border-slate-200 flex items-center justify-center text-primary hover:bg-accent hover:text-white hover:border-accent transition-all"><span class="material-symbols-outlined text-sm">groups</span></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-surface border border-slate-200 flex items-center justify-center text-primary hover:bg-accent hover:text-white hover:border-accent transition-all"><span class="material-symbols-outlined text-sm">mail</span></a>
+                </div>
+                <p class="font-light text-xs">Cotonou, République du Bénin<br>Séances internationales via Zoom</p>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6 border-t border-slate-100 pt-8 text-center text-xs text-slate-400 font-light">
+            <p>&copy; 2026 Sacha Coaching Personnel & Professionnel. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-sm');
+                nav.classList.replace('bg-surface/80', 'bg-surface/95');
+                nav.classList.replace('border-primary/5', 'border-transparent');
+            } else {
+                nav.classList.remove('shadow-sm');
+                nav.classList.replace('bg-surface/95', 'bg-surface/80');
+                nav.classList.replace('border-transparent', 'border-primary/5');
+            }
+        });
+    </script>
+</body>
+</html>

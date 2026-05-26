@@ -11,6 +11,7 @@ use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -23,8 +24,15 @@ class OrderController extends Controller
         $perPage = (int) $request->integer('per_page', 10);
         $perPage = max(1, min($perPage, 100));
 
+        $filters = $request->validate([
+            'status' => ['nullable', 'string', Rule::in(array_column(OrderStatus::cases(), 'value'))],
+            'payment_status' => ['nullable', 'string', Rule::in(array_column(PaymentStatus::cases(), 'value'))],
+        ]);
+
         $orders = Order::with(['template.sector', 'instruction', 'latestPayment'])
             ->forUser($request->user()->id)
+            ->when($filters['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
+            ->when($filters['payment_status'] ?? null, fn ($query, string $paymentStatus) => $query->where('payment_status', $paymentStatus))
             ->latest()
             ->paginate($perPage);
 

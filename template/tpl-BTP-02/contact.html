@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Contact | ARCHITECTUS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-xl shadow-2xl shadow-slate-950/50 flex justify-between items-center px-8 py-4 max-w-full mx-auto">
+    <div class="text-2xl font-bold tracking-tighter text-slate-50 font-['Space_Grotesk']">
+        ARCHITECTUS
+    </div>
+    <div class="hidden md:flex gap-8 items-center">
+        <a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="index.html">Accueil</a>
+        <a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="about.html">À propos</a>
+        <a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="services.html">Services</a>
+        <a class="text-slate-400 hover:text-slate-100 transition-colors font-['Space_Grotesk'] tracking-tight" href="portfolio.html">Réalisations</a>
+        <a class="text-orange-500 font-bold border-b-2 border-orange-500 pb-1 font-['Space_Grotesk'] tracking-tight" href="contact.html">Contact</a>
+    </div>
+    <a href="#quote-form" class="bg-gradient-to-r from-primary to-primary-container text-on-primary-container px-6 py-2 rounded-md font-bold hover:scale-95 transition-all duration-200">
+        Obtenir un Devis
+    </a>
+</nav>
+
+<main class="pt-32 pb-20">
+    <!-- Hero Section -->
+    <header class="max-w-7xl mx-auto px-8 mb-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
+        <div>
+            <span class="font-label uppercase tracking-widest text-primary text-xs mb-4 block">Logistique de Précision Mondiale</span>
+            <h1 class="font-headline text-5xl md:text-7xl font-bold text-on-background leading-none tracking-tighter">
+                Pôles d'Ingénierie <br/><span class="text-tertiary">Internationaux</span>
+            </h1>
+        </div>
+        <div class="lg:pb-2 max-w-md">
+            <p class="text-on-surface-variant font-body text-lg leading-relaxed">
+                Connectez-vous avec nos équipes de pilotage et nos directions régionales. Nous maintenons une présence active dans les centres industriels stratégiques pour garantir notre excellence opérationnelle.
+            </p>
+        </div>
+    </header>
+
+    <!-- Multi-Department Inquiry & Contact Info -->
+    <section class="max-w-7xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-12 gap-8" id="quote-form">
+        <!-- Contact Form (Bento Style Card) -->
+        <div class="lg:col-span-7 bg-surface-container-low rounded-xl p-10 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none"></div>
+            <h2 class="font-headline text-3xl font-bold mb-8">Demande Directe</h2>
+            <form class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Nom Complet</label>
+                        <input class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all" placeholder="Jean Dupont" type="text"/>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Email Professionnel</label>
+                        <input class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all" placeholder="j.dupont@entreprise.com" type="email"/>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Type d'Évaluation / Département</label>
+                    <select class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all appearance-none">
+                        <option>Appel d'Offres & Chiffrage</option>
+                        <option>Information Générale & Siège</option>
+                        <option>Carrières & Recrutement Technique</option>
+                        <option>Partenariat Qualité Matériaux</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Détails de la Requête</label>
+                    <textarea class="w-full bg-surface-container-high border-none rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all" placeholder="Décrivez le cahier des charges, le tonnage d'acier ou les besoins structurels..." rows="4"></textarea>
+                </div>
+                <button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container font-bold py-4 rounded-md uppercase tracking-widest text-sm hover:opacity-90 transition-opacity">
+                    Transmettre le Dossier
+                </button>
+            </form>
+        </div>
+        <!-- Key Department Contacts -->
+        <div class="lg:col-span-5 space-y-8">
+            <!-- Tendering -->
+            <div class="bg-surface-container-high p-8 rounded-xl group transition-all hover:bg-surface-container-highest">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="font-label text-xs uppercase tracking-widest text-tertiary mb-2 block">Bureau d'Études</span>
+                        <h3 class="font-headline text-xl font-bold mb-4">Bureau des Marchés</h3>
+                        <p class="text-sm text-on-surface-variant mb-6">Pour les appels d'offres, chiffrages, soumissions RFP et qualifications techniques.</p>
+                        <div class="space-y-2 font-body text-on-surface">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary text-lg">mail</span>
+                                <span>marches@architectus.global</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary text-lg">call</span>
+                                <span>+1 (800) 555-0192</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-surface-bright group-hover:text-primary transition-colors text-4xl" data-weight="fill">architecture</span>
+                </div>
+            </div>
+            <!-- Careers -->
+            <div class="bg-surface-container-high p-8 rounded-xl group transition-all hover:bg-surface-container-highest">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="font-label text-xs uppercase tracking-widest text-tertiary mb-2 block">Ressources Humaines</span>
+                        <h3 class="font-headline text-xl font-bold mb-4">Talents & Recrutement</h3>
+                        <p class="text-sm text-on-surface-variant mb-6">Pour les candidatures liées au travail technique sur chantier et au génie civil.</p>
+                        <div class="space-y-2 font-body text-on-surface">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary text-lg">work</span>
+                                <span>carrieres@architectus.global</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-surface-bright group-hover:text-primary transition-colors text-4xl" data-weight="fill">engineering</span>
+                </div>
+            </div>
+            <!-- Partnership Card -->
+            <div class="bg-surface-container-lowest p-8 rounded-xl border-l-4 border-primary">
+                <h3 class="font-headline text-xl font-bold mb-2">Partenariat & Démarches</h3>
+                <p class="text-sm text-on-surface-variant mb-4">Vous êtes sous-traitant ou fournisseur en acier de construction prêt à intégrer notre chaîne logistique de premier plan ?</p>
+                <a class="text-primary font-label text-xs uppercase font-bold tracking-widest flex items-center gap-2 hover:gap-4 transition-all" href="#">
+                    Espace Fournisseurs BTP <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="max-w-7xl mx-auto px-8 mt-32">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-low">
+            <!-- Locations Sidebar -->
+            <div class="lg:col-span-1 p-8 space-y-10 bg-surface-container-high">
+                <h2 class="font-headline text-2xl font-bold">Présence Constante</h2>
+                <div class="space-y-8">
+                    <div>
+                        <h4 class="font-label text-xs uppercase tracking-widest text-primary mb-3">Siège Principal</h4>
+                        <p class="text-on-surface font-bold leading-tight">Parc Industriel de Chicago</p>
+                        <p class="text-on-surface-variant text-sm mt-1">1200 Skyway Plaza<br/>Chicago, IL 60601</p>
+                    </div>
+                    <div>
+                        <h4 class="font-label text-xs uppercase tracking-widest text-tertiary mb-3">Opérations Europe</h4>
+                        <p class="text-on-surface font-bold leading-tight">Bureaux de Londres</p>
+                        <p class="text-on-surface-variant text-sm mt-1">45 Canary Wharf<br/>Londres, E14 5AB</p>
+                    </div>
+                    <div>
+                        <h4 class="font-label text-xs uppercase tracking-widest text-tertiary mb-3">Secteur MENA</h4>
+                        <p class="text-on-surface font-bold leading-tight">Centre Logistique de Dubaï</p>
+                        <p class="text-on-surface-variant text-sm mt-1">Niveau 20, Tour Burj Gate<br/>Sheikh Zayed Rd, Dubaï</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Map Visual -->
+            <div class="lg:col-span-3 h-[500px] relative">
+                <img class="w-full h-full object-cover grayscale opacity-60" data-alt="Technical architectural map rendering with geometric data overlays and dark navy blue color palette for corporate construction headquarters" data-location="Chicago" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3s791FZ6cYZwq3HVeTQDU68NTAGFwOLJmACrA_whqIhKwPgiJdDpGYEAgI2ra_tw1UwBE5fmSrfMP4jmsgn_5kuaorK2f1Q8wFlJCYIn7oxCjH5FTIAMfNcNmtp9elh9Fvet57BIaKNlXYT29bauMRPpJjEWuJ9tfhLmc3QH0mI6GqGSbgXEe7SsIXOqjUf4BaYPAQmkXlbDl2vXWZAZyViXiGifWmsoHEu68JN365SGzknq17h-m92c26sy2ExgSjLRu-B-Eh5w"/>
+                <div class="absolute inset-0 bg-gradient-to-r from-surface-container-high/60 to-transparent pointer-events-none"></div>
+                <!-- Pulsing Point HQ -->
+                <div class="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                    <div class="absolute w-8 h-8 bg-primary/20 rounded-full animate-ping"></div>
+                    <div class="w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(255,182,147,0.8)]"></div>
+                    <div class="ml-4 bg-surface-container-highest/90 backdrop-blur-md px-4 py-2 rounded shadow-xl border border-primary/20">
+                        <span class="text-xs font-label uppercase font-bold text-on-surface">Base Technique Centrale</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full border-t border-slate-800/50 bg-slate-950 grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20">
+    <div class="md:col-span-1">
+        <div class="text-xl font-black text-slate-100 font-['Space_Grotesk'] mb-6">ARCHITECTUS</div>
+        <p class="text-slate-500 font-['Inter'] text-sm leading-relaxed lowercase">
+            Définissant le paysage de l'ingénierie structurelle moderne grâce à la précision numérique et l'excellence des matériaux.
+        </p>
+    </div>
+    <div class="md:col-span-1">
+        <h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6">Portail</h4>
+        <ul class="space-y-4">
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Politique des Données & Vie Privée</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Charte d'Exigences Complètes</a></li>
+        </ul>
+    </div>
+    <div class="md:col-span-1">
+        <h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6">Opérations & Recrutement</h4>
+        <ul class="space-y-4">
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Contrôles Anti-Accidents</a></li>
+            <li><a class="text-slate-500 hover:text-orange-500 transition-colors font-['Inter'] text-sm tracking-widest uppercase" href="#">Nous Rejoindre sur Chantier</a></li>
+        </ul>
+    </div>
+    <div class="md:col-span-1">
+        <h4 class="text-orange-500 font-['Inter'] text-sm tracking-widest uppercase mb-6">Agrément Sécurité Chantier</h4>
+        <p class="text-slate-500 font-['Inter'] text-xs tracking-widest uppercase leading-loose mt-4">
+            © 2024 Architectus Global. L'Excellence en Ingénierie de Précision.
+        </p>
+    </div>
+</footer>
+</body>
+</html>

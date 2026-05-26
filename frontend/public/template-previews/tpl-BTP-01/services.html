@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Services | STRUCTUR</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link href="css/style.css" rel="stylesheet"/>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="bg-slate-50 dark:bg-slate-950 rounded-none w-full top-0 sticky z-50 tonal-shift">
+    <div class="flex justify-between items-center px-6 md:px-12 py-6 w-full max-w-none">
+        <div class="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tighter font-headline">
+            STRUCTUR
+        </div>
+        <div class="hidden md:flex gap-8 items-center">
+            <a class="text-slate-600 dark:text-slate-400 font-medium font-headline uppercase tracking-tighter hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="index.html">Accueil</a>
+            <a class="text-slate-600 dark:text-slate-400 font-medium font-headline uppercase tracking-tighter hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="about.html">À propos</a>
+            <a class="text-orange-600 dark:text-orange-500 border-b-4 border-orange-600 dark:border-orange-500 pb-1 font-headline uppercase tracking-tighter" href="services.html">Services</a>
+            <a class="text-slate-600 dark:text-slate-400 font-medium font-headline uppercase tracking-tighter hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="portfolio.html">Réalisations</a>
+            <a class="text-slate-600 dark:text-slate-400 font-medium font-headline uppercase tracking-tighter hover:text-orange-600 dark:hover:text-orange-400 transition-colors duration-150" href="contact.html">Contact</a>
+        </div>
+        <a href="contact.html" class="bg-primary text-on-primary px-6 py-3 font-headline font-bold uppercase tracking-tight btn-shadow-hover transition-all duration-150 inline-block">
+            Demander un Devis
+        </a>
+    </div>
+</nav>
+
+<main>
+<!-- Hero Section -->
+<section class="relative h-[614px] flex items-center bg-primary-container overflow-hidden">
+    <div class="absolute inset-0 opacity-40">
+        <img class="w-full h-full object-cover" data-alt="Monochromatic wide shot of a massive brutalist concrete structure under construction with cranes and steel scaffolding against a grey sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB79NnawTvajFXv6kydxylMalDXUsY-iiQlRC_OEpV6WF_1gHSTWICCTEJoo4dCt8rvGgSYVgr-rihtjObju2aVG1krFXbfjezbIjvMoLYPAL45ad6_KFq_GLd-8pEGfjXE2_HTyIAtFuM-hI136Qdk_K0PRAbo6G87DEGun1S9V9EI_K4nthAmr_xu9OPb4HeM3RnLJ4zukYqyCz5X0YWUQP1mWNrJ80Ezc9HzH9kn3JZwuAH-CYnDXZzqDIgP0tvf5bphrtyu45Q"/>
+    </div>
+    <div class="relative z-10 px-6 md:px-12 max-w-4xl">
+        <span class="bg-secondary-container text-on-secondary-container px-3 py-1 font-label text-[0.6875rem] font-bold tracking-[0.1em] uppercase mb-4 inline-block">Nos Capacités</span>
+        <h1 class="text-on-primary font-headline font-black text-5xl md:text-7xl leading-tight tracking-tighter uppercase">
+            L'Intégrité<br/>Architecturale.
+        </h1>
+        <p class="text-on-primary-container text-lg md:text-xl mt-6 font-body max-w-2xl leading-relaxed">
+            Fournir une ingénierie de précision et une excellente structurelle à travers les environnements résidentiels, commerciaux et civiques. Nous construisons les infrastructures de demain.
+        </p>
+    </div>
+</section>
+
+<!-- Service 1: Building Construction -->
+<section class="bg-surface py-24 px-6 md:px-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div class="lg:col-span-5">
+            <div class="mb-8">
+                <span class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem]">01 / Infrastructure</span>
+                <h2 class="font-headline font-black text-4xl md:text-5xl text-primary mt-2 uppercase tracking-tighter">Construction de Bâtiments</h2>
+            </div>
+            <div class="space-y-6 text-on-surface-variant leading-relaxed">
+                <p>Nous sommes spécialisés dans l'intégration verticale à grande échelle. Des complexes résidentiels de haute densité aux sièges commerciaux impressionnants, notre approche donne la priorité à la longévité structurelle et à l'honnêteté des matériaux.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                    <div class="bg-surface-container-low p-6">
+                        <span class="material-symbols-outlined text-secondary text-3xl" data-icon="apartment">apartment</span>
+                        <h4 class="font-headline font-bold mt-4 uppercase text-sm tracking-tight">Résidentiel</h4>
+                        <p class="text-xs mt-2 opacity-80">Domaines de luxe, bâtiments collectifs et développements urbains.</p>
+                    </div>
+                    <div class="bg-surface-container-low p-6">
+                        <span class="material-symbols-outlined text-secondary text-3xl" data-icon="corporate_fare">corporate_fare</span>
+                        <h4 class="font-headline font-bold mt-4 uppercase text-sm tracking-tight">Commercial</h4>
+                        <p class="text-xs mt-2 opacity-80">Bureaux d'entreprise, pôles industriels et centres commerciaux.</p>
+                    </div>
+                </div>
+                <div class="pt-8">
+                    <h5 class="font-label font-bold text-[0.6875rem] uppercase tracking-widest text-primary mb-4">Spécifications Techniques</h5>
+                    <ul class="space-y-3 font-body text-sm border-l-2 border-outline-variant pl-6">
+                        <li>Béton Armé à Haute Résistance (B50+)</li>
+                        <li>Systèmes de Distribution Sismique</li>
+                        <li>Fabrication d'Ossatures en Acier de Précision</li>
+                        <li>Matériaux Certifiés Éco-Responsables LEED</li>
+                    </ul>
+                </div>
+                <div class="pt-10">
+                    <button class="bg-secondary-container text-on-secondary-container px-8 py-4 font-headline font-bold uppercase tracking-tight btn-shadow-hover flex items-center gap-3">
+                        Consulter nos experts
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-7 grid grid-cols-2 gap-4">
+            <img class="w-full h-[600px] object-cover col-span-2 md:col-span-1" data-alt="Sharp low angle shot of a glass and steel skyscraper reflecting the sky with deep industrial shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpDRTgIowajDFwVheYc-OyvQckcxrvqUmY_nvV0mORjN-Pva70TuyTUVV-WyQBFivvzpAmS0H4YYgl4eWvWSYZhj-KLSQk2Eth1Am8Zi24IAgaWdkJMhi5XYxmuOusgpORU5bVGDV1owhQkDFaWH71Ps_zIhM01s7ofEp15oEIZYCNfKeemcD9DCnv-S9e2MU2eNMY8zEjrODmR6pwZemSmo9CCyASRcA-brBBxkZ0puzss3be4J6HT0zK0kmBkLtL_Dp3zhdAG5A"/>
+            <div class="grid grid-rows-2 gap-4">
+                <img class="w-full h-full object-cover" data-alt="Interior of a modern concrete building with large windows and minimalist industrial architecture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoMQjhJkfbM1ZbDBGIGjLsR9Hk2vWGHt1qdnZ85E8UlxU9iFhn0IZ67bY_egMsbCiY7dUIWGWhmfu-Hwlg3ZI61V2sJkfPUwfSRvr36_8lTo1rR6tLsuzkr_GhZqMFUgTX9Yoe9LC0-gUo1Ro92xQkdUf4-U4szKz46uqDG5G3OcPD4MPGUFXh212MBu6XED5REErYaSLvbYi4AyasTN7pW2Z9nNYVEKHl6Qs5CmJq9jptKtvvCG38dTy7wCo1MTd_dN4N0TfxPaQ"/>
+                <img class="w-full h-full object-cover" data-alt="Construction site detail showing reinforced steel bars and wooden forms for concrete pouring" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDR6C-Uf6ZBVMSUhyywBjznHOtaAx9Vn3nwCl95BxEuSCiUZEoxneGzN5UW8e1E-z0PfkxOssi9JcQ4qdYX-78itJCzEIZR68P-P6kw5RMKUY-WbpAfGApsVtDgHCS-hxiaQ_9r-xWk8tqfs_C0BHmTwB8lcPrZgREyk_g66PkVzbMg9Q61ZdY1iiFFP3nAtxr5SX7ahxV9GcVWSBzltwVLXDNadNMZ-6vXW7JO98oXZFbvNnQNY7NVVC7MIW6nyf5zox1RwIUhdwg"/>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Service 2: Renovation -->
+<section class="bg-surface-container-low py-24 px-6 md:px-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-6 order-2 lg:order-1">
+            <div class="grid grid-cols-2 gap-2">
+                <div class="aspect-square bg-primary-container overflow-hidden">
+                    <img class="w-full h-full object-cover opacity-80" data-alt="Extreme close up of industrial renovation work showing precision welding sparks and dark metal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKNN_1Bg1zji-5cIOu_cnMYpAgCU1Z6VDhpRnNWcXwYNIn5gOvG1n2fXdfwhCH8mijPyXZb51_ir9IXdjIaq6_yOkjuUN6UH0zUVTY2bj5uaAYTY_lr7Ah6KH0NQSd-m-S34hx3rSqWoFoBo_SmPQmL-r9rDTstx0LYN4tz6YVkAsDf3e-PuC8toS0b4wRn-YTqSHUgLeEwr2CBV3NaSY-jPxkYiqZ3pY3YQOr23syv4r5FJXhlrNBfhyp6b3SvpJxmJd0D5nuL5Y"/>
+                </div>
+                <div class="aspect-square flex items-center justify-center p-8 bg-surface">
+                    <div class="text-center">
+                        <span class="block text-4xl font-black font-headline text-secondary">250+</span>
+                        <span class="font-label text-[0.6rem] uppercase tracking-widest text-on-surface-variant">Restaurations Terminées</span>
+                    </div>
+                </div>
+                <div class="aspect-square bg-surface-container-highest flex flex-col justify-end p-6">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-4" data-icon="architecture">architecture</span>
+                    <h4 class="font-headline font-bold uppercase text-xs">Héritage Architectural</h4>
+                </div>
+                <div class="aspect-square overflow-hidden">
+                    <img class="w-full h-full object-cover" data-alt="Minimalist loft interior with exposed brick and high-end modern finishes during renovation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDuvsF4Cw3wy147TiuLsOxO-CrCHy2LxMnQdDgl2ukHtporUojuHG8CJ-cyjeZExnYAZIJu9P-o06C4d2DIEStchFezEzavPIv6-M2tQUSCEVRML4fC3XsDqRqQLplG75ChmSWZ9R50_LILGvOtLYEltbNXOb_Ot8aGJWb86_WlHDhAkSGwFPqOLno1DgRCECapAG-eklUIH56WJyBhUYKejEJskIrYTzzU4eO7NLoGLAPSfiVEgqO30s8kFHOOQsXmSALIUG9MO4"/>
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-6 order-1 lg:order-2">
+            <span class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem]">02 / Rénovation</span>
+            <h2 class="font-headline font-black text-4xl md:text-5xl text-primary mt-2 uppercase tracking-tighter">Réhabilitation & Mise aux Normes</h2>
+            <p class="mt-6 text-on-surface-variant leading-relaxed">Transformer les structures existantes grâce à une ingénierie chirurgicale. Nous gérons des révisions intérieures complexes et des modernisations de façade qui améliorent les performances thermiques et la valeur esthétique.</p>
+            <div class="mt-10 space-y-4">
+                <div class="flex items-start gap-4 p-4 bg-surface hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-primary" data-icon="format_paint">format_paint</span>
+                    <div>
+                        <h4 class="font-headline font-bold uppercase text-sm tracking-tight">Révision Intérieure</h4>
+                        <p class="text-xs text-on-surface-variant mt-1">Suppression de murs structurels, mises à jour des systèmes, et travaux sur mesure.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-4 bg-surface hover:bg-surface-container-high transition-colors">
+                    <span class="material-symbols-outlined text-primary" data-icon="layers">layers</span>
+                    <div>
+                        <h4 class="font-headline font-bold uppercase text-sm tracking-tight">Restauration Extérieure</h4>
+                        <p class="text-xs text-on-surface-variant mt-1">Nettoyage des façades, renforcement structurel et étanchéité de l'enveloppe.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-10">
+                <button class="bg-primary text-on-primary px-8 py-4 font-headline font-bold uppercase tracking-tight btn-shadow-hover flex items-center gap-3">
+                    Consulter nos experts
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Service 3: Civil Works -->
+<section class="bg-surface py-24 px-6 md:px-12">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+            <div class="max-w-2xl">
+                <span class="font-label text-secondary font-bold tracking-[0.1em] uppercase text-[0.6875rem]">03 / Génie Civil</span>
+                <h2 class="font-headline font-black text-4xl md:text-6xl text-primary mt-2 uppercase tracking-tighter leading-[0.9]">Génie Civil & Infrastructures</h2>
+            </div>
+            <div class="bg-primary-container p-6 text-on-primary md:w-64">
+                <p class="text-[0.6875rem] font-label uppercase tracking-widest opacity-60 mb-2">Axe Principal</p>
+                <p class="font-headline font-bold text-sm uppercase">Réseau National & Soutien Logistique</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-1">
+            <div class="group relative aspect-[3/4] overflow-hidden">
+                <img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Massive highway interchange with complex concrete pillars and sweeping asphalt curves in harsh light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxVNCaRrBAGKLH-suxXelHS1hbkYEI6EcxPp1X6HeiEQfu_7KxCmyP8rTk7MQA9TmDzHRPr1MoheynCU8BpAFSrtMHMvBNtmxVSGvry8gSQGIb_lisQlEzDyo5dhkTyFlF5mj-IhPOfjOu149Bf6lsyFdXgLANlRP-7x4fKI4fACs1kGAzTRCJ53myl6dJJlayg5qfQumblqcF0T7pRton6ZsQLANrwdpM7KIycG4C1r7NrgRmsyIj7qOKIP3CTqFW0Pncoq64-Pk"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent p-8 flex flex-col justify-end">
+                    <h4 class="text-on-primary font-headline font-bold text-xl uppercase mb-2">Routes & Ponts</h4>
+                    <p class="text-on-primary-container text-xs leading-relaxed">Pavages en asphalte robustes et ingénierie des ponts de grande portée pour les corridors nationaux.</p>
+                </div>
+            </div>
+            <div class="group relative aspect-[3/4] overflow-hidden">
+                <img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Industrial water treatment plant with huge steel pipes and concrete tanks, engineering precision" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGXsiWtsgXbRKyimOHQCOHEtFITj7SCa9fIjQDIO-LtC-REr2jm4Enn827voxcrQ-9SGrNmSEbEAYTOXevL-DE1lUbGyTh3g9O_UMENPTpFyEoDSO5HSFxEe0tVOWrUaIOd3nxU5WH5XB_ml-bdcHsuJ7-HPR8fCU_DQ8BZfTTtkiUy6c2l2VCYqUG_Qnvf-pEeZqFygz3PQKTm5WEuIwo-xPV1yJEBqMUlOiAxYfNXjPFrQuMpTcSYTUr-948eTq0yesbouWQb00"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent p-8 flex flex-col justify-end">
+                    <h4 class="text-on-primary font-headline font-bold text-xl uppercase mb-2">Systèmes Hydrauliques</h4>
+                    <p class="text-on-primary-container text-xs leading-relaxed">Modélisation hydraulique et infrastructures de drainage pour la résilience urbaine.</p>
+                </div>
+            </div>
+            <div class="group relative aspect-[3/4] overflow-hidden">
+                <img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Underground tunnel construction showing massive tunnel boring machine cutters and industrial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3HB00hv2wg8218SfJ-9yfYdeYCD-K-332fRsU0PicHVje4B0ILLy43NItgwsV_pQVzOzrtxrU4MAlC8p2r2xvMC5vVVgZiEk_4Gp4pVxqJ-8NPffQU-4I5Kk6GVwzY4X91fk8_ivq_0ecl7H4jRwnshTu_x6gzUmPw3b29uxhDhRDeqSqCcEiw-LkZTZqju6XgkFFHs9rheFNZKzT_QS9wKNlA2s0Gr29YH8je5K3SPspTO-Kpr67XLQPH14gpL9fjnA38gvP2OE"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent p-8 flex flex-col justify-end">
+                    <h4 class="text-on-primary font-headline font-bold text-xl uppercase mb-2">Infrastructures Urbaines</h4>
+                    <p class="text-on-primary-container text-xs leading-relaxed">Intégration d'infrastructures souterraines et solutions de gainage en béton résistant.</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-16 flex flex-wrap gap-12 items-center justify-between border-t border-outline-variant pt-12">
+            <div class="flex gap-8">
+                <div>
+                    <span class="block text-primary font-headline font-black text-2xl">640km+</span>
+                    <span class="text-[0.6rem] font-label uppercase tracking-widest text-on-surface-variant">De Routes Construites</span>
+                </div>
+                <div>
+                    <span class="block text-primary font-headline font-black text-2xl">18</span>
+                    <span class="text-[0.6rem] font-label uppercase tracking-widest text-on-surface-variant">Chantiers Actifs</span>
+                </div>
+            </div>
+            <button class="bg-secondary-container text-on-secondary-container px-12 py-5 font-headline font-bold uppercase tracking-widest btn-shadow-hover">
+                Consulter nos experts
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA Section -->
+<section class="bg-primary py-32 px-6 text-center">
+    <h2 class="text-on-primary font-headline font-black text-4xl md:text-6xl uppercase tracking-tighter mb-8 max-w-4xl mx-auto">
+        PRÊT À EXÉCUTER VOTRE VISION AVEC UNE PRÉCISION ABSOLUE ?
+    </h2>
+    <div class="flex flex-col md:flex-row gap-6 justify-center">
+        <button class="bg-on-primary text-primary px-10 py-5 font-headline font-bold uppercase tracking-tight btn-shadow-hover">
+            Contacter le Siège
+        </button>
+        <button class="border-2 border-on-primary text-on-primary px-10 py-5 font-headline font-bold uppercase tracking-tight hover:bg-on-primary hover:text-primary transition-all duration-150">
+            Voir Nos Réalisations
+        </button>
+    </div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-slate-100 dark:bg-slate-900 grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 w-full">
+    <div class="md:col-span-1">
+        <div class="text-xl font-black text-slate-900 dark:text-slate-50 font-headline mb-6 tracking-tighter uppercase">STRUCTUR</div>
+        <p class="font-body text-[0.8rem] text-slate-500 dark:text-slate-400 leading-relaxed uppercase tracking-wider">
+            Redéfinir le standard de l'ingénierie brutaliste et de la construction industrielle depuis 1994.
+        </p>
+    </div>
+    <div class="flex flex-col gap-4">
+        <h5 class="font-label text-primary dark:text-slate-50 font-bold uppercase text-[0.6875rem] tracking-[0.2em] mb-2">Navigation</h5>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Accueil</a>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Services</a>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Réalisations</a>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Plan du site</a>
+    </div>
+    <div class="flex flex-col gap-4">
+        <h5 class="font-label text-primary dark:text-slate-50 font-bold uppercase text-[0.6875rem] tracking-[0.2em] mb-2">Légal</h5>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Politique de Confidentialité</a>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Protocoles de Sécurité</a>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Carrières</a>
+    </div>
+    <div class="flex flex-col gap-4">
+        <h5 class="font-label text-primary dark:text-slate-50 font-bold uppercase text-[0.6875rem] tracking-[0.2em] mb-2">Réseaux</h5>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">LinkedIn</a>
+        <a class="font-label text-[0.6875rem] uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 hover:text-orange-600 transition-all duration-150" href="#">Instagram</a>
+        <div class="mt-4 font-label text-[0.6875rem] text-slate-400">
+            © 2024 STRUCTUR ARCHITECTURE BTP. TOUS DROITS RÉSERVÉS.
+        </div>
+    </div>
+</footer>
+</body>
+</html>

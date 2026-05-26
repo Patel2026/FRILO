@@ -26,6 +26,8 @@ RUN apk add --no-cache \
     zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY backend/ ./
+COPY template/ /var/www/html/template-source/
 COPY docker/backend/entrypoint.sh /usr/local/bin/frilo-backend-entrypoint
 
 RUN chmod +x /usr/local/bin/frilo-backend-entrypoint
