@@ -31,38 +31,37 @@ const columns = [
 ];
 
 export function Footer() {
-  const { isAuthenticated, loading } = useAuthState();
+  const { isAuthenticated, hasToken, loading } = useAuthState();
   const { pricing } = usePublicPricing();
 
-  const accountLinks = loading
-    ? []
-    : isAuthenticated
-      ? [{ name: 'Dashboard', href: '/dashboard' }]
-      : [
-          { name: 'Connexion', href: '/login' },
-          { name: "S'inscrire", href: '/register' },
-        ];
+  const showDashboard = isAuthenticated || (loading && hasToken);
+  const accountLinks = showDashboard
+    ? [{ name: 'Dashboard', href: '/dashboard' }]
+    : [
+        { name: 'Connexion', href: '/login' },
+        { name: "S'inscrire", href: '/register' },
+      ];
 
   const mainColumns = columns.filter((column) => column.label !== 'Compte');
 
   return (
     <footer className="bg-black text-white">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-[1320px] px-6 lg:px-8">
         <div className="border-b border-white/10 py-10 md:py-12">
-          <div className="flex flex-col gap-6 rounded-[1.6rem] bg-white px-5 py-6 text-black md:flex-row md:items-center md:justify-between md:px-7">
+          <div className="flex flex-col gap-6 rounded-3xl bg-white px-5 py-6 text-black md:flex-row md:items-center md:justify-between md:px-7">
             <div className="max-w-2xl">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">
-                Dernier pas
+                Prêt quand vous l&apos;êtes
               </p>
               <h2 className="mt-3 text-2xl font-black leading-tight tracking-tight md:text-4xl">
-                Prêt à donner une image plus sérieuse à votre entreprise ?
+                Choisissez le modèle qui peut porter votre entreprise.
               </h2>
             </div>
             <Link
               href="/templates"
               className="inline-flex shrink-0 items-center justify-center rounded-full bg-[oklch(57%_0.24_29)] px-6 py-3 text-sm font-black text-white transition-colors hover:bg-[oklch(51%_0.24_29)]"
             >
-              Voir les modèles
+              Choisir un modèle
             </Link>
           </div>
         </div>
@@ -76,14 +75,6 @@ export function Footer() {
               <p className="text-sm leading-7 text-gray-300">
                 Votre site vitrine professionnel, livré clé en main en 48h. Dès {formatPublicPrice(pricing.starting_price, pricing.currency_label)}, paiement unique.
               </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white">
-                  48h garantis
-                </span>
-                <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white">
-                  Support inclus
-                </span>
-              </div>
             </div>
           </div>
 
@@ -110,9 +101,9 @@ export function Footer() {
 
             {accountLinks.length > 0 && (
               <div className="col-span-2 border-t border-white/10 pt-6">
-                  <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[oklch(57%_0.24_29)]">
-                    Compte
-                  </p>
+                <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[oklch(57%_0.24_29)]">
+                  Compte
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {accountLinks.map((link) => (
                     <Link
@@ -130,12 +121,12 @@ export function Footer() {
 
           <div className="border-t border-white/10 pt-6 text-center">
             <div className="space-y-2">
-                <p className="text-xs text-gray-400">
-                  © {new Date().getFullYear()} FRILO. Tous droits réservés.
-                </p>
-                <p className="text-xs font-semibold text-gray-300">
-                  Fait pour les entrepreneurs d&apos;Afrique de l&apos;Ouest
-                </p>
+              <p className="text-xs text-gray-400">
+                © {new Date().getFullYear()} FRILO. Tous droits réservés.
+              </p>
+              <p className="text-xs font-semibold text-gray-300">
+                Fait pour les entrepreneurs d&apos;Afrique de l&apos;Ouest
+              </p>
             </div>
           </div>
         </div>
@@ -149,23 +140,15 @@ export function Footer() {
               <p className="text-sm leading-relaxed text-gray-300">
                 Votre site vitrine professionnel, livré clé en main en 48h. Dès {formatPublicPrice(pricing.starting_price, pricing.currency_label)}, paiement unique.
               </p>
-              <div className="flex gap-2">
-                <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs text-white">
-                  48h garantis
-                </span>
-                <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs text-white">
-                  Support inclus
-                </span>
-              </div>
             </div>
 
-            {columns.map((column) => (
+            {[...mainColumns, { label: 'Compte', links: accountLinks }].map((column) => (
               <div key={column.label}>
                 <p className="mb-5 text-xs font-bold uppercase tracking-widest text-[oklch(57%_0.24_29)]">
                   {column.label}
                 </p>
                 <ul className="space-y-3">
-                  {(column.label === 'Compte' ? accountLinks : column.links).map((link) => (
+                  {column.links.map((link) => (
                     <li key={link.name}>
                       <Link
                         href={link.href}

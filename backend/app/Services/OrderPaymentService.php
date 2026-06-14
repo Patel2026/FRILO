@@ -51,7 +51,8 @@ class OrderPaymentService
             'customer' => [
                 'id' => $customerId,
             ],
-            'metadata' => [
+            'merchant_reference' => $this->merchantReference($order->id),
+            'custom_metadata' => [
                 'order_id' => (string) $order->id,
                 'order_reference' => $this->orderReference($order->id),
                 'user_id' => (string) $user->id,
@@ -297,6 +298,11 @@ class OrderPaymentService
     private function orderReference(int $orderId): string
     {
         return '#ORD-'.str_pad((string) $orderId, 5, '0', STR_PAD_LEFT);
+    }
+
+    private function merchantReference(int $orderId): string
+    {
+        return 'FRILO-ORD-'.str_pad((string) $orderId, 5, '0', STR_PAD_LEFT);
     }
 
     private function sanitizePhoneNumber(mixed $phoneNumber): ?array

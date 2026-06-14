@@ -6,7 +6,7 @@ import { NotificationsBell } from "@/components/dashboard/NotificationsBell";
 import { authService } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, Plus } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -33,7 +33,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[#f7f7f7]">
+    <div className="flex min-h-screen bg-[oklch(98.5%_0.003_95)] text-neutral-950">
       <Sidebar mobileOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
       {mobileNavOpen && (
         <button
@@ -44,23 +44,35 @@ export default function DashboardLayout({
         />
       )}
       <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
-        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100">
-          <div className="px-4 md:px-8 py-3 flex items-center justify-between gap-3">
+        <div className="sticky top-0 z-30 border-b border-neutral-200 bg-[oklch(98.5%_0.003_95)]/95 backdrop-blur">
+          <div className="px-4 py-3 md:px-7 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <button
                 type="button"
                 onClick={() => setMobileNavOpen(true)}
-                className="md:hidden p-2 rounded-lg border border-gray-200 text-gray-600 hover:text-black"
+                className="md:hidden p-2 rounded-lg border border-neutral-200 text-neutral-600 hover:text-neutral-950"
                 aria-label="Ouvrir le menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <Link href="/" className="text-sm font-black tracking-tight text-black md:hidden">
+              <Link href="/" className="text-sm font-black tracking-tight text-neutral-950 md:hidden">
                 FRILO
               </Link>
-              <p className="hidden md:block text-sm font-semibold text-black">Espace client</p>
+              <div className="hidden min-w-0 md:block">
+                <p className="text-sm font-black tracking-tight text-neutral-950">Suivi client</p>
+                <p className="text-xs font-medium text-neutral-500">Commandes, paiement, livraison</p>
+              </div>
             </div>
-            <NotificationsBell />
+            <div className="flex items-center gap-2">
+              <Link
+                href="/templates"
+                className="hidden items-center gap-2 rounded-full bg-[oklch(55%_0.23_29)] px-4 py-2 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-[oklch(48%_0.22_29)] sm:inline-flex"
+              >
+                <Plus className="h-4 w-4" />
+                Nouvelle commande
+              </Link>
+              <NotificationsBell />
+            </div>
           </div>
         </div>
         {children}

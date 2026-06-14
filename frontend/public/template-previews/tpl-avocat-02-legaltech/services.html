@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Nos Services | Sanctum Avocats</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-surface text-on-surface antialiased">
+
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#fbf9f4]/70 dark:bg-[#1b1c19]/70 backdrop-blur-xl shadow-sm dark:shadow-none">
+    <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto font-['Plus_Jakarta_Sans'] tracking-tight">
+        <div class="text-xl font-bold text-[#496455] dark:text-[#87a593]">Sanctum Avocats</div>
+        
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+            <a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300" href="index.html">Accueil</a>
+            <a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300" href="about.html">Le Cabinet</a>
+            <a class="text-[#496455] dark:text-[#87a593] font-semibold border-b-2 border-[#496455]" href="services.html">Nos Services</a>
+            <a class="text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-colors duration-300" href="contact.html">Contact</a>
+        </div>
+        
+        <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-full font-medium scale-95 active:opacity-80 transition-transform shadow-md">
+            Prendre Rendez-vous
+        </button>
+    </div>
+</nav>
+
+<main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto">
+    <!-- Hero Section -->
+    <header class="mb-20 max-w-3xl">
+        <span class="text-xs font-bold uppercase tracking-widest text-primary mb-4 block">Nos Domaines d'Intervention</span>
+        <h1 class="text-5xl md:text-6xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-6">
+            Un accompagnement juridique conçu pour <span class="text-primary italic">l'humain</span>.
+        </h1>
+        <p class="text-xl text-on-surface-variant leading-relaxed">
+            Nous avons repensé les services juridiques pour qu'ils soient accessibles, transparents et réparateurs. Notre objectif est de vous guider à travers les transitions de la vie avec dignité et sérénité.
+        </p>
+    </header>
+
+    <!-- Services Grid (Bento Style) -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <!-- Family Law -->
+        <div class="md:col-span-7 group bg-surface-container-low rounded-xl p-8 md:p-12 flex flex-col justify-between transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="w-14 h-14 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-8">
+                    <span class="material-symbols-outlined text-3xl">family_history</span>
+                </div>
+                <h2 class="text-3xl font-bold text-primary mb-4">Droit de la Famille</h2>
+                <p class="text-on-surface-variant text-lg leading-relaxed mb-8 max-w-md">
+                    Gérer les changements familiaux nécessite plus qu'un simple avocat ; cela demande une main sûre. Nous traitons les divorces, les gardes d'enfants et les adoptions en mettant l'accent sur le bien-être émotionnel et la stabilité à long terme de toutes les personnes impliquées.
+                </p>
+            </div>
+            <div class="flex items-center gap-4 relative z-10">
+                <button class="bg-primary text-on-primary px-8 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">En savoir plus</button>
+                <button class="text-primary font-bold flex items-center gap-2 px-4 py-3 hover:bg-surface-container rounded-lg transition-colors">
+                    Voir la FAQ <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            </div>
+            <!-- Decorative element -->
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+        </div>
+        
+        <!-- Mediation -->
+        <div class="md:col-span-5 bg-surface-container-highest rounded-xl p-8 flex flex-col justify-between transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl border border-transparent hover:border-outline-variant/10">
+            <div>
+                <div class="w-12 h-12 bg-primary-container/30 text-primary rounded-full flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-2xl">handshake</span>
+                </div>
+                <h2 class="text-2xl font-bold text-primary mb-3">Médiation</h2>
+                <p class="text-on-surface-variant leading-relaxed mb-6">
+                    Une résolution en dehors du tribunal. Nous facilitons des conversations calmes et productives pour aider les parties à trouver un terrain d'entente et à créer leurs propres accords contraignants.
+                </p>
+            </div>
+            <button class="w-full bg-surface-container-lowest text-primary border border-primary/20 py-3 rounded-full font-semibold hover:bg-primary hover:text-on-primary transition-all">
+                Se Renseigner
+            </button>
+        </div>
+        
+        <!-- Small Business Law -->
+        <div class="md:col-span-5 bg-secondary-container/20 rounded-xl p-8 flex flex-col justify-between transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl border border-transparent hover:border-outline-variant/10">
+            <div>
+                <div class="w-12 h-12 bg-secondary text-on-secondary rounded-full flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-2xl">storefront</span>
+                </div>
+                <h2 class="text-2xl font-bold text-primary mb-3">Droit des Petites Entreprises</h2>
+                <p class="text-on-surface-variant leading-relaxed mb-6">
+                    Protéger votre rêve dès le départ. De la création aux contrats, nous fournissons la base juridique pour que vous puissiez vous concentrer sur la croissance et l'impact de votre communauté.
+                </p>
+            </div>
+            <button class="w-full bg-secondary text-on-secondary py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">
+                Démarrer mon entreprise
+            </button>
+        </div>
+        
+        <!-- Real Estate -->
+        <div class="md:col-span-7 bg-surface-container-low rounded-xl p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center transition-all duration-500 hover:bg-surface-container-lowest hover:shadow-xl relative overflow-hidden">
+            <div class="flex-1 relative z-10">
+                <div class="w-14 h-14 bg-tertiary-fixed text-on-tertiary-fixed rounded-full flex items-center justify-center mb-8">
+                    <span class="material-symbols-outlined text-3xl">home_work</span>
+                </div>
+                <h2 class="text-3xl font-bold text-primary mb-4">Création et Immobilier</h2>
+                <p class="text-on-surface-variant text-lg leading-relaxed mb-8">
+                    Que ce soit votre première maison ou votre dixième investissement, nous veillons à ce que vos transitions se fassent en douceur. Nous examinons les contrats, gérons les clôtures et résolvons les problèmes de titre avec un soin méticuleux.
+                </p>
+                <button class="bg-primary-container text-on-primary-container px-8 py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">En savoir plus</button>
+            </div>
+            <div class="flex-1 w-full h-64 rounded-xl overflow-hidden shadow-inner">
+                <img alt="Architecture moderne" class="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC6MoFxBSDUCOQhuOSGYKFyBigl83EgiEKE67ztkRfbRQilbrXuB9nbfpYQBodCG1cjRZNup-pShXjWOsijRSZE4lI_LRrKF0t9S2brlzCpa1EeYMBpG0QlE6EljFqWXQD7MedVWlpF-epVwrhwghHfV2ja5nWeO5sqXe8iZ-dJVtYXLjUj6PuL3rw5pWC-tTK1cuLYJPdGv0QJStNCscGk5JPre9SaB-Z3-hbzJWqnL4YAASQmubZuvnd7Jn362LQx7DZ5FYWu3Fi"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <section class="mt-24 bg-primary rounded-xl p-12 md:p-20 text-center relative overflow-hidden">
+        <div class="relative z-10 max-w-2xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-on-primary mb-6 tracking-tight">Prêt à trouver votre refuge juridique ?</h2>
+            <p class="text-primary-fixed text-xl mb-10 opacity-90">
+                Nos premières consultations sont conçues pour apporter de la clarté et un plan d'action, et non un argumentaire de vente. Parlons de vos besoins.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="contact.html" class="inline-block bg-surface text-primary px-10 py-4 rounded-full font-bold text-lg hover:bg-surface-container transition-colors shadow-lg">
+                    Planifier un Appel
+                </a>
+                <a href="contact.html" class="inline-block bg-transparent border-2 border-primary-fixed text-primary-fixed px-10 py-4 rounded-full font-bold text-lg hover:bg-primary-container/20 transition-colors">
+                    Envoyer un Message
+                </a>
+            </div>
+        </div>
+        
+        <!-- Background Decoration -->
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-primary-container/20 rounded-full blur-[100px] -mb-48 -mr-48"></div>
+        <div class="absolute top-0 left-0 w-64 h-64 bg-secondary/10 rounded-full blur-[80px] -mt-32 -ml-32"></div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-[#fbf9f4] dark:bg-[#1b1c19] w-full rounded-t-[3rem] mt-12 border-t border-outline-variant/10">
+    <div class="flex flex-col md:flex-row justify-between items-center px-12 py-16 w-full max-w-7xl mx-auto">
+        <div class="mb-8 md:mb-0">
+            <div class="text-lg font-bold text-[#496455] dark:text-[#87a593] mb-4">Sanctum Avocats</div>
+            <p class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4]">
+                © 2026 Le Cabinet Juridique Humain. Tous droits réservés.
+            </p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-8 text-center">
+            <a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">Politique de Confidentialité</a>
+            <a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">Conditions d'Utilisation</a>
+            <a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">LinkedIn</a>
+            <a class="font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest text-[#424845] dark:text-[#c2c8c4] hover:text-[#496455] transition-opacity" href="#">Instagram</a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

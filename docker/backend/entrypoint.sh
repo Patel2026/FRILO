@@ -24,6 +24,9 @@ mkdir -p \
   storage/framework/views \
   storage/logs
 
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+
 if ! grep -q "^APP_KEY=base64:" .env; then
   php artisan key:generate --force
 fi

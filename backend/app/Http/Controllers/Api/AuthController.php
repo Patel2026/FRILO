@@ -7,6 +7,7 @@ use App\Http\Requests\Api\ForgotPasswordRequest;
 use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Requests\Api\ResetPasswordRequest;
+use App\Http\Requests\Api\UpdatePasswordRequest;
 use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
@@ -187,6 +188,23 @@ class AuthController extends Controller
         $user->loadMissing('sector');
 
         return response()->json($this->transformUser($user));
+    }
+
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->forceFill(['password' => Hash::make($request->validated()['password'])]);
+        $user->save();
+
+        $currentTokenId = $request->user()->currentAccessToken()->id;
+        $user->tokens()->where('id', '!=', $currentTokenId)->delete();
+
+        Log::info('auth.password.updated', [
+            'user_id' => $user->id,
+            'ip' => $request->ip(),
+        ]);
+
+        return response()->json(['message' => 'Mot de passe mis à jour.']);
     }
 
     private function transformUser(User $user): array

@@ -18,7 +18,13 @@ test('critical path: visiteur -> commande -> admin -> suivi client (jusqu’à l
   await page.getByRole('link', { name: /Commander/ }).first().click();
   await expect(page).toHaveURL(/\/commande\?templateId=\d+/);
 
-  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.locator('input[placeholder="Ex : Maison Adja"]').fill('Client E2E');
+  await page.locator('textarea[placeholder*="Que vendez-vous"]').fill(
+    'Nous sommes un commerce local et nous voulons un site vitrine moderne.'
+  );
+  await page.locator('input[placeholder*="Sobre, noir et rouge"]').fill('Bleu, Blanc');
+  await page.getByRole('button', { name: /Vérifier ma commande/ }).click();
+
   await page.getByRole('button', { name: 'Inscription' }).click();
 
   await page.locator('input[placeholder="Jean Dupont"]').fill('Client E2E');
@@ -30,16 +36,10 @@ test('critical path: visiteur -> commande -> admin -> suivi client (jusqu’à l
   await registerPasswordInputs.nth(1).fill(clientPassword);
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
 
-  await expect(page.getByText('Détails de votre projet')).toBeVisible();
-  await page.locator('input[placeholder="mon-restaurant.com"]').fill('e2e-client.frilo');
-  await page.locator('textarea[placeholder*="Dites-nous en plus"]').fill(
-    'Nous sommes un commerce local et nous voulons un site vitrine moderne.'
-  );
-  await page.locator('input[placeholder*="Bleu et Blanc"]').fill('Bleu, Blanc');
-  await page.getByRole('button', { name: /Valider et continuer/ }).click();
-
+  await expect(page.getByRole('heading', { name: 'Vérifiez votre commande.' })).toBeVisible();
+  await page.getByRole('button', { name: /Continuer vers le paiement/ }).click();
   await expect(page.getByText('Paiement sécurisé')).toBeVisible();
-  await page.getByRole('button', { name: /Valider la commande/ }).click();
+  await page.getByRole('button', { name: /Payer maintenant/ }).click();
   await expect(page.getByText('Commande confirmée.')).toBeVisible({ timeout: 20_000 });
 
   const orderRefText = (await page.getByText(/^#ORD-\d+$/).first().textContent()) || '';

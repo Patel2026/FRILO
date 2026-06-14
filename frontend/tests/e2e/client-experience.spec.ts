@@ -50,9 +50,8 @@ test('tunnel commande: bypass étape auth pour client connecté', async ({ page,
   await page.getByRole('link', { name: /Commander/ }).first().click();
   await expect(page).toHaveURL(/\/commande\?templateId=\d+/);
 
-  await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Détails de votre projet')).toBeVisible();
-  await expect(page.getByText('Connexion ou inscription')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Adaptons ce modèle à votre activité.' })).toBeVisible();
+  await expect(page.getByText('Avant de vérifier')).toHaveCount(0);
 });
 
 test('contact: soumission réelle du formulaire', async ({ page, baseURL }) => {
@@ -90,17 +89,15 @@ test('dashboard: navigation vers détail commande client', async ({ page, baseUR
   await page.getByRole('link', { name: /Commander/ }).first().click();
   await expect(page).toHaveURL(/\/commande\?templateId=\d+/);
 
-  await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Détails de votre projet')).toBeVisible();
-
-  await page.locator('input[placeholder="mon-restaurant.com"]').fill('client-dashboard.frilo');
-  await page.locator('textarea[placeholder*="Dites-nous en plus"]').fill(
+  await page.locator('input[placeholder="Ex : Maison Adja"]').fill('Client Dashboard');
+  await page.locator('textarea[placeholder*="Que vendez-vous"]').fill(
     'Commande de test e2e pour vérifier la navigation vers le détail.'
   );
-  await page.locator('input[placeholder*="Bleu et Blanc"]').fill('Noir, Blanc');
-  await page.getByRole('button', { name: /Valider et continuer/ }).click();
+  await page.locator('input[placeholder*="Sobre, noir et rouge"]').fill('Noir, Blanc');
+  await page.getByRole('button', { name: /Vérifier ma commande/ }).click();
 
-  await page.getByRole('button', { name: /Valider la commande/ }).click();
+  await page.getByRole('button', { name: /Continuer vers le paiement/ }).click();
+  await page.getByRole('button', { name: /Payer maintenant/ }).click();
   await expect(page.getByText('Commande confirmée.')).toBeVisible({ timeout: 20_000 });
 
   const orderRefText = (await page.getByText(/^#ORD-\d+$/).first().textContent()) || '';
@@ -232,6 +229,12 @@ test('P2 analytics funnel: événements view_template et start_order stockés lo
   await page.getByRole('link', { name: /Commander/ }).first().click();
   await expect(page).toHaveURL(/\/commande\?templateId=\d+/);
 
+  await page.locator('input[placeholder="Ex : Maison Adja"]').fill('Test Analytics');
+  await page.locator('textarea[placeholder*="Que vendez-vous"]').fill(
+    'Activité de test pour vérifier le suivi du parcours de commande.'
+  );
+  await page.getByRole('button', { name: /Vérifier ma commande/ }).click();
+
   await expect.poll(async () => {
     return page.evaluate(() => {
       const raw = localStorage.getItem('frilo.analytics.funnel.v1');
@@ -253,8 +256,12 @@ test('tunnel commande: échec auth affiche un message explicite', async ({ page,
   await page.getByRole('link', { name: /Commander/ }).first().click();
   await expect(page).toHaveURL(/\/commande\?templateId=\d+/);
 
-  await page.getByRole('button', { name: 'Continuer' }).click();
-  await expect(page.getByText('Connexion ou inscription')).toBeVisible();
+  await page.locator('input[placeholder="Ex : Maison Adja"]').fill('Test Auth');
+  await page.locator('textarea[placeholder*="Que vendez-vous"]').fill(
+    'Activité de test pour vérifier le message en cas d’échec de connexion.'
+  );
+  await page.getByRole('button', { name: /Vérifier ma commande/ }).click();
+  await expect(page.getByText('Avant de vérifier')).toBeVisible();
 
   await page.locator('input[placeholder="vous@exemple.com"]').fill(`invalide-${Date.now()}@frilo.test`);
   await page.locator('input[placeholder="••••••••"]').first().fill('motdepasse-invalide');

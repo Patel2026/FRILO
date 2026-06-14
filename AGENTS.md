@@ -1,6 +1,6 @@
 # AGENTS.md — FRILO
 
-Stack : Laravel 11 / PHP 8.3+ / MySQL 8 / Next.js 15 / TypeScript / Tailwind CSS / Sanctum / Filament  
+Stack : Laravel 12 / PHP 8.2 plateforme Docker-CI / MySQL 8 / Next.js 16 / React 19 / TypeScript / Tailwind CSS 4 / Sanctum / admin Blade custom  
 Rôle : Développeur Senior — Exécution autonome, zéro régression, qualité production
 
 ---
@@ -27,7 +27,7 @@ Règles :
 - Aucune logique métier en Controller
 - Toute logique métier passe par Service
 - Toute autorisation passe par Policy
-- `authorize()` en première ligne de chaque méthode controller
+- `authorize()` au tout début de chaque méthode controller, immédiatement après le chargement strictement nécessaire de l'entité concernée
 
 ### Frontend (Next.js)
 
@@ -39,6 +39,7 @@ Page/Composant → Service (api.ts) → API Laravel
 Règles :
 - Aucun appel `fetch()` direct dans les composants
 - Toute la logique API dans `services/*.service.ts`
+- Exception documentée : `frontend/lib/*.server.ts` peut utiliser `fetch()` côté serveur uniquement pour les lectures publiques cacheables Next.js
 - Pas de logique métier dans les composants
 
 ---
@@ -94,7 +95,7 @@ Authentification :
 - Token Sanctum
 
 Administration :
-- Filament Resources (Order, Template, Sector, User)
+- Admin Blade custom (Order, Template, Sector, User, paiements, réglages, notifications)
 
 ---
 
@@ -121,7 +122,8 @@ Administration :
 
 Commande minimale avant commit :
 ```bash
-php artisan test
+docker compose exec backend composer qa
+docker compose exec frontend npm run qa
 ```
 
 Tests prioritaires :
@@ -160,4 +162,4 @@ NEXT_PUBLIC_API_URL=https://api.frilo.com
 
 ## STATUT
 
-FRILO — Backend à construire. Frontend Next.js en place. Règles gouvernance dans `rules/`.
+FRILO — Backend Laravel construit, API client et admin custom en place. Frontend Next.js en place. Règles gouvernance dans `rules/` et orchestration AI-native dans `.claude/`.

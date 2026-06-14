@@ -1,0 +1,145 @@
+{
+  "generated_at": "2026-06-14T09:39:38.463Z",
+  "templates": [
+    {
+      "folder": "tpl-BTP-01",
+      "preview_url": "/template-previews/tpl-BTP-01/",
+      "pages": [
+        {
+          "label": "Accueil",
+          "path": "index.html"
+        },
+        {
+          "label": "A propos",
+          "path": "about.html"
+        },
+        {
+          "label": "Services",
+          "path": "services.html"
+        },
+        {
+          "label": "Realisations",
+          "path": "portfolio.html"
+        },
+        {
+          "label": "Contact",
+          "path": "contact.html"
+        }
+      ]
+    },
+    {
+      "folder": "tpl-BTP-02",
+      "preview_url": "/template-previews/tpl-BTP-02/",
+      "pages": [
+        {
+          "label": "Accueil",
+          "path": "index.html"
+        },
+        {
+          "label": "A propos",
+          "path": "about.html"
+        },
+        {
+          "label": "Services",
+          "path": "services.html"
+        },
+        {
+          "label": "Realisations",
+          "path": "portfolio.html"
+        },
+        {
+          "label": "Contact",
+          "path": "contact.html"
+        }
+      ]
+    },
+    {
+      "folder": "tpl-COA-02",
+      "preview_url": "/template-previews/tpl-COA-02/",
+      "pages": [
+        {
+          "label": "Accueil",
+          "path": "index.html"
+        },
+        {
+          "label": "A propos",
+          "path": "about.html"
+        },
+        {
+          "label": "Services",
+          "path": "services.html"
+        },
+        {
+          "label": "Contact",
+          "path": "contact.html"
+        }
+      ]
+    },
+    {
+      "folder": "tpl-COA-03",
+      "preview_url": "/template-previews/tpl-COA-03/",
+      "pages": [
+        {
+          "label": "Accueil",
+          "path": "index.html"
+        },
+        {
+          "label": "A propos",
+          "path": "about.html"
+        },
+        {
+          "label": "Services",
+          "path": "services.html"
+        },
+        {
+          "label": "Contact",
+          "path": "contact.html"
+        }
+      ]
+    },
+    {
+      "folder": "tpl-avocat-01-corporate",
+      "preview_url": "/template-previews/tpl-avocat-01-corporate/",
+      "pages": [
+        {
+          "label": "Accueil",
+          "path": "index.html"
+        },
+        {
+          "label": "A propos",
+          "path": "about.html"
+        },
+        {
+          "label": "Services",
+          "path": "services.html"
+        },
+        {
+          "label": "Contact",
+          "path": "contact.html"
+        }
+      ]
+    },
+    {
+      "folder": "tpl-avocat-02-legaltech",
+      "preview_url": "/template-previews/tpl-avocat-02-legaltech/",
+      "pages": [
+        {
+          "label": "Accueil",
+          "path": "index.html"
+        },
+        {
+          "label": "A propos",
+          "path": "about.html"
+        },
+        {
+          "label": "Services",
+          "path": "services.html"
+        },
+        {
+          "label": "Contact",
+          "path": "contact.html"
+        }
+      ]
+    }
+  ]
+}

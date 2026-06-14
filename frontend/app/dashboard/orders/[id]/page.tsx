@@ -51,9 +51,14 @@ export default function OrderDetailPage() {
   const [reloadKey, setReloadKey] = useState(0);
   const [isStartingPayment, setIsStartingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
+    setFeedbackSuccess(false);
 
     businessService.getOrder(orderId)
       .then((response) => {
@@ -92,6 +97,24 @@ export default function OrderDetailPage() {
   const projectName = instruction?.enterprise_name || 'Projet sans nom';
   const currentStep = order ? getCurrentStep(order, paymentStatusValue) : 1;
 
+  const handleSubmitFeedback = async () => {
+    if (!order || feedbackText.trim().length < 5) return;
+
+    setFeedbackSubmitting(true);
+    setFeedbackError(null);
+
+    try {
+      const updated = await businessService.submitOrderFeedback(order.id, feedbackText.trim());
+      setOrder(updated);
+      setFeedbackSuccess(true);
+      setFeedbackText('');
+    } catch {
+      setFeedbackError('Impossible d\'envoyer vos retours pour le moment. Réessayez.');
+    } finally {
+      setFeedbackSubmitting(false);
+    }
+  };
+
   const handleStartPayment = async () => {
     if (!order) return;
 
@@ -118,27 +141,27 @@ export default function OrderDetailPage() {
   };
 
   return (
-    <div className="w-full max-w-[1180px] p-4 md:p-6">
-      <div className="mb-6 border-b border-gray-200 pb-5">
+    <div className="w-full max-w-[1180px] px-4 py-5 md:px-7 md:py-7">
+      <div className="mb-5 border-b border-neutral-200 pb-5">
         <Link
           href="/dashboard/orders"
-          className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition-colors hover:text-black"
+          className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 transition-colors hover:text-neutral-950"
         >
           <ArrowLeft className="h-4 w-4" />
           Retour aux commandes
         </Link>
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Commande #{order ? String(order.id).padStart(4, '0') : '0000'}</p>
-            <h1 className="text-3xl font-black tracking-tight text-black">{loading ? 'Chargement' : projectName}</h1>
-            <p className="mt-2 max-w-xl text-sm text-gray-500">
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Commande #{order ? String(order.id).padStart(4, '0') : '0000'}</p>
+            <h1 className="text-3xl font-black tracking-tight text-neutral-950">{loading ? 'Chargement' : projectName}</h1>
+            <p className="mt-2 max-w-xl text-sm text-neutral-500">
               {order
                 ? `${order.template?.name || 'Modèle'}${order.template?.sector?.name ? ` · ${order.template.sector.name}` : ''}`
                 : 'Suivi de commande FRILO'}
             </p>
           </div>
           {order?.created_at && (
-            <p className="text-sm font-semibold text-gray-400">
+            <p className="text-sm font-semibold text-neutral-400">
               {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
           )}
@@ -146,17 +169,17 @@ export default function OrderDetailPage() {
       </div>
 
       {loading ? (
-        <div className="border-y border-gray-200 py-8">
+        <div className="border-y border-neutral-200 py-8">
           <div className="space-y-3">
-            <div className="h-5 w-56 animate-pulse rounded bg-gray-100" />
-            <div className="h-4 w-80 max-w-full animate-pulse rounded bg-gray-100" />
-            <div className="h-4 w-48 animate-pulse rounded bg-gray-100" />
+            <div className="h-5 w-56 animate-pulse rounded bg-neutral-100" />
+            <div className="h-4 w-80 max-w-full animate-pulse rounded bg-neutral-100" />
+            <div className="h-4 w-48 animate-pulse rounded bg-neutral-100" />
           </div>
         </div>
       ) : error ? (
-        <div className="border-y border-gray-200 py-12">
+        <div className="border-y border-neutral-200 py-12">
           <AlertTriangle className="mb-3 h-10 w-10 text-amber-400" />
-          <p className="mb-6 max-w-xl text-sm text-gray-500">{error}</p>
+          <p className="mb-6 max-w-xl text-sm text-neutral-500">{error}</p>
           <button
             type="button"
             onClick={() => {
@@ -164,35 +187,35 @@ export default function OrderDetailPage() {
               setLoading(true);
               setReloadKey(v => v + 1);
             }}
-            className="inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
+            className="inline-flex items-center justify-center rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)]"
           >
             Réessayer
           </button>
         </div>
       ) : order && status ? (
         <div className="space-y-8">
-          <section className="border-y border-gray-200">
+          <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)]">
             <div className="grid gap-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-              <div className="border-b border-gray-100 py-5 md:border-b-0 md:pr-8">
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">État commande</p>
+              <div className="border-b border-neutral-100 p-5 md:border-b-0 md:border-r md:pr-8">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">État commande</p>
                 <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold", status.classes)}>
                   <span className={cn("h-1.5 w-1.5 flex-shrink-0 rounded-full", status.dot)} />
                   {status.label}
                 </span>
-                <p className="mt-3 max-w-sm text-sm text-gray-500">{status.next}</p>
+                <p className="mt-3 max-w-sm text-sm text-neutral-500">{status.next}</p>
               </div>
-              <div className="border-b border-gray-100 py-5 md:border-b-0 md:px-8">
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Paiement</p>
+              <div className="border-b border-neutral-100 p-5 md:border-b-0 md:border-r md:px-8">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Paiement</p>
                 <span className={cn("inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold", paymentStatus.classes)}>
                   {paymentStatus.label}
                 </span>
-                <p className="mt-3 max-w-sm text-sm text-gray-500">{paymentStatus.next}</p>
+                <p className="mt-3 max-w-sm text-sm text-neutral-500">{paymentStatus.next}</p>
               </div>
-              <div className="py-5 md:pl-8 md:text-right">
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Total</p>
-                <p className="text-xl font-black text-black">{order.price.toLocaleString('fr-FR')} FCFA</p>
+              <div className="p-5 md:pl-8 md:text-right">
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Total</p>
+                <p className="text-xl font-black text-neutral-950">{order.price.toLocaleString('fr-FR')} FCFA</p>
                 {order.paid_at && (
-                  <p className="mt-2 text-xs font-semibold text-gray-400">
+                  <p className="mt-2 text-xs font-semibold text-neutral-400">
                     Payée le {new Date(order.paid_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
                 )}
@@ -200,13 +223,33 @@ export default function OrderDetailPage() {
             </div>
           </section>
 
+          {order.selected_options && order.selected_options.length > 0 && (
+            <section className="border-y border-neutral-200 py-5">
+              <div className="mb-4 flex flex-col justify-between gap-2 md:flex-row md:items-end">
+                <div>
+                  <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Options choisies</p>
+                  <h2 className="text-lg font-black text-neutral-950">Fonctions ajoutées à votre site</h2>
+                </div>
+                <p className="text-sm font-semibold text-neutral-400">{order.selected_options.length} option{order.selected_options.length > 1 ? 's' : ''}</p>
+              </div>
+              <div className="divide-y divide-neutral-100">
+                {order.selected_options.map((option) => (
+                  <div key={`${option.id ?? 'deleted'}-${option.name}-${option.price}`} className="flex items-center justify-between gap-4 py-3 text-sm">
+                    <span className="text-neutral-600">{option.name}</span>
+                    <span className="shrink-0 font-black text-neutral-950">{option.price.toLocaleString('fr-FR')} FCFA</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {canPay && (
-            <section className="bg-black px-5 py-5 text-white md:px-6">
+            <section className="rounded-2xl bg-neutral-950 px-5 py-5 text-[oklch(99%_0.004_95)] md:px-6">
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-red-500">Action requise</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[oklch(70%_0.19_29)]">Action requise</p>
                   <p className="mt-2 text-lg font-black">Confirmez le paiement pour lancer la production.</p>
-                  <p className="mt-1 max-w-2xl text-sm text-white/60">
+                  <p className="mt-1 max-w-2xl text-sm text-[oklch(99%_0.004_95)]/60">
                     Vous serez redirigé vers FedaPay. Mobile Money et carte peuvent être proposés selon votre compte.
                   </p>
                   {paymentError && <p className="mt-3 text-sm font-semibold text-red-300">{paymentError}</p>}
@@ -215,7 +258,7 @@ export default function OrderDetailPage() {
                   type="button"
                   onClick={handleStartPayment}
                   disabled={isStartingPayment}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-black text-black transition-colors hover:bg-gray-100 disabled:opacity-60 md:w-auto"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-[oklch(99%_0.004_95)] px-6 py-3 text-sm font-black text-neutral-950 transition-colors hover:bg-neutral-100 disabled:opacity-60 md:w-auto"
                 >
                   {isStartingPayment ? 'Redirection...' : 'Payer maintenant'}
                 </button>
@@ -224,37 +267,37 @@ export default function OrderDetailPage() {
           )}
 
           <section>
-            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-gray-400">Avancement</p>
+            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-neutral-400">Avancement</p>
             <div className="grid gap-3 md:grid-cols-4">
               {stepLabels.map((label, index) => {
                 const stepNumber = index + 1;
                 const isDone = stepNumber <= currentStep;
 
                 return (
-                  <div key={label} className="border-t border-gray-200 pt-4">
+                  <div key={label} className="border-t border-neutral-200 pt-4">
                     <span className={cn(
                       "inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-black",
-                      isDone ? "bg-black text-white" : "bg-gray-100 text-gray-400"
+                      isDone ? "bg-neutral-950 text-[oklch(99%_0.004_95)]" : "bg-neutral-100 text-neutral-400"
                     )}>
                       {stepNumber}
                     </span>
-                    <p className={cn("mt-3 text-sm font-black", isDone ? "text-black" : "text-gray-400")}>{label}</p>
+                    <p className={cn("mt-3 text-sm font-black", isDone ? "text-neutral-950" : "text-neutral-400")}>{label}</p>
                   </div>
                 );
               })}
             </div>
           </section>
 
-          <section className="border-y border-gray-200 py-6">
+          <section className="rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] p-5 md:p-6">
             <div className="mb-5 flex flex-col justify-between gap-3 md:flex-row md:items-end">
               <div>
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Informations transmises</p>
-                <h2 className="text-xl font-black tracking-tight text-black">Ce que FRILO utilise pour adapter le modèle.</h2>
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Informations transmises</p>
+                <h2 className="text-xl font-black tracking-tight text-neutral-950">Ce que FRILO utilise pour adapter le modèle.</h2>
               </div>
               {order.template?.id && (
                 <Link
                   href={`/templates/${order.template.id}`}
-                  className="inline-flex items-center gap-1 text-sm font-black text-black underline underline-offset-4"
+                  className="inline-flex items-center gap-1 text-sm font-black text-neutral-950 underline underline-offset-4"
                 >
                   Revoir le modèle
                   <ArrowUpRight className="h-4 w-4" />
@@ -262,27 +305,105 @@ export default function OrderDetailPage() {
               )}
             </div>
 
-            <dl className="divide-y divide-gray-100 text-sm">
+            <dl className="divide-y divide-neutral-100 text-sm">
               <div className="grid gap-2 py-4 md:grid-cols-[220px_minmax(0,1fr)]">
-                <dt className="font-bold text-gray-400">Activité</dt>
-                <dd className="min-w-0 break-words text-black">{instruction?.activity_description || 'Non renseigné'}</dd>
+                <dt className="font-bold text-neutral-400">Activité</dt>
+                <dd className="min-w-0 break-words text-neutral-950">{instruction?.activity_description || 'Non renseigné'}</dd>
               </div>
               <div className="grid gap-2 py-4 md:grid-cols-[220px_minmax(0,1fr)]">
-                <dt className="font-bold text-gray-400">Couleurs souhaitées</dt>
-                <dd className="min-w-0 break-words text-black">{(instruction?.colors || []).join(', ') || 'Non renseigné'}</dd>
+                <dt className="font-bold text-neutral-400">Couleurs souhaitées</dt>
+                <dd className="min-w-0 break-words text-neutral-950">{(instruction?.colors || []).join(', ') || 'Non renseigné'}</dd>
               </div>
               <div className="grid gap-2 py-4 md:grid-cols-[220px_minmax(0,1fr)]">
-                <dt className="font-bold text-gray-400">Notes complémentaires</dt>
-                <dd className="min-w-0 break-words text-black">{instruction?.specific_instructions || 'Aucune note'}</dd>
+                <dt className="font-bold text-neutral-400">Notes complémentaires</dt>
+                <dd className="min-w-0 break-words text-neutral-950">{instruction?.specific_instructions || 'Aucune note'}</dd>
               </div>
             </dl>
           </section>
+
+          {order.preview_url && (
+            <section className="rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] p-5 md:p-6">
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">
+                Prévisualisation
+              </p>
+              <h2 className="text-xl font-black tracking-tight text-neutral-950">
+                Votre site est prêt à valider.
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+                FRILO a préparé une version de votre site. Consultez le lien ci-dessous et transmettez
+                vos retours dans les 24 heures. Les modifications seront intégrées avant la mise en ligne définitive.
+              </p>
+              <a
+                href={order.preview_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-neutral-950 px-5 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-neutral-800"
+              >
+                Voir la prévisualisation
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+
+              <div className="mt-6 border-t border-neutral-100 pt-6">
+                {order.client_feedback ? (
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">
+                      Vos retours envoyés
+                    </p>
+                    <p className="text-sm text-neutral-700 leading-6 bg-neutral-50 rounded-xl p-4">
+                      {order.client_feedback}
+                    </p>
+                    {order.feedback_submitted_at && (
+                      <p className="mt-2 text-xs font-semibold text-neutral-400">
+                        Envoyé le {new Date(order.feedback_submitted_at).toLocaleDateString('fr-FR', {
+                          day: 'numeric', month: 'long', year: 'numeric',
+                        })}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-2">
+                      Transmettre vos retours
+                    </p>
+                    {feedbackSuccess ? (
+                      <div className="rounded-xl bg-emerald-50 px-4 py-3 text-emerald-700">
+                        <p className="text-sm font-semibold">
+                          Retours reçus. FRILO les intègre dans les 24 heures.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <textarea
+                          value={feedbackText}
+                          onChange={(e) => setFeedbackText(e.target.value)}
+                          rows={4}
+                          placeholder="Décrivez les modifications souhaitées (couleurs, textes, logo, mise en page…)"
+                          className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-950 outline-none transition-colors focus:border-neutral-950 resize-none"
+                        />
+                        {feedbackError && (
+                          <p className="text-xs font-semibold text-red-600">{feedbackError}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={handleSubmitFeedback}
+                          disabled={feedbackSubmitting || feedbackText.trim().length < 5}
+                          className="inline-flex items-center justify-center rounded-full bg-[oklch(55%_0.23_29)] px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-[oklch(48%_0.22_29)] disabled:opacity-45 disabled:cursor-not-allowed"
+                        >
+                          {feedbackSubmitting ? 'Envoi…' : 'Envoyer mes retours'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {order.template?.id && (paymentStatusValue === 'paid' || order.status === 'processing' || order.status === 'completed') && (
             <section className="pb-2">
               <p className="text-sm text-gray-500">
                 Votre retour aide FRILO à améliorer les modèles.{' '}
-                <Link href={`/templates/${order.template.id}#template-reviews`} className="font-black text-black underline underline-offset-4">
+                <Link href={`/templates/${order.template.id}#template-reviews`} className="font-black text-neutral-950 underline underline-offset-4">
                   Donner mon avis
                 </Link>
               </p>

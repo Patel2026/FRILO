@@ -148,12 +148,12 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="w-full max-w-[1180px] p-4 md:p-6">
-      <div className="mb-6 flex flex-col justify-between gap-4 border-b border-gray-200 pb-5 lg:flex-row lg:items-end">
+    <div className="w-full max-w-[1180px] px-4 py-5 md:px-7 md:py-7">
+      <div className="mb-5 flex flex-col justify-between gap-4 border-b border-neutral-200 pb-5 lg:flex-row lg:items-end">
         <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Espace client</p>
-          <h1 className="text-3xl font-black tracking-tight text-black">Notifications</h1>
-          <p className="mt-2 max-w-xl text-sm text-gray-500">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Espace client</p>
+          <h1 className="text-3xl font-black tracking-tight text-neutral-950">Notifications</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
             Les mises à jour utiles sur vos commandes, paiements et échanges FRILO.
           </p>
         </div>
@@ -161,7 +161,7 @@ export default function NotificationsPage() {
           type="button"
           onClick={handleMarkAllAsRead}
           disabled={markingAll || unreadCount === 0}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 px-5 py-3 text-sm font-black text-gray-600 transition-colors hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 bg-[oklch(99%_0.004_95)] px-5 py-3 text-sm font-black text-neutral-600 transition-colors hover:border-neutral-950 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
         >
           <CheckCheck className="h-4 w-4" />
           Tout marquer lu
@@ -169,12 +169,12 @@ export default function NotificationsPage() {
       </div>
 
       <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+        <p className="text-xs font-bold uppercase tracking-widest text-neutral-400">
           {loading ? 'Chargement' : `${total} notification${total > 1 ? 's' : ''}`}
         </p>
         <p className={cn(
           "text-sm font-semibold",
-          unreadCount > 0 ? "text-black" : "text-gray-400"
+          unreadCount > 0 ? "text-neutral-950" : "text-neutral-400"
         )}>
           {unreadCount > 0
             ? `${unreadCount} non lue${unreadCount > 1 ? 's' : ''}`
@@ -182,20 +182,20 @@ export default function NotificationsPage() {
         </p>
       </div>
 
-      <div className="overflow-hidden border-y border-gray-200">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)]">
         {loading ? (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-neutral-100 px-5">
             {[...Array(5)].map((_, index) => (
               <div key={index} className="py-5">
-                <div className="h-4 w-56 animate-pulse rounded bg-gray-100" />
-                <div className="mt-3 h-3 w-80 max-w-full animate-pulse rounded bg-gray-100" />
+                <div className="h-4 w-56 animate-pulse rounded bg-neutral-100" />
+                <div className="mt-3 h-3 w-80 max-w-full animate-pulse rounded bg-neutral-100" />
               </div>
             ))}
           </div>
         ) : error ? (
-          <div className="py-12">
+          <div className="px-5 py-12">
             <AlertTriangle className="mb-3 h-10 w-10 text-amber-400" />
-            <p className="mb-6 max-w-xl text-sm text-gray-500">{error}</p>
+            <p className="mb-6 max-w-xl text-sm text-neutral-500">{error}</p>
             <button
               type="button"
               onClick={() => {
@@ -203,24 +203,24 @@ export default function NotificationsPage() {
                 setLoading(true);
                 setReloadKey((value) => value + 1);
               }}
-              className="inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
+              className="inline-flex items-center justify-center rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)]"
             >
               Réessayer
             </button>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="py-12">
-            <Bell className="mb-4 h-10 w-10 text-gray-300" />
-            <p className="text-xl font-black text-black">Aucune notification récente.</p>
-            <p className="mt-2 max-w-xl text-sm text-gray-500">
+          <div className="px-5 py-12">
+            <Bell className="mb-4 h-10 w-10 text-neutral-300" />
+            <p className="text-xl font-black text-neutral-950">Aucune notification récente.</p>
+            <p className="mt-2 max-w-xl text-sm text-neutral-500">
               Les prochaines mises à jour de commande et de paiement apparaîtront ici.
             </p>
-            <Link href="/dashboard/orders" className="mt-6 inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900">
+            <Link href="/dashboard/orders" className="mt-6 inline-flex items-center justify-center rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)]">
               Voir mes commandes
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-neutral-100">
             {notifications.map((item) => {
               const href = item.action_url || '/dashboard/orders';
 
@@ -228,24 +228,24 @@ export default function NotificationsPage() {
                 <article
                   key={item.id}
                   className={cn(
-                    "grid gap-4 py-5 transition-colors md:grid-cols-[minmax(0,1fr)_auto] md:items-center",
-                    !item.is_read && "bg-gray-50"
+                    "grid gap-4 px-5 py-5 transition-colors md:grid-cols-[minmax(0,1fr)_auto] md:items-center",
+                    !item.is_read && "bg-[oklch(97%_0.006_95)]"
                   )}
                 >
                   <div className="min-w-0 md:pr-5">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={cn(
                         "h-2 w-2 rounded-full",
-                        item.is_read ? "bg-gray-300" : "bg-black"
+                        item.is_read ? "bg-neutral-300" : "bg-[oklch(55%_0.23_29)]"
                       )} />
-                      <span className="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-500">
+                      <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-neutral-500">
                         {notificationTone(item.type)}
                       </span>
-                      <p className="text-xs font-semibold text-gray-400">{formatDate(item.created_at)}</p>
+                      <p className="text-xs font-semibold text-neutral-400">{formatDate(item.created_at)}</p>
                     </div>
-                    <h2 className="mt-3 text-base font-black text-black">{item.title}</h2>
+                    <h2 className="mt-3 text-base font-black text-neutral-950">{item.title}</h2>
                     {item.message && (
-                      <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">{item.message}</p>
+                      <p className="mt-1 max-w-2xl text-sm leading-6 text-neutral-500">{item.message}</p>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-2 md:justify-end">
@@ -256,14 +256,14 @@ export default function NotificationsPage() {
                           void handleMarkAsRead(item);
                         }}
                         disabled={processingIds[item.id]}
-                        className="inline-flex items-center rounded-full border border-gray-200 px-4 py-2 text-xs font-black text-gray-600 transition-colors hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-45"
+                        className="inline-flex items-center rounded-full border border-neutral-200 px-4 py-2 text-xs font-black text-neutral-600 transition-colors hover:border-neutral-950 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-45"
                       >
                         Marquer lu
                       </button>
                     )}
                     <Link
                       href={href}
-                      className="inline-flex items-center gap-1 rounded-full bg-black px-4 py-2 text-xs font-black text-white transition-colors hover:bg-gray-900"
+                      className="inline-flex items-center gap-1 rounded-full bg-neutral-950 px-4 py-2 text-xs font-black text-[oklch(99%_0.004_95)]"
                     >
                       {item.action_label || 'Voir'}
                       <ArrowRight className="h-3.5 w-3.5" />
@@ -276,8 +276,8 @@ export default function NotificationsPage() {
         )}
 
         {meta && meta.last_page > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-100 py-4">
-            <p className="text-xs text-gray-400">
+          <div className="flex items-center justify-between border-t border-neutral-100 px-5 py-4">
+            <p className="text-xs text-neutral-400">
               Page {meta.current_page} sur {meta.last_page} · {meta.total} notification{meta.total > 1 ? 's' : ''}
             </p>
             <div className="flex items-center gap-2">
@@ -289,7 +289,7 @@ export default function NotificationsPage() {
                   setPage((value) => Math.max(1, value - 1));
                 }}
                 disabled={meta.current_page === 1}
-                className="rounded-lg border border-gray-200 p-2 text-gray-400 transition-all hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-lg border border-neutral-200 p-2 text-neutral-400 transition-colors hover:border-neutral-950 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -301,7 +301,7 @@ export default function NotificationsPage() {
                   setPage((value) => Math.min(meta.last_page, value + 1));
                 }}
                 disabled={meta.current_page === meta.last_page}
-                className="rounded-lg border border-gray-200 p-2 text-gray-400 transition-all hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-lg border border-neutral-200 p-2 text-neutral-400 transition-colors hover:border-neutral-950 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>

@@ -76,6 +76,20 @@ class OrderPaymentApiTest extends TestCase
         $response->assertJsonPath('payment.checkout_url', 'https://checkout.fedapay.com/pay/tok_777');
         $response->assertJsonPath('order.payment_status', PaymentStatus::AwaitingPayment->value);
 
+        Http::assertSent(function ($request) use ($order, $user): bool {
+            if ($request->url() !== 'https://sandbox-api.fedapay.com/v1/transactions') {
+                return false;
+            }
+
+            $payload = $request->data();
+
+            return ($payload['merchant_reference'] ?? null) === 'FRILO-ORD-'.str_pad((string) $order->id, 5, '0', STR_PAD_LEFT)
+                && ($payload['custom_metadata']['order_id'] ?? null) === (string) $order->id
+                && ($payload['custom_metadata']['order_reference'] ?? null) === '#ORD-'.str_pad((string) $order->id, 5, '0', STR_PAD_LEFT)
+                && ($payload['custom_metadata']['user_id'] ?? null) === (string) $user->id
+                && ! array_key_exists('metadata', $payload);
+        });
+
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'fedapay_customer_id' => 901,

@@ -157,26 +157,26 @@ export function NotificationsBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:text-black hover:border-black transition-colors"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-200 bg-[oklch(99%_0.004_95)] text-neutral-600 transition-colors hover:border-neutral-950 hover:text-neutral-950"
         aria-label="Notifications"
       >
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">
+          <span className="absolute -top-1.5 -right-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-[oklch(55%_0.23_29)] px-1.5 py-0.5 text-[10px] font-semibold text-[oklch(99%_0.004_95)]">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-[min(92vw,380px)] rounded-2xl border border-gray-100 bg-white shadow-xl z-50 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between gap-3">
-            <p className="text-sm font-bold text-black">Notifications</p>
+        <div className="absolute right-0 z-50 mt-2 w-[min(92vw,380px)] overflow-hidden rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] shadow-xl">
+          <div className="flex items-center justify-between gap-3 border-b border-neutral-100 px-4 py-3">
+            <p className="text-sm font-bold text-neutral-950">Notifications</p>
             <button
               type="button"
               onClick={handleMarkAllAsRead}
               disabled={markingAll || unreadCount === 0}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-gray-600 hover:text-black hover:border-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:border-neutral-950 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <CheckCheck className="w-3.5 h-3.5" />
               Tout marquer lu
@@ -184,18 +184,18 @@ export function NotificationsBell() {
           </div>
 
           {loading ? (
-            <div className="px-4 py-8 text-center text-sm text-gray-500">Chargement…</div>
+            <div className="px-4 py-8 text-center text-sm text-neutral-500">Chargement...</div>
           ) : error ? (
             <div className="px-4 py-8 text-center">
               <AlertTriangle className="w-5 h-5 text-amber-500 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">{error}</p>
+              <p className="text-sm text-neutral-500">{error}</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-gray-500">
+            <div className="px-4 py-8 text-center text-sm text-neutral-500">
               Aucune notification récente.
             </div>
           ) : (
-            <div className="max-h-[420px] overflow-y-auto divide-y divide-gray-50">
+            <div className="max-h-[420px] divide-y divide-neutral-100 overflow-y-auto">
               {items.map((item) => {
                 const href = item.action_url || '/dashboard/notifications';
                 return (
@@ -207,21 +207,21 @@ export function NotificationsBell() {
                       setOpen(false);
                     }}
                     className={cn(
-                      'block px-4 py-3 hover:bg-gray-50 transition-colors',
-                      !item.is_read && 'bg-slate-50/70'
+                      'block px-4 py-3 transition-colors hover:bg-neutral-50',
+                      !item.is_read && 'bg-[oklch(97%_0.006_95)]'
                     )}
                   >
                     <div className="flex items-start gap-3">
                       <span className={cn(
                         'mt-1.5 h-2 w-2 rounded-full flex-shrink-0',
-                        item.is_read ? 'bg-gray-300' : 'bg-black'
+                        item.is_read ? 'bg-neutral-300' : 'bg-[oklch(55%_0.23_29)]'
                       )} />
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-black">{item.title}</p>
+                        <p className="text-sm font-semibold text-neutral-950">{item.title}</p>
                         {item.message && (
-                          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.message}</p>
+                          <p className="mt-1 line-clamp-2 text-xs text-neutral-500">{item.message}</p>
                         )}
-                        <p className="text-[11px] text-gray-400 mt-1.5">{formatNotificationDate(item.created_at)}</p>
+                        <p className="mt-1.5 text-[11px] text-neutral-400">{formatNotificationDate(item.created_at)}</p>
                       </div>
                     </div>
                   </Link>
@@ -230,11 +230,11 @@ export function NotificationsBell() {
             </div>
           )}
 
-          <div className="px-4 py-3 border-t border-gray-100">
+          <div className="border-t border-neutral-100 px-4 py-3">
             <Link
               href="/dashboard/notifications"
               onClick={() => setOpen(false)}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-3 py-2.5 text-sm font-semibold text-gray-700 hover:text-black hover:border-black transition-colors"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-200 px-3 py-2.5 text-sm font-semibold text-neutral-700 transition-colors hover:border-neutral-950 hover:text-neutral-950"
             >
               Voir toutes les notifications
               <ArrowRight className="w-4 h-4" />

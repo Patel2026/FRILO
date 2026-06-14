@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
+use App\Models\OrderOption;
 use App\Models\Template;
 use App\Models\User;
 use App\Notifications\OrderCreatedNotification;
 use App\Notifications\OrderStatusUpdatedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class OrderService
@@ -23,15 +25,42 @@ class OrderService
      */
     public function createOrder(array $data, User $user): Order
     {
-        $template = Template::active()->findOrFail($data['template_id']);
+        $optionIds = collect($data['option_ids'] ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
 
-        $order = DB::transaction(function () use ($data, $user, $template) {
+        $order = DB::transaction(function () use ($data, $user, $optionIds) {
+            $template = Template::query()
+                ->active()
+                ->lockForUpdate()
+                ->findOrFail($data['template_id']);
+
+            $options = $optionIds->isEmpty()
+                ? collect()
+                : OrderOption::query()
+                    ->active()
+                    ->whereIn('id', $optionIds)
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->lockForUpdate()
+                    ->get();
+
+            if ($options->count() !== $optionIds->count()) {
+                throw ValidationException::withMessages([
+                    'option_ids' => 'Une ou plusieurs options sélectionnées ne sont plus disponibles.',
+                ]);
+            }
+
+            $optionsTotal = (int) $options->sum('price');
+            $totalPrice = (int) $template->price + $optionsTotal;
+
             $order = Order::create([
                 'user_id' => $user->id,
                 'template_id' => $template->id,
                 'status' => OrderStatus::Pending,
                 'payment_status' => PaymentStatus::AwaitingPayment,
-                'price' => $template->price, // snapshot
+                'price' => $totalPrice,
             ]);
 
             $order->instruction()->create([
@@ -41,14 +70,24 @@ class OrderService
                 'specific_instructions' => $data['specific_instructions'] ?? null,
             ]);
 
+            foreach ($options as $option) {
+                $order->optionSelections()->create([
+                    'order_option_id' => $option->id,
+                    'name_snapshot' => $option->name,
+                    'price_snapshot' => (int) $option->price,
+                ]);
+            }
+
             Log::info('order.created', [
                 'order_id' => $order->id,
                 'user_id' => $user->id,
                 'template_id' => $template->id,
-                'price' => $order->price,
+                'base_price' => (int) $template->price,
+                'options_total' => $optionsTotal,
+                'price' => (int) $order->price,
             ]);
 
-            return $order->load(['template.sector', 'instruction']);
+            return $order->load(['template.sector', 'instruction', 'optionSelections']);
         });
 
         if ($user->isClient()) {
@@ -100,6 +139,24 @@ class OrderService
                 new OrderStatusUpdatedNotification($order, $previousStatus, $newStatus)
             );
         }
+
+        return $order->fresh();
+    }
+
+    public function submitFeedback(Order $order, string $feedback): Order
+    {
+        if (! $order->preview_url) {
+            throw new HttpException(422, 'Aucun lien de prévisualisation disponible pour cette commande.');
+        }
+
+        $order->client_feedback = $feedback;
+        $order->feedback_submitted_at = now();
+        $order->save();
+
+        Log::info('order.feedback.submitted', [
+            'order_id' => $order->id,
+            'user_id' => $order->user_id,
+        ]);
 
         return $order->fresh();
     }

@@ -22,8 +22,18 @@ function clearClientSession(): void {
     }
 }
 
+function getApiBaseUrl(): string {
+    if (typeof window !== 'undefined') {
+        return '/api/frilo';
+    }
+
+    return process.env.API_INTERNAL_URL
+        || process.env.NEXT_PUBLIC_API_URL
+        || 'http://localhost:8000/api';
+}
+
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+    baseURL: getApiBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

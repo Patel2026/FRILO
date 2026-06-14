@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\CreateOrderRequest;
+use App\Http\Requests\Api\SubmitOrderFeedbackRequest;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,7 @@ class OrderController extends Controller
             'payment_status' => ['nullable', 'string', Rule::in(array_column(PaymentStatus::cases(), 'value'))],
         ]);
 
-        $orders = Order::with(['template.sector', 'instruction', 'latestPayment'])
+        $orders = Order::with(['template.sector', 'instruction', 'latestPayment', 'optionSelections'])
             ->forUser($request->user()->id)
             ->when($filters['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
             ->when($filters['payment_status'] ?? null, fn ($query, string $paymentStatus) => $query->where('payment_status', $paymentStatus))
@@ -101,9 +102,20 @@ class OrderController extends Controller
 
         $this->authorize('view', $order);
 
-        $order->load(['template.sector', 'instruction', 'latestPayment']);
+        $order->load(['template.sector', 'instruction', 'latestPayment', 'optionSelections']);
 
         return response()->json($this->transformOrder($order));
+    }
+
+    public function submitFeedback(SubmitOrderFeedbackRequest $request, int $id): JsonResponse
+    {
+        $order = Order::findOrFail($id);
+
+        $this->authorize('view', $order);
+
+        $updated = $this->orderService->submitFeedback($order, $request->validated()['feedback']);
+
+        return response()->json($this->transformOrder($updated));
     }
 
     private function transformOrder(Order $order): array
@@ -124,12 +136,21 @@ class OrderController extends Controller
             ? $order->payment_status->value
             : (string) $order->payment_status;
 
+        $selectedOptions = $order->relationLoaded('optionSelections')
+            ? $order->optionSelections->map(fn ($selection) => [
+                'id' => $selection->order_option_id,
+                'name' => $selection->name_snapshot,
+                'price' => (int) $selection->price_snapshot,
+            ])->values()->all()
+            : [];
+
         return [
             'id' => $order->id,
             'status' => $status,
             'payment_status' => $paymentStatus,
             'paid_at' => optional($order->paid_at)?->toISOString(),
             'price' => (int) $order->price,
+            'selected_options' => $selectedOptions,
             'created_at' => optional($order->created_at)?->toISOString(),
             'template' => $order->template ? [
                 'id' => $order->template->id,
@@ -140,6 +161,12 @@ class OrderController extends Controller
                     'slug' => $order->template->sector->slug,
                 ] : null,
             ] : null,
+            'preview_url' => $order->preview_url,
+            'client_feedback' => $order->client_feedback,
+            'feedback_submitted_at' => optional($order->feedback_submitted_at)?->toISOString(),
+            'site_url' => $order->site_url,
+            'domain' => $order->domain,
+            'hosting_expires_at' => $order->hosting_expires_at?->toDateString(),
             // Contract V1 canonical
             'instruction' => $instruction,
             // Backward compatibility for existing front implementations

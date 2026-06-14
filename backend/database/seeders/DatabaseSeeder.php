@@ -12,8 +12,10 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             SectorSeeder::class,
             TemplateSeeder::class,
+            OrderOptionSeeder::class,
             TemplatePreviewSeeder::class,
             FaqItemSeeder::class,
+            PublicContentSeeder::class,
             DemoClientSeeder::class,
         ]);
     }

@@ -120,6 +120,21 @@ export interface OrderInstruction {
     specific_instructions: string | null;
 }
 
+export interface OrderOption {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    persona_hint: string | null;
+    price: number;
+}
+
+export interface SelectedOrderOption {
+    id: number | null;
+    name: string;
+    price: number;
+}
+
 export interface Order {
     id: number;
     status: OrderStatus;
@@ -137,9 +152,16 @@ export interface Order {
         } | null;
     } | null;
     instruction: OrderInstruction | null;
+    selected_options?: SelectedOrderOption[];
     payment?: PaymentInfo | null;
     // Backward compatibility with older payloads
     instructions?: OrderInstruction[];
+    preview_url: string | null;
+    client_feedback: string | null;
+    feedback_submitted_at: string | null;
+    site_url: string | null;
+    domain: string | null;
+    hosting_expires_at: string | null;
 }
 
 export interface OrderSummary {
@@ -181,6 +203,7 @@ export interface CreateOrderPayload {
     activity_description?: string;
     colors?: string[];
     specific_instructions?: string;
+    option_ids?: number[];
 }
 
 export interface InitiateOrderPaymentPayload {
@@ -250,6 +273,11 @@ export const businessService = {
     async getPublicPricing(): Promise<PublicPricingConfig> {
         const response = await api.get('/public/pricing');
         return response.data as PublicPricingConfig;
+    },
+
+    async getOrderOptions(): Promise<OrderOption[]> {
+        const response = await api.get('/order-options');
+        return Array.isArray(response.data) ? response.data as OrderOption[] : [];
     },
 
     async getTemplateReviews(templateId: number | string): Promise<TemplateReviewListResponse> {
@@ -360,5 +388,10 @@ export const businessService = {
     async getOrderSummary(): Promise<OrderSummary> {
         const response = await api.get('/orders/summary');
         return response.data as OrderSummary;
+    },
+
+    async submitOrderFeedback(orderId: number, feedback: string): Promise<Order> {
+        const response = await api.post(`/orders/${orderId}/feedback`, { feedback });
+        return response.data as Order;
     },
 };

@@ -4,7 +4,9 @@ import type { PublicPricingConfig } from '@/services/business.service';
 import { DEFAULT_PUBLIC_PRICING, normalizePublicPricing } from '@/lib/publicPricing';
 
 function getApiBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+  return process.env.API_INTERNAL_URL
+    || process.env.NEXT_PUBLIC_API_URL
+    || 'http://localhost:8000/api';
 }
 
 export async function getPublicPricingServer(): Promise<PublicPricingConfig> {

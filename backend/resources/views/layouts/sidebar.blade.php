@@ -118,6 +118,20 @@
 
                 <li class="menu-title"><span>Plateforme</span></li>
                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.content.pages*') ? 'active' : '' }}"
+                       href="{{ route('admin.content.pages.index') }}">
+                        <i class="ri-pages-line"></i>
+                        <span>Contenu du site - Pages</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.content.history*') ? 'active' : '' }}"
+                       href="{{ route('admin.content.history.index') }}">
+                        <i class="ri-history-line"></i>
+                        <span>Contenu du site - Historique</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}"
                        href="{{ route('admin.notifications.index') }}">
                         <i class="ri-notification-3-line"></i>

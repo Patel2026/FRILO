@@ -19,7 +19,7 @@ class OrderController extends Controller
         private readonly AdminAuditLogger $auditLogger
     ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\View\View
     {
         $query = Order::with(['user', 'template.sector', 'instruction', 'latestPayment'])->latest();
 
@@ -38,7 +38,7 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders', 'statuses', 'paymentStatuses'));
     }
 
-    public function show(Order $order)
+    public function show(Order $order): \Illuminate\View\View
     {
         $order->load(['user', 'template.sector', 'instruction', 'latestPayment']);
 
@@ -82,5 +82,61 @@ class OrderController extends Controller
         return redirect()
             ->route('admin.orders.show', $order)
             ->with('success', 'Statut mis à jour : '.$newStatus->label());
+    }
+
+    public function setPreviewUrl(Request $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'preview_url' => ['nullable', 'string', 'max:500', 'regex:/^(https?:\/\/|\/).*/'],
+        ]);
+
+        $order->preview_url = $request->preview_url ?: null;
+        $order->save();
+
+        $this->auditLogger->record(
+            event: 'order.preview_url.set',
+            payload: [
+                'order_id' => $order->id,
+                'preview_url' => $order->preview_url,
+            ],
+            actor: $request->user(),
+            message: 'Lien de prévisualisation défini depuis le backoffice',
+            targetType: 'order',
+            targetId: (string) $order->id,
+            request: $request
+        );
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with('success', 'Lien de prévisualisation mis à jour.');
+    }
+
+    public function setSiteInfo(Request $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'site_url'           => ['nullable', 'url', 'max:255', 'regex:/^https?:\/\//i'],
+            'domain'             => ['nullable', 'string', 'max:255'],
+            'hosting_expires_at' => ['nullable', 'date'],
+        ]);
+
+        $order->update($validated);
+
+        $this->auditLogger->record(
+            event: 'order.site_info.updated',
+            payload: [
+                'order_id' => $order->id,
+                'site_url' => $order->site_url,
+                'domain'   => $order->domain,
+            ],
+            actor: $request->user(),
+            message: 'Informations du site livré définies depuis le backoffice',
+            targetType: 'order',
+            targetId: (string) $order->id,
+            request: $request
+        );
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with('success', 'Informations du site mises à jour.');
     }
 }

@@ -41,9 +41,24 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function clientContacts(): HasMany
+    {
+        return $this->hasMany(ClientContact::class);
+    }
+
     public function templateReviews(): HasMany
     {
         return $this->hasMany(TemplateReview::class);
+    }
+
+    public function cashEntries(): HasMany
+    {
+        return $this->hasMany(CashEntry::class);
+    }
+
+    public function deadlines(): HasMany
+    {
+        return $this->hasMany(Deadline::class);
     }
 
     public function sector(): BelongsTo

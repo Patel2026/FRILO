@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Contact | Sanctum Avocats</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#fbf9f4]/70 backdrop-blur-xl shadow-sm">
+    <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto font-['Plus_Jakarta_Sans'] tracking-tight">
+        <div class="text-xl font-bold text-[#496455]">Sanctum Avocats</div>
+        <div class="hidden md:flex items-center space-x-8">
+            <a class="text-[#424845] hover:text-[#496455] transition-colors duration-300" href="index.html">Accueil</a>
+            <a class="text-[#424845] hover:text-[#496455] transition-colors duration-300" href="about.html">Le Cabinet</a>
+            <a class="text-[#424845] hover:text-[#496455] transition-colors duration-300" href="services.html">Nos Services</a>
+            <a class="text-[#496455] font-semibold border-b-2 border-[#496455] transition-colors duration-300" href="contact.html">Contact</a>
+        </div>
+        <button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-full font-semibold scale-95 active:opacity-80 transition-transform shadow-sm">
+            Prendre Rendez-vous
+        </button>
+    </div>
+</nav>
+
+<main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto">
+    <!-- Hero Section -->
+    <header class="mb-16 md:mb-24 text-center md:text-left max-w-3xl">
+        <span class="text-xs font-bold uppercase tracking-widest text-primary mb-4 block">Entrer en Contact</span>
+        <h1 class="text-5xl md:text-7xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-6">
+            Nous sommes là pour vous <br/>
+            <span class="text-primary italic font-serif">accompagner.</span>
+        </h1>
+        <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed">
+            La complexité juridique ne devrait pas être un fardeau que vous portez seul. Contactez-nous pour une conversation sereine et bienveillante sur vos prochaines étapes.
+        </p>
+    </header>
+
+    <!-- Main Layout: Bento Style -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8">
+        
+        <!-- Contact Form Card -->
+        <section class="md:col-span-7 bg-surface-container-lowest rounded-xl p-8 md:p-12 shadow-sm transition-all hover:shadow-md">
+            <h2 class="text-2xl font-bold text-primary mb-8">Envoyer un Message</h2>
+            <form class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1">Nom</label>
+                        <input class="w-full bg-surface-container-high border-none rounded-md p-4 focus:ring-4 focus:ring-secondary/20 transition-all placeholder:text-outline outline-none" placeholder="Votre nom complet" type="text"/>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1">Email</label>
+                        <input class="w-full bg-surface-container-high border-none rounded-md p-4 focus:ring-4 focus:ring-secondary/20 transition-all placeholder:text-outline outline-none" placeholder="email@adresse.com" type="email"/>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-1">Comment pouvons-nous vous aider ?</label>
+                    <textarea class="w-full bg-surface-container-high border-none rounded-md p-4 focus:ring-4 focus:ring-secondary/20 transition-all placeholder:text-outline outline-none resize-none" placeholder="Dites-nous en un peu plus sur votre situation..." rows="5"></textarea>
+                </div>
+                <button class="w-full md:w-auto bg-gradient-to-br from-primary to-primary-container text-on-primary px-10 py-4 rounded-full font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all" type="submit">
+                    Envoyer la Demande
+                </button>
+            </form>
+        </section>
+
+        <!-- Side Bento Column -->
+        <div class="md:col-span-5 space-y-6 lg:space-y-8">
+            <!-- Quick CTAs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4 lg:gap-6">
+                <a class="group flex items-center p-6 bg-secondary-container text-on-secondary-container rounded-xl transition-all hover:scale-[1.02] active:scale-95" href="https://wa.me/123456789">
+                    <div class="h-12 w-12 bg-white/40 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">chat</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-bold uppercase tracking-wider opacity-70">Nous écrire</span>
+                        <span class="text-lg font-bold">Chat WhatsApp</span>
+                    </div>
+                </a>
+                
+                <a class="group flex items-center p-6 bg-primary-fixed text-on-primary-fixed rounded-xl transition-all hover:scale-[1.02] active:scale-95" href="tel:+123456789">
+                    <div class="h-12 w-12 bg-white/40 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">call</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-bold uppercase tracking-wider opacity-70">Appel Vocal</span>
+                        <span class="text-lg font-bold">+33 (0) 1 555 234</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Office Info & Map -->
+            <section class="bg-surface-container rounded-xl overflow-hidden shadow-sm">
+                <div class="p-8">
+                    <h3 class="text-xl font-bold text-primary mb-4">Contact Rapide</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <span class="material-symbols-outlined text-primary mr-3 mt-0.5">schedule</span>
+                            <div>
+                                <p class="font-bold text-sm uppercase tracking-tight">Heures d'Ouverture</p>
+                                <p class="text-on-surface-variant">Lun – Ven : 9h00 – 18h00</p>
+                                <p class="text-on-surface-variant">Week-ends : Sur Rendez-vous</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="material-symbols-outlined text-primary mr-3 mt-0.5">location_on</span>
+                            <div>
+                                <p class="font-bold text-sm uppercase tracking-tight">Adresse</p>
+                                <p class="text-on-surface-variant">128 Sanctuary Blvd, Suite 400<br/>Quartier Juridique, Paris 75008</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Interactive Map placeholder -->
+                <div class="h-48 w-full bg-surface-container-highest relative group">
+                    <img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" data-alt="Carte abstraite de ville moderne" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn55ktyW_PKeDkk2-YbZNu4Tep5-bgATHnodmTUDkyv6z8sbdq7WCYdrIlX3H3Eje1ADr4fZWLo0wPPknWlsgGkj6rMcfv5G9uAiTg8eQajUk6uYWUJ80_Vll_5CWFvsYir7YnqNYgr-YJi0sZH5bIDHiYS-ww3G69tUSipY7NN6tYH8C40mSLgaHjCLZ5wHa0eakrYixkGDMLfaBpzrsg9KM6y8KNWYTBDf7WHyheMssYBNG4mhV3Wp7PhSzTibyPJSdPllQDnq9P"/>
+                    <div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Reassurance Banner -->
+    <section class="mt-16 md:mt-24 p-12 bg-surface-container-low rounded-xl border-l-8 border-primary relative overflow-hidden">
+        <div class="relative z-10">
+            <h3 class="text-3xl font-extrabold text-on-surface mb-4">Aucun engagement, que de la clarté.</h3>
+            <p class="text-on-surface-variant text-lg max-w-2xl leading-relaxed">
+                Notre consultation initiale est conçue pour comprendre vos besoins et vous proposer une feuille de route préliminaire. Nous croyons en la transparence, l'empathie, et au fait de vous offrir un refuge face aux tempêtes de l'incertitude juridique.
+            </p>
+        </div>
+        <span class="material-symbols-outlined absolute -right-8 -bottom-8 text-[12rem] text-primary/5 pointer-events-none" style="font-variation-settings: 'FILL' 1;">vaping_rooms</span>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full rounded-t-[3rem] bg-[#fbf9f4] flex flex-col md:flex-row justify-between items-center px-12 py-16 font-['Plus_Jakarta_Sans'] text-sm uppercase tracking-widest mt-12 border-t border-outline-variant/10">
+    <div class="mb-8 md:mb-0">
+        <div class="text-lg font-bold text-[#496455] mb-2">Sanctum Avocats</div>
+        <p class="text-[#424845] normal-case tracking-normal">© 2026 Le Cabinet Juridique Humain. Tous droits réservés.</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-8 text-[#424845] text-center">
+        <a class="hover:text-[#496455] transition-opacity opacity-100 hover:opacity-80" href="#">Politique de Confidentialité</a>
+        <a class="hover:text-[#496455] transition-opacity opacity-100 hover:opacity-80" href="#">Conditions d'Utilisation</a>
+        <a class="hover:text-[#496455] transition-opacity opacity-100 hover:opacity-80" href="#">LinkedIn</a>
+        <a class="hover:text-[#496455] transition-opacity opacity-100 hover:opacity-80" href="#">Instagram</a>
+    </div>
+</footer>
+
+</body>
+</html>

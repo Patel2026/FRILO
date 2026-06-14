@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { ZodError } from 'zod';
 import { AlertTriangle, CheckCircle2, Mail, Save, User } from 'lucide-react';
-import { authService, AuthUser } from '@/services/auth.service';
+import { authService, AuthUser, UpdatePasswordPayload } from '@/services/auth.service';
 import { businessService, Sector } from '@/services/business.service';
 
 interface ProfileFormState {
@@ -29,6 +29,12 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const [pwForm, setPwForm] = useState<UpdatePasswordPayload>({ current_password: '', password: '', password_confirmation: '' });
+  const [pwFieldErrors, setPwFieldErrors] = useState<{ current_password?: string; password?: string; password_confirmation?: string }>({});
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -166,61 +172,97 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePasswordSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPwSaving(true);
+    setPwError(null);
+    setPwSuccess(null);
+    setPwFieldErrors({});
+
+    try {
+      const message = await authService.updatePassword(pwForm);
+      setPwSuccess(message);
+      setPwForm({ current_password: '', password: '', password_confirmation: '' });
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const errs: { current_password?: string; password?: string; password_confirmation?: string } = {};
+        for (const issue of err.issues) {
+          const path = issue.path[0] as keyof typeof errs;
+          if (path) errs[path] = issue.message;
+        }
+        setPwFieldErrors(errs);
+        setPwError('Veuillez corriger les champs invalides.');
+      } else if (axios.isAxiosError(err) && err.response?.status === 422) {
+        const apiErrors = err.response.data?.errors ?? {};
+        setPwFieldErrors({
+          current_password: Array.isArray(apiErrors.current_password) ? apiErrors.current_password[0] : undefined,
+          password: Array.isArray(apiErrors.password) ? apiErrors.password[0] : undefined,
+          password_confirmation: Array.isArray(apiErrors.password_confirmation) ? apiErrors.password_confirmation[0] : undefined,
+        });
+        setPwError('Veuillez corriger les erreurs.');
+      } else {
+        setPwError('Impossible de mettre à jour le mot de passe. Réessayez.');
+      }
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   return (
-    <div className="w-full max-w-[1180px] p-4 md:p-6">
-      <div className="mb-6 flex flex-col justify-between gap-4 border-b border-gray-200 pb-5 lg:flex-row lg:items-end">
+    <div className="w-full max-w-[1180px] px-4 py-5 md:px-7 md:py-7">
+      <div className="mb-5 flex flex-col justify-between gap-4 border-b border-neutral-200 pb-5 lg:flex-row lg:items-end">
         <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Espace client</p>
-          <h1 className="text-3xl font-black tracking-tight text-black">Mon profil</h1>
-          <p className="mt-2 max-w-xl text-sm text-gray-500">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Espace client</p>
+          <h1 className="text-3xl font-black tracking-tight text-neutral-950">Mon profil</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
             Gardez vos informations à jour pour recevoir un suivi clair et des modèles mieux adaptés.
           </p>
         </div>
         {user && (
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-sm font-black text-white">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-neutral-950 text-sm font-black text-[oklch(99%_0.004_95)]">
               {user.name.slice(0, 1).toUpperCase()}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-sm font-black text-black">{user.name}</p>
-              <p className="truncate text-xs font-semibold text-gray-400">{user.email}</p>
+              <p className="truncate text-sm font-black text-neutral-950">{user.name}</p>
+              <p className="truncate text-xs font-semibold text-neutral-400">{user.email}</p>
             </div>
           </div>
         )}
       </div>
 
       {loading ? (
-        <div className="border-y border-gray-200 py-8">
+        <div className="border-y border-neutral-200 py-8">
           <div className="space-y-3">
-            <div className="h-5 w-56 animate-pulse rounded bg-gray-100" />
-            <div className="h-4 w-80 max-w-full animate-pulse rounded bg-gray-100" />
-            <div className="h-4 w-48 animate-pulse rounded bg-gray-100" />
+            <div className="h-5 w-56 animate-pulse rounded bg-neutral-100" />
+            <div className="h-4 w-80 max-w-full animate-pulse rounded bg-neutral-100" />
+            <div className="h-4 w-48 animate-pulse rounded bg-neutral-100" />
           </div>
         </div>
       ) : !user ? (
-        <div className="border-y border-gray-200 py-10">
+        <div className="border-y border-neutral-200 py-10">
           <AlertTriangle className="mb-3 h-9 w-9 text-amber-400" />
-          <p className="max-w-xl text-sm text-gray-500">{error || 'Profil indisponible.'}</p>
+          <p className="max-w-xl text-sm text-neutral-500">{error || 'Profil indisponible.'}</p>
         </div>
       ) : (
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <form onSubmit={handleSubmit} className="border-y border-gray-200">
-            <div className="grid gap-5 border-b border-gray-100 py-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
+          <form onSubmit={handleSubmit} className="rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] px-5 md:px-6">
+            <div className="grid gap-5 border-b border-neutral-100 py-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
               <div>
-                <label htmlFor="profile-name" className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                <label htmlFor="profile-name" className="text-xs font-bold uppercase tracking-widest text-neutral-400">
                   Nom
                 </label>
-                <p className="mt-2 text-sm text-gray-500">Nom affiché sur votre espace client.</p>
+                <p className="mt-2 text-sm text-neutral-500">Nom affiché sur votre espace client.</p>
               </div>
               <div>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                   <input
                     id="profile-name"
                     type="text"
                     value={form.name}
                     onChange={(event) => onFieldChange('name', event.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-3 text-sm font-medium text-black outline-none transition-colors focus:border-black"
+                    className="w-full rounded-xl border border-neutral-200 bg-[oklch(99%_0.004_95)] py-3 pl-10 pr-3 text-sm font-medium text-neutral-950 outline-none transition-colors focus:border-neutral-950"
                     placeholder="Votre nom complet"
                     autoComplete="name"
                   />
@@ -229,22 +271,22 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="grid gap-5 border-b border-gray-100 py-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
+            <div className="grid gap-5 border-b border-neutral-100 py-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
               <div>
-                <label htmlFor="profile-email" className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                <label htmlFor="profile-email" className="text-xs font-bold uppercase tracking-widest text-neutral-400">
                   Adresse e-mail
                 </label>
-                <p className="mt-2 text-sm text-gray-500">Utilisée pour votre connexion et le suivi FRILO.</p>
+                <p className="mt-2 text-sm text-neutral-500">Utilisée pour votre connexion et le suivi FRILO.</p>
               </div>
               <div>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                   <input
                     id="profile-email"
                     type="email"
                     value={form.email}
                     onChange={(event) => onFieldChange('email', event.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-3 text-sm font-medium text-black outline-none transition-colors focus:border-black"
+                    className="w-full rounded-xl border border-neutral-200 bg-[oklch(99%_0.004_95)] py-3 pl-10 pr-3 text-sm font-medium text-neutral-950 outline-none transition-colors focus:border-neutral-950"
                     placeholder="vous@exemple.com"
                     autoComplete="email"
                   />
@@ -253,19 +295,19 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="grid gap-5 border-b border-gray-100 py-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
+            <div className="grid gap-5 border-b border-neutral-100 py-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
               <div>
-                <label htmlFor="profile-sector" className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                <label htmlFor="profile-sector" className="text-xs font-bold uppercase tracking-widest text-neutral-400">
                   Domaine d'activité
                 </label>
-                <p className="mt-2 text-sm text-gray-500">Aide FRILO à vous proposer des modèles pertinents.</p>
+                <p className="mt-2 text-sm text-neutral-500">Aide FRILO à vous proposer des modèles pertinents.</p>
               </div>
               <div>
                 <select
                   id="profile-sector"
                   value={form.sectorId}
                   onChange={(event) => onSectorChange(event.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm font-medium text-black outline-none transition-colors focus:border-black"
+                  className="w-full rounded-xl border border-neutral-200 bg-[oklch(99%_0.004_95)] px-3 py-3 text-sm font-medium text-neutral-950 outline-none transition-colors focus:border-neutral-950"
                   disabled={loadingSectors}
                 >
                   <option value="">
@@ -307,36 +349,102 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={saving || !hasChanges}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-45"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[oklch(55%_0.23_29)] px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-[oklch(48%_0.22_29)] disabled:cursor-not-allowed disabled:opacity-45"
               >
                 <Save className="h-4 w-4" />
                 {saving ? 'Enregistrement' : 'Enregistrer'}
               </button>
               {!hasChanges && !saving && (
-                <p className="text-sm font-semibold text-gray-400">Aucune modification en attente.</p>
+                <p className="text-sm font-semibold text-neutral-400">Aucune modification en attente.</p>
               )}
             </div>
           </form>
 
-          <aside className="border-y border-gray-200 py-6">
-            <p className="mb-5 text-xs font-bold uppercase tracking-widest text-gray-400">Compte</p>
-            <dl className="divide-y divide-gray-100 text-sm">
+          <form onSubmit={handlePasswordSubmit} className="rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] px-5 md:px-6">
+            <div className="py-5 border-b border-neutral-100">
+              <p className="text-xs font-bold uppercase tracking-widest text-neutral-400">Mot de passe</p>
+              <p className="mt-2 text-sm text-neutral-500">Modifiez votre mot de passe de connexion.</p>
+            </div>
+
+            {[
+              { id: 'pw-current', field: 'current_password' as const, label: 'Mot de passe actuel', placeholder: '••••••••' },
+              { id: 'pw-new', field: 'password' as const, label: 'Nouveau mot de passe', placeholder: 'Min. 8 caractères' },
+              { id: 'pw-confirm', field: 'password_confirmation' as const, label: 'Confirmer le nouveau', placeholder: '••••••••' },
+            ].map(({ id, field, label, placeholder }) => (
+              <div key={field} className="grid gap-5 border-b border-neutral-100 py-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
+                <label htmlFor={id} className="text-xs font-bold uppercase tracking-widest text-neutral-400 pt-0.5">
+                  {label}
+                </label>
+                <div>
+                  <input
+                    id={id}
+                    type="password"
+                    value={pwForm[field]}
+                    onChange={(e) => {
+                      setPwForm((prev) => ({ ...prev, [field]: e.target.value }));
+                      setPwFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+                      setPwError(null);
+                      setPwSuccess(null);
+                    }}
+                    placeholder={placeholder}
+                    autoComplete={field === 'current_password' ? 'current-password' : 'new-password'}
+                    className="w-full rounded-xl border border-neutral-200 bg-[oklch(99%_0.004_95)] px-3 py-3 text-sm font-medium text-neutral-950 outline-none transition-colors focus:border-neutral-950"
+                  />
+                  {pwFieldErrors[field] && (
+                    <p className="mt-2 text-xs font-semibold text-red-600">{pwFieldErrors[field]}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {(pwError || pwSuccess) && (
+              <div className="py-5">
+                {pwError && (
+                  <div className="flex gap-3 rounded-xl bg-red-50 px-4 py-3 text-red-700">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <p className="text-sm font-semibold">{pwError}</p>
+                  </div>
+                )}
+                {pwSuccess && (
+                  <div className="flex gap-3 rounded-xl bg-emerald-50 px-4 py-3 text-emerald-700">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <p className="text-sm font-semibold">{pwSuccess}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="py-5">
+              <button
+                type="submit"
+                disabled={pwSaving || !pwForm.current_password || !pwForm.password || !pwForm.password_confirmation}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                <Save className="h-4 w-4" />
+                {pwSaving ? 'Enregistrement…' : 'Changer le mot de passe'}
+              </button>
+            </div>
+          </form>
+
+          <aside className="rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] p-5 md:p-6">
+            <p className="mb-5 text-xs font-bold uppercase tracking-widest text-neutral-400">Compte</p>
+            <dl className="divide-y divide-neutral-100 text-sm">
               <div className="flex items-center justify-between gap-6 py-4">
-                <dt className="font-semibold text-gray-500">Statut</dt>
-                <dd className="font-black text-black">{user.is_active ? 'Actif' : 'Suspendu'}</dd>
+                <dt className="font-semibold text-neutral-500">Statut</dt>
+                <dd className="font-black text-neutral-950">{user.is_active ? 'Actif' : 'Suspendu'}</dd>
               </div>
               <div className="flex items-center justify-between gap-6 py-4">
-                <dt className="font-semibold text-gray-500">Espace</dt>
-                <dd className="font-black text-black">Client</dd>
+                <dt className="font-semibold text-neutral-500">Espace</dt>
+                <dd className="font-black text-neutral-950">Client</dd>
               </div>
               <div className="flex items-center justify-between gap-6 py-4">
-                <dt className="font-semibold text-gray-500">Domaine</dt>
-                <dd className="max-w-[160px] truncate text-right font-black text-black">
+                <dt className="font-semibold text-neutral-500">Domaine</dt>
+                <dd className="max-w-[160px] truncate text-right font-black text-neutral-950">
                   {selectedSector?.name || 'Non renseigné'}
                 </dd>
               </div>
             </dl>
-            <p className="mt-5 text-sm leading-6 text-gray-500">
+            <p className="mt-5 text-sm leading-6 text-neutral-500">
               Ces informations servent au suivi de vos commandes et à la personnalisation des modèles proposés.
             </p>
           </aside>

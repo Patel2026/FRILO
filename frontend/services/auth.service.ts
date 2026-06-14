@@ -37,6 +37,15 @@ export const updateProfileSchema = z.object({
     sector_id: z.number().int().positive().nullable().optional(),
 });
 
+export const updatePasswordSchema = z.object({
+    current_password: z.string().min(1, 'Requis'),
+    password: z.string().min(8, 'Au moins 8 caractères'),
+    password_confirmation: z.string().min(8),
+}).refine((data) => data.password === data.password_confirmation, {
+    message: 'Les mots de passe ne correspondent pas.',
+    path: ['password_confirmation'],
+});
+
 export const resetPasswordSchema = z.object({
     token: z.string().min(1),
     email: z.string().email(),
@@ -51,6 +60,7 @@ export type LoginCredentials = z.infer<typeof loginSchema>;
 export type ForgotPasswordPayload = z.infer<typeof forgotPasswordSchema>;
 export type RegisterCredentials = z.infer<typeof registerSchema>;
 export type UpdateProfilePayload = z.infer<typeof updateProfileSchema>;
+export type UpdatePasswordPayload = z.infer<typeof updatePasswordSchema>;
 export type ResetPasswordPayload = z.infer<typeof resetPasswordSchema>;
 
 export interface AuthUser {
@@ -116,6 +126,12 @@ export const authService = {
         const response = await api.put('/user', validatedPayload);
         emitAuthChanged();
         return response.data as AuthUser;
+    },
+
+    async updatePassword(payload: UpdatePasswordPayload): Promise<string> {
+        const validatedPayload = updatePasswordSchema.parse(payload);
+        const response = await api.put('/user/password', validatedPayload);
+        return (response.data?.message as string) || 'Mot de passe mis à jour.';
     },
 
     async requestPasswordReset(payload: ForgotPasswordPayload): Promise<string> {

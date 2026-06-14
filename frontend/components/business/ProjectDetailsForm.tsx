@@ -17,12 +17,22 @@ interface ProjectDetailsFormProps {
   onSuccess: (data: ProjectDetails) => void;
   onChange?: (data: Partial<ProjectDetails>) => void;
   initialValues?: Partial<ProjectDetails>;
+  formId?: string;
+  showSubmit?: boolean;
+  submitLabel?: string;
 }
 
-const inputClass = "w-full rounded-2xl border border-slate-200 px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-slate-950";
+const inputClass = "w-full rounded-lg border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-slate-950";
 const labelClass = "mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950";
 
-export function ProjectDetailsForm({ onSuccess, onChange, initialValues }: ProjectDetailsFormProps) {
+export function ProjectDetailsForm({
+  onSuccess,
+  onChange,
+  initialValues,
+  formId,
+  showSubmit = true,
+  submitLabel = 'Valider et continuer',
+}: ProjectDetailsFormProps) {
   const { register, handleSubmit, formState: { errors } } = useForm<ProjectDetails>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -38,7 +48,7 @@ export function ProjectDetailsForm({ onSuccess, onChange, initialValues }: Proje
   };
 
   return (
-    <form onSubmit={handleSubmit(onSuccess)} className="space-y-5">
+    <form id={formId} onSubmit={handleSubmit(onSuccess)} className="space-y-5">
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
@@ -91,16 +101,16 @@ export function ProjectDetailsForm({ onSuccess, onChange, initialValues }: Proje
         />
       </div>
 
-      <div className="rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-white">
-        <p className="font-black">Pas besoin de tout préparer maintenant.</p>
-        <p className="mt-1 text-white/65">Après paiement, FRILO récupère les images, le logo et les derniers contenus avec vous.</p>
+      <div className="border-l-2 border-slate-950 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+        <p className="font-black text-slate-950">Vous pouvez commencer avec l’essentiel.</p>
+        <p className="mt-1">Après paiement, FRILO récupère les images, le logo et les derniers contenus avec vous.</p>
       </div>
 
-      <div className="flex justify-end pt-2">
+      {showSubmit && <div className="flex justify-end pt-2">
         <button type="submit" className="inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-sm font-black text-white transition-colors hover:bg-black sm:w-auto">
-          Valider et continuer
+          {submitLabel}
         </button>
-      </div>
+      </div>}
     </form>
   );
 }

@@ -3,12 +3,17 @@
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\ContentBlockController as AdminContentBlockController;
+use App\Http\Controllers\Admin\ContentRevisionController as AdminContentRevisionController;
+use App\Http\Controllers\Admin\DeadlineController as AdminDeadlineController;
 use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentTransactionController as AdminPaymentTransactionController;
+use App\Http\Controllers\Admin\PublicPageController as AdminPublicPageController;
+use App\Http\Controllers\Admin\PublicSectionController as AdminPublicSectionController;
 use App\Http\Controllers\Admin\SectorController as AdminSectorController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
@@ -37,6 +42,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
     // Commandes
     Route::resource('orders', AdminOrderController::class)->only(['index', 'show']);
     Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
+    Route::patch('orders/{order}/preview', [AdminOrderController::class, 'setPreviewUrl'])->name('orders.preview');
+    Route::patch('orders/{order}/site', [AdminOrderController::class, 'setSiteInfo'])->name('orders.site');
 
     // Paiements
     Route::resource('payments', AdminPaymentTransactionController::class)->only(['index', 'show']);
@@ -52,6 +59,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
 
     // FAQ publique
     Route::resource('faqs', AdminFaqController::class)->except(['show']);
+
+    // Contenu public
+    Route::get('content/pages', [AdminPublicPageController::class, 'index'])->name('content.pages.index');
+    Route::get('content/pages/{publicPage}/edit', [AdminPublicPageController::class, 'edit'])->name('content.pages.edit');
+    Route::patch('content/pages/{publicPage}', [AdminPublicPageController::class, 'update'])->name('content.pages.update');
+    Route::post('content/pages/{publicPage}/blocks', [AdminContentBlockController::class, 'store'])->name('content.pages.blocks.store');
+    Route::patch('content/pages/{publicPage}/blocks/order', [AdminPublicPageController::class, 'reorderBlocks'])->name('content.pages.blocks.order');
+    Route::patch('content/sections/{publicSection}', [AdminPublicSectionController::class, 'update'])->name('content.sections.update');
+    Route::patch('content/blocks/{contentBlock}', [AdminContentBlockController::class, 'update'])->name('content.blocks.update');
+    Route::delete('content/blocks/{contentBlock}', [AdminContentBlockController::class, 'destroy'])->name('content.blocks.destroy');
+    Route::get('content/history', [AdminContentRevisionController::class, 'index'])->name('content.history.index');
+    Route::post('content/history/{contentRevision}/restore', [AdminContentRevisionController::class, 'restore'])->name('content.history.restore');
 
     // Secteurs
     Route::resource('sectors', AdminSectorController::class)->except(['show']);
@@ -88,6 +107,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
     Route::get('settings/history/compare', [AdminSettingsController::class, 'compare'])->name('settings.history.compare');
     Route::post('settings/history/{revision}/restore-draft', [AdminSettingsController::class, 'restoreDraft'])
         ->name('settings.history.restore-draft');
+
+    // Échéances système
+    Route::resource('deadlines', AdminDeadlineController::class)->except(['show']);
 
     // Journal d'audit
     Route::get('audit-logs', [AdminAuditLogController::class, 'index'])->name('audit-logs.index');

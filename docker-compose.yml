@@ -29,13 +29,15 @@ services:
       dockerfile: docker/backend/Dockerfile
     container_name: frilo-backend
     restart: unless-stopped
+    env_file:
+      - backend/.env
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
-      APP_URL: http://localhost:8080
+      APP_URL: http://localhost:8081
       FRONTEND_APP_URL: http://localhost:3000
       DB_CONNECTION: mysql
       DB_HOST: mysql
@@ -49,10 +51,16 @@ services:
       RUN_MIGRATIONS: "false"
     command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
     ports:
-      - "8080:8080"
+      - "8081:8080"
     volumes:
       - ./backend/public/build:/var/www/html/public/build:ro
     entrypoint: ["/usr/local/bin/frilo-backend-entrypoint"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/api/sectors >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
     networks:
       - frilo
 
@@ -63,14 +71,20 @@ services:
     container_name: frilo-frontend
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8080/api
+      API_INTERNAL_URL: http://backend:8080/api
+      NEXT_PUBLIC_API_URL: http://localhost:8081/api
       WATCHPACK_POLLING: "true"
       CHOKIDAR_USEPOLLING: "true"
     entrypoint: ["/usr/local/bin/frilo-frontend-entrypoint"]
     ports:
       - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
     networks:
       - frilo
 

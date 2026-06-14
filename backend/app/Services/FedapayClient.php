@@ -59,11 +59,27 @@ class FedapayClient
         $decoded = is_array($data) ? $data : [];
 
         if ($status >= 200 && $status < 300) {
-            return $decoded;
+            return $this->unwrapResource($decoded);
         }
 
         $message = $decoded['message'] ?? 'Erreur API FedaPay.';
         throw new RuntimeException($message, $status);
+    }
+
+    private function unwrapResource(array $payload): array
+    {
+        if (count($payload) !== 1) {
+            return $payload;
+        }
+
+        $key = array_key_first($payload);
+        $value = $payload[$key] ?? null;
+
+        if (is_string($key) && str_starts_with($key, 'v1/') && is_array($value)) {
+            return $value;
+        }
+
+        return $payload;
     }
 
     private function client(): PendingRequest

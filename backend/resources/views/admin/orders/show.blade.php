@@ -134,6 +134,97 @@
                 @endif
             </div>
         </div>
+
+        {{-- Site livré --}}
+        <div class="card mt-3">
+            <div class="card-header"><h5 class="card-title mb-0">Site livré</h5></div>
+            <div class="card-body">
+                @if($order->site_url || $order->domain || $order->hosting_expires_at)
+                    @if($order->site_url)
+                        @php $siteUrlSafe = Str::startsWith($order->site_url, ['http://', 'https://']) ? $order->site_url : '#'; @endphp
+                        <p class="mb-1"><strong>URL :</strong> <a href="{{ $siteUrlSafe }}" target="_blank" rel="noopener noreferrer" class="text-primary">{{ $order->site_url }}</a></p>
+                    @endif
+                    @if($order->domain)
+                        <p class="mb-1"><strong>Domaine :</strong> {{ $order->domain }}</p>
+                    @endif
+                    @if($order->hosting_expires_at)
+                        <p class="mb-3"><strong>Hébergement expire le :</strong> {{ $order->hosting_expires_at->format('d/m/Y') }}</p>
+                    @endif
+                    <hr>
+                @else
+                    <p class="text-muted mb-3">Aucune information de site renseignée.</p>
+                @endif
+                <form action="{{ route('admin.orders.site', $order) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="mb-2">
+                        <label class="form-label">URL du site</label>
+                        <input type="url" name="site_url" class="form-control form-control-sm @error('site_url') is-invalid @enderror"
+                            value="{{ old('site_url', $order->site_url) }}" placeholder="https://...">
+                        @error('site_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Nom de domaine</label>
+                        <input type="text" name="domain" class="form-control form-control-sm @error('domain') is-invalid @enderror"
+                            value="{{ old('domain', $order->domain) }}" placeholder="monsite.com">
+                        @error('domain')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Expiration hébergement</label>
+                        <input type="date" name="hosting_expires_at" class="form-control form-control-sm @error('hosting_expires_at') is-invalid @enderror"
+                            value="{{ old('hosting_expires_at', $order->hosting_expires_at?->format('Y-m-d')) }}">
+                        @error('hosting_expires_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <button type="submit" class="btn btn-soft-primary btn-sm w-100">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+
+        {{-- Prévisualisation --}}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lien de prévisualisation</h5>
+            </div>
+            <div class="card-body">
+                @if($order->preview_url)
+                    <p class="mb-2">
+                        <a href="{{ $order->preview_url }}" target="_blank" class="text-primary">
+                            {{ $order->preview_url }}
+                        </a>
+                    </p>
+                @else
+                    <p class="text-muted mb-2">Aucun lien défini.</p>
+                @endif
+
+                @if($order->client_feedback)
+                    <div class="alert alert-info mt-3">
+                        <strong>Retours client :</strong><br>
+                        {{ $order->client_feedback }}<br>
+                        <small class="text-muted">
+                            Soumis le {{ $order->feedback_submitted_at?->format('d/m/Y H:i') }}
+                        </small>
+                    </div>
+                @endif
+
+                <form action="{{ route('admin.orders.preview', $order) }}" method="POST" class="mt-3">
+                    @csrf
+                    @method('PATCH')
+                    <div class="mb-3">
+                        <label for="preview_url" class="form-label">URL de prévisualisation</label>
+                        <input type="text"
+                               id="preview_url"
+                               name="preview_url"
+                               class="form-control @error('preview_url') is-invalid @enderror"
+                               value="{{ old('preview_url', $order->preview_url) }}"
+                               placeholder="https://preview.frilo.bj/orders/{{ $order->id }}">
+                        @error('preview_url')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer le lien</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

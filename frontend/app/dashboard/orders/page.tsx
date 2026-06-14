@@ -69,30 +69,30 @@ export default function OrdersPage() {
   const totalOrders = meta?.total ?? orders.length;
 
   return (
-    <div className="w-full max-w-[1180px] p-4 md:p-6">
-      <div className="mb-6 flex flex-col justify-between gap-4 border-b border-gray-200 pb-5 lg:flex-row lg:items-end">
+    <div className="w-full max-w-[1180px] px-4 py-5 md:px-7 md:py-7">
+      <div className="mb-5 flex flex-col justify-between gap-4 border-b border-neutral-200 pb-5 lg:flex-row lg:items-end">
         <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Espace client</p>
-          <h1 className="text-3xl font-black tracking-tight text-black">Mes commandes</h1>
-          <p className="mt-2 max-w-xl text-sm text-gray-500">
-            Retrouvez vos commandes, leur paiement et l'étape en cours.
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-neutral-400">Espace client</p>
+          <h1 className="text-3xl font-black tracking-tight text-neutral-950">Mes commandes</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
+            Retrouvez le statut, le paiement et le prochain point d’attention de chaque dossier.
           </p>
         </div>
-        <Link href="/templates" className="inline-flex w-full items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900 sm:w-auto">
+        <Link href="/templates" className="inline-flex w-full items-center justify-center rounded-full bg-[oklch(55%_0.23_29)] px-5 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-[oklch(48%_0.22_29)] sm:w-auto">
           Nouvelle commande
         </Link>
       </div>
 
       <div className="mb-3 flex items-center justify-between gap-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+        <p className="text-xs font-bold uppercase tracking-widest text-neutral-400">
           {loading ? 'Chargement' : `${totalOrders} commande${totalOrders > 1 ? 's' : ''}`}
         </p>
-        <Link href="/dashboard" className="text-sm font-semibold text-gray-500 transition-colors hover:text-black">
+        <Link href="/dashboard" className="text-sm font-semibold text-neutral-500 transition-colors hover:text-neutral-950">
           Vue d'ensemble
         </Link>
       </div>
 
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
         {filterOptions.map(option => {
           const isActive = option.key === activeFilter;
 
@@ -109,8 +109,8 @@ export default function OrdersPage() {
               className={cn(
                 "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-black transition-colors",
                 isActive
-                  ? "border-black bg-black text-white"
-                  : "border-gray-200 bg-transparent text-gray-500 hover:border-black hover:text-black"
+                  ? "border-neutral-950 bg-neutral-950 text-[oklch(99%_0.004_95)]"
+                  : "border-neutral-200 bg-[oklch(99%_0.004_95)] text-neutral-500 hover:border-neutral-950 hover:text-neutral-950"
               )}
             >
               {option.label}
@@ -119,23 +119,23 @@ export default function OrdersPage() {
         })}
       </div>
 
-      <div className="overflow-hidden border-y border-gray-200">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)]">
         {loading ? (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-neutral-100">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center justify-between gap-4 py-5">
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-48 animate-pulse rounded bg-gray-100" />
-                  <div className="h-3 w-32 animate-pulse rounded bg-gray-100" />
+                  <div className="h-4 w-48 animate-pulse rounded bg-neutral-100" />
+                  <div className="h-3 w-32 animate-pulse rounded bg-neutral-100" />
                 </div>
-                <div className="h-6 w-20 animate-pulse rounded-full bg-gray-100" />
+                <div className="h-6 w-20 animate-pulse rounded-full bg-neutral-100" />
               </div>
             ))}
           </div>
         ) : error ? (
           <div className="py-12 text-center">
             <AlertTriangle className="mx-auto mb-3 h-10 w-10 text-amber-400" />
-            <p className="mb-6 text-sm text-gray-500">{error}</p>
+            <p className="mb-6 text-sm text-neutral-500">{error}</p>
             <button
               type="button"
               onClick={() => {
@@ -143,23 +143,23 @@ export default function OrdersPage() {
                 setLoading(true);
                 setReloadKey(v => v + 1);
               }}
-              className="inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
+              className="inline-flex items-center justify-center rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors"
             >
               Réessayer
             </button>
           </div>
         ) : orders.length === 0 ? (
-          <div className="py-12">
-            <p className="text-xl font-black text-black">
+          <div className="px-5 py-12">
+            <p className="text-xl font-black text-neutral-950">
               {activeFilter === 'all' ? 'Aucune commande pour le moment.' : 'Aucune commande dans ce filtre.'}
             </p>
-            <p className="mt-2 max-w-xl text-sm text-gray-500">
+            <p className="mt-2 max-w-xl text-sm text-neutral-500">
               {activeFilter === 'all'
                 ? 'Choisissez un modèle, transmettez vos informations, puis suivez la production depuis cet espace.'
                 : 'Essayez un autre filtre ou revenez à toutes vos commandes.'}
             </p>
             {activeFilter === 'all' ? (
-              <Link href="/templates" className="mt-6 inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900">
+              <Link href="/templates" className="mt-6 inline-flex items-center justify-center rounded-full bg-[oklch(55%_0.23_29)] px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-[oklch(48%_0.22_29)]">
                 Commander un modèle
               </Link>
             ) : (
@@ -171,14 +171,14 @@ export default function OrdersPage() {
                   setPage(1);
                   setActiveFilter('all');
                 }}
-                className="mt-6 inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-gray-900"
+                className="mt-6 inline-flex items-center justify-center rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)]"
               >
                 Voir toutes les commandes
               </button>
             )}
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-neutral-100">
             {orders.map(order => {
               const cfg = statusConfig[order.status] || { label: order.status, classes: 'bg-gray-50 text-gray-600', dot: 'bg-gray-400' };
               const payment = paymentConfig[order.payment_status] || { label: order.payment_status, classes: 'bg-gray-50 text-gray-600' };
@@ -188,16 +188,16 @@ export default function OrdersPage() {
                 <Link
                   key={order.id}
                   href={`/dashboard/orders/${order.id}`}
-                  className="grid gap-4 py-5 transition-colors hover:bg-gray-50 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                  className="grid gap-4 px-5 py-5 transition-colors hover:bg-neutral-50 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
                 >
                   <div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <p className="text-base font-black text-black">{name}</p>
-                      <p className="text-xs font-semibold text-gray-400">
+                      <p className="text-base font-black text-neutral-950">{name}</p>
+                      <p className="text-xs font-semibold text-neutral-400">
                         {new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </p>
                     </div>
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-1 text-xs text-neutral-400">
                       #{String(order.id).padStart(4, '0')}
                       {order.template?.name && ` · ${order.template.name}`}
                       {order.template?.sector?.name && ` · ${order.template.sector.name}`}
@@ -213,8 +213,8 @@ export default function OrdersPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-4 md:justify-end">
-                    <p className="text-sm font-black text-black">{order.price.toLocaleString('fr-FR')} FCFA</p>
-                    <ArrowRight className="h-4 w-4 text-gray-300" />
+                    <p className="text-sm font-black text-neutral-950">{order.price.toLocaleString('fr-FR')} FCFA</p>
+                    <ArrowRight className="h-4 w-4 text-neutral-300" />
                   </div>
                 </Link>
               );
@@ -223,8 +223,8 @@ export default function OrdersPage() {
         )}
 
         {meta && meta.last_page > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-100 py-4">
-            <p className="text-xs text-gray-400">
+          <div className="flex items-center justify-between border-t border-neutral-100 px-5 py-4">
+            <p className="text-xs text-neutral-400">
               Page {meta.current_page} sur {meta.last_page} · {meta.total} commande{meta.total > 1 ? 's' : ''}
             </p>
             <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export default function OrdersPage() {
                   setPage(p => Math.max(1, p - 1));
                 }}
                 disabled={meta.current_page === 1}
-                className="rounded-lg border border-gray-200 p-2 text-gray-400 transition-all hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-lg border border-neutral-200 p-2 text-neutral-400 transition-colors hover:border-neutral-950 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -246,7 +246,7 @@ export default function OrdersPage() {
                   setPage(p => Math.min(meta.last_page, p + 1));
                 }}
                 disabled={meta.current_page === meta.last_page}
-                className="rounded-lg border border-gray-200 p-2 text-gray-400 transition-all hover:border-black hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-lg border border-neutral-200 p-2 text-neutral-400 transition-colors hover:border-neutral-950 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -256,8 +256,8 @@ export default function OrdersPage() {
       </div>
 
       {!loading && !error && orders.length > 0 && (
-        <p className="mt-4 text-sm text-gray-500">
-          Besoin d'un autre site ? <Link href="/templates" className="font-black text-black underline underline-offset-4">Choisir un modèle</Link>.
+        <p className="mt-4 text-sm text-neutral-500">
+          Besoin d'un autre site ? <Link href="/templates" className="font-black text-neutral-950 underline underline-offset-4">Choisir un modèle</Link>.
         </p>
       )}
     </div>

@@ -12,10 +12,10 @@ const navLinks = [
   { name: 'Modèles', href: '/templates' },
   { name: 'Comment ça marche', href: '/#how-it-works' },
   { name: 'FAQ', href: '/faq' },
+  { name: 'Contact', href: '/contact' },
 ];
 
 const supportLinks = [
-  { name: 'Contact', href: '/contact' },
   { name: 'Mentions légales', href: '/mentions-legales' },
   { name: 'CGU / CGV', href: '/cgu' },
 ];
@@ -94,7 +94,7 @@ export function Header() {
               : 'bg-white/98 backdrop-blur-sm border-b border-gray-100 py-4'
         )}
       >
-        <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-6 px-6 lg:px-8 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+        <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-6 px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:px-8">
           <Link
             href="/"
             className={cn(
@@ -105,7 +105,7 @@ export function Header() {
             FRILO
           </Link>
 
-          <nav className="hidden md:flex justify-center justify-self-center">
+          <nav className="hidden justify-center justify-self-center lg:flex">
             <div
               className={cn(
                 'inline-flex items-center gap-1 rounded-full px-2 py-1',
@@ -135,20 +135,19 @@ export function Header() {
             </div>
           </nav>
 
-          <div className="hidden md:flex items-center gap-3 justify-end justify-self-end">
-            {!authLoading && (
-              <Link
-                href={accountLink.href}
-                className={cn(
-                  'inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-colors',
-                  dark
-                    ? 'border-white/30 text-white hover:bg-white/10'
-                    : 'border-gray-200 text-gray-600 hover:border-black hover:text-black'
-                )}
-              >
-                {accountLink.label}
-              </Link>
-            )}
+          <div className="hidden items-center gap-3 justify-end justify-self-end lg:flex">
+            <Link
+              href={accountLink.href}
+              className={cn(
+                'inline-flex min-w-28 items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-colors',
+                authLoading && !hasToken && 'opacity-70',
+                dark
+                  ? 'border-white/30 text-white hover:bg-white/10'
+                  : 'border-gray-200 text-gray-600 hover:border-black hover:text-black'
+              )}
+            >
+              {accountLink.label}
+            </Link>
             <Link
               href="/templates"
               className={cn(
@@ -158,13 +157,13 @@ export function Header() {
                   : 'bg-black text-white hover:bg-gray-900'
               )}
             >
-              Commencer →
+              Choisir un modèle →
             </Link>
           </div>
 
           <button
             className={cn(
-              'md:hidden inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors',
+              'inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors lg:hidden',
               mobileOpen || dark
                 ? 'border-white/15 text-white hover:bg-white/10'
                 : 'border-gray-200 text-black hover:bg-gray-50'
@@ -185,7 +184,7 @@ export function Header() {
         aria-modal="true"
         aria-hidden={!mobileOpen}
         className={cn(
-          'fixed inset-0 z-40 bg-black text-white transition-all duration-300 md:hidden',
+          'fixed inset-0 z-40 bg-black text-white transition-all duration-300 lg:hidden',
           mobileOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         )}
       >
@@ -270,7 +269,7 @@ export function Header() {
                 onClick={() => setMobileOpen(false)}
                 className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-3.5 text-sm font-bold text-black transition-colors hover:bg-gray-100"
               >
-                Commencer →
+                Choisir un modèle →
               </Link>
               <p className="text-center text-xs text-gray-500">
                 © {new Date().getFullYear()} FRILO. Conçu pour les entrepreneurs d&apos;Afrique de l&apos;Ouest.

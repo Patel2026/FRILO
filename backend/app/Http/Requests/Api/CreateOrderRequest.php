@@ -25,6 +25,11 @@ class CreateOrderRequest extends FormRequest
             'colors'                => ['nullable', 'array'],
             'colors.*'              => ['string', 'max:50'],
             'specific_instructions' => ['nullable', 'string'],
+            'option_ids'            => ['nullable', 'array', 'max:20'],
+            'option_ids.*'          => [
+                'integer',
+                Rule::exists('order_options', 'id')->where(fn ($query) => $query->where('is_active', true)),
+            ],
         ];
         // Note : user_id, price et status ne sont JAMAIS acceptés du client.
     }
