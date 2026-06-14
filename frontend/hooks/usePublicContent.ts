@@ -37,24 +37,35 @@ function loadPublicContent(pageKey: string): Promise<PublicContentResponse> {
 }
 
 export function usePublicContent(pageKey: string) {
-  const [content, setContent] = useState<PublicContentResponse>(() => (
-    contentCache.get(pageKey) ?? fallbackPublicContent(pageKey)
-  ));
-  const [loading, setLoading] = useState(!contentCache.has(pageKey));
+  const [state, setState] = useState(() => {
+    const cachedContent = contentCache.get(pageKey);
+
+    return {
+      pageKey,
+      content: cachedContent ?? fallbackPublicContent(pageKey),
+      loaded: Boolean(cachedContent),
+    };
+  });
+
+  const cachedContent = contentCache.get(pageKey);
+  const content = state.pageKey === pageKey
+    ? state.content
+    : cachedContent ?? fallbackPublicContent(pageKey);
+  const loading = state.pageKey === pageKey
+    ? !state.loaded
+    : !cachedContent;
 
   useEffect(() => {
     let active = true;
 
-    setLoading(!contentCache.has(pageKey));
     loadPublicContent(pageKey)
       .then((nextContent) => {
         if (active) {
-          setContent(nextContent);
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
+          setState({
+            pageKey,
+            content: nextContent,
+            loaded: true,
+          });
         }
       });
 
