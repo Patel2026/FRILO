@@ -24,7 +24,7 @@ function clearClientSession(): void {
 
 function getApiBaseUrl(): string {
     if (typeof window !== 'undefined') {
-        return '/api/frilo';
+        return '/api';
     }
 
     return process.env.API_INTERNAL_URL
