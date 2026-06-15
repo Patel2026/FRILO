@@ -129,6 +129,29 @@ class OrderProductionCenterTest extends TestCase
         ]);
     }
 
+    public function test_material_patch_preserves_absent_check_fields(): void
+    {
+        $admin = $this->superAdmin();
+        $order = $this->createOrder([
+            'material_logo_received' => true,
+            'material_photos_received' => true,
+            'material_missing_note' => 'Note existante.',
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.orders.material', $order), [
+                'material_activity_received' => '1',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $order->refresh();
+
+        $this->assertTrue($order->material_activity_received);
+        $this->assertTrue($order->material_logo_received);
+        $this->assertTrue($order->material_photos_received);
+        $this->assertSame('Note existante.', $order->material_missing_note);
+    }
+
     public function test_super_admin_can_update_production_and_quality_checks(): void
     {
         $admin = $this->superAdmin();

@@ -116,4 +116,34 @@ class OrderSiteInfoTest extends TestCase
 
         $this->assertDatabaseHas('orders', ['id' => $order->id, 'site_url' => null]);
     }
+
+    public function test_site_info_update_preserves_absent_delivery_fields(): void
+    {
+        $admin = $this->adminUser();
+        $order = $this->createOrder();
+
+        $order->update([
+            'delivery_ssl_checked' => true,
+            'delivery_form_checked' => true,
+            'delivery_mobile_checked' => false,
+            'delivery_note' => 'Checklist livraison deja controlee.',
+        ]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.orders.site', $order), [
+                'site_url' => 'https://nouveau-site.com',
+                'domain' => 'nouveau-site.com',
+                'hosting_expires_at' => '2027-12-31',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $order->refresh();
+
+        $this->assertSame('https://nouveau-site.com', $order->site_url);
+        $this->assertSame('nouveau-site.com', $order->domain);
+        $this->assertTrue($order->delivery_ssl_checked);
+        $this->assertTrue($order->delivery_form_checked);
+        $this->assertFalse($order->delivery_mobile_checked);
+        $this->assertSame('Checklist livraison deja controlee.', $order->delivery_note);
+    }
 }

@@ -26,14 +26,21 @@ class UpdateOrderMaterialRequest extends FormRequest
 
     public function productionData(): array
     {
-        return [
-            'material_activity_received' => $this->boolean('material_activity_received'),
-            'material_logo_received' => $this->boolean('material_logo_received'),
-            'material_photos_received' => $this->boolean('material_photos_received'),
-            'material_texts_received' => $this->boolean('material_texts_received'),
-            'material_contacts_received' => $this->boolean('material_contacts_received'),
-            'material_colors_received' => $this->boolean('material_colors_received'),
-            'material_missing_note' => $this->validated('material_missing_note'),
-        ];
+        $data = $this->validated();
+
+        foreach ([
+            'material_activity_received',
+            'material_logo_received',
+            'material_photos_received',
+            'material_texts_received',
+            'material_contacts_received',
+            'material_colors_received',
+        ] as $field) {
+            if ($this->has($field)) {
+                $data[$field] = $this->boolean($field);
+            }
+        }
+
+        return $data;
     }
 }

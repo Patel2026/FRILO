@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderProductionService
 {
@@ -70,12 +71,19 @@ class OrderProductionService
 
     public function recordReminder(Order $order, array $data, User $actor, ?Request $request = null): Order
     {
-        $order->update([
-            'last_client_reminder_at' => now(),
-            'client_reminder_count' => (int) $order->client_reminder_count + 1,
-            'last_client_reminder_reason' => $data['last_client_reminder_reason'],
-            'internal_follow_up_note' => $data['internal_follow_up_note'] ?? null,
-        ]);
+        $order = DB::transaction(function () use ($order, $data): Order {
+            $order->newQuery()
+                ->whereKey($order->getKey())
+                ->update([
+                    'last_client_reminder_at' => now(),
+                    'client_reminder_count' => DB::raw('client_reminder_count + 1'),
+                    'last_client_reminder_reason' => $data['last_client_reminder_reason'],
+                    'internal_follow_up_note' => $data['internal_follow_up_note'] ?? null,
+                    'updated_at' => now(),
+                ]);
+
+            return $order->fresh();
+        });
 
         $this->audit('order.production.client_reminder.recorded', $order, $actor, $request, [
             'client_reminder_count' => $order->client_reminder_count,

@@ -25,13 +25,20 @@ class UpdateOrderProductionRequest extends FormRequest
 
     public function productionData(): array
     {
-        return [
-            'production_template_adapted' => $this->boolean('production_template_adapted'),
-            'production_content_integrated' => $this->boolean('production_content_integrated'),
-            'production_preview_prepared' => $this->boolean('production_preview_prepared'),
-            'production_preview_sent_at' => $this->validated('production_preview_sent_at'),
-            'production_feedback_received' => $this->boolean('production_feedback_received'),
-            'production_corrections_completed' => $this->boolean('production_corrections_completed'),
-        ];
+        $data = $this->validated();
+
+        foreach ([
+            'production_template_adapted',
+            'production_content_integrated',
+            'production_preview_prepared',
+            'production_feedback_received',
+            'production_corrections_completed',
+        ] as $field) {
+            if ($this->has($field)) {
+                $data[$field] = $this->boolean($field);
+            }
+        }
+
+        return $data;
     }
 }

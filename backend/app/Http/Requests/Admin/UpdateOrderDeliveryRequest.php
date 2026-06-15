@@ -26,14 +26,18 @@ class UpdateOrderDeliveryRequest extends FormRequest
 
     public function productionData(): array
     {
-        return [
-            'site_url' => $this->validated('site_url'),
-            'domain' => $this->validated('domain'),
-            'hosting_expires_at' => $this->validated('hosting_expires_at'),
-            'delivery_ssl_checked' => $this->boolean('delivery_ssl_checked'),
-            'delivery_form_checked' => $this->boolean('delivery_form_checked'),
-            'delivery_mobile_checked' => $this->boolean('delivery_mobile_checked'),
-            'delivery_note' => $this->validated('delivery_note'),
-        ];
+        $data = $this->validated();
+
+        foreach ([
+            'delivery_ssl_checked',
+            'delivery_form_checked',
+            'delivery_mobile_checked',
+        ] as $field) {
+            if ($this->has($field)) {
+                $data[$field] = $this->boolean($field);
+            }
+        }
+
+        return $data;
     }
 }
