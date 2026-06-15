@@ -25,7 +25,7 @@
             </div>
 
             <div class="d-flex align-items-center">
-                <a href="{{ config('app.frontend_url', env('FRONTEND_APP_URL', 'http://localhost:3000')) }}" target="_blank" rel="noreferrer" class="btn btn-sm btn-soft-primary me-2">
+                <a href="{{ rtrim((string) config('app.frontend_url'), '/') }}" target="_blank" rel="noreferrer" class="btn btn-sm btn-soft-primary me-2">
                     <i class="ri-external-link-line align-middle me-1"></i> Site client
                 </a>
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DataBackupController;
 use App\Http\Controllers\Admin\DeadlineController as AdminDeadlineController;
 use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\OrderOptionController as AdminOrderOptionController;
 use App\Http\Controllers\Admin\PaymentTransactionController as AdminPaymentTransactionController;
 use App\Http\Controllers\Admin\PublicPageController as AdminPublicPageController;
 use App\Http\Controllers\Admin\PublicSectionController as AdminPublicSectionController;
@@ -69,6 +70,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
 
     // Templates
     Route::resource('templates', AdminTemplateController::class)->except(['show']);
+
+    // Options payantes du tunnel de commande
+    Route::resource('order-options', AdminOrderOptionController::class)->except(['show']);
 
     // Avis clients
     Route::get('reviews', [AdminTemplateReviewController::class, 'index'])->name('reviews.index');

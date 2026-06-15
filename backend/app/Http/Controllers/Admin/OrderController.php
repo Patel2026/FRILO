@@ -21,7 +21,7 @@ class OrderController extends Controller
 
     public function index(Request $request): \Illuminate\View\View
     {
-        $query = Order::with(['user', 'template.sector', 'instruction', 'latestPayment'])->latest();
+        $query = Order::with(['user', 'template.sector', 'instruction', 'latestPayment', 'options'])->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -40,7 +40,7 @@ class OrderController extends Controller
 
     public function show(Order $order): \Illuminate\View\View
     {
-        $order->load(['user', 'template.sector', 'instruction', 'latestPayment']);
+        $order->load(['user', 'template.sector', 'instruction', 'latestPayment', 'options']);
 
         return view('admin.orders.show', compact('order'));
     }
@@ -114,8 +114,8 @@ class OrderController extends Controller
     public function setSiteInfo(Request $request, Order $order): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate([
-            'site_url'           => ['nullable', 'url', 'max:255', 'regex:/^https?:\/\//i'],
-            'domain'             => ['nullable', 'string', 'max:255'],
+            'site_url' => ['nullable', 'url', 'max:255', 'regex:/^https?:\/\//i'],
+            'domain' => ['nullable', 'string', 'max:255'],
             'hosting_expires_at' => ['nullable', 'date'],
         ]);
 
@@ -126,7 +126,7 @@ class OrderController extends Controller
             payload: [
                 'order_id' => $order->id,
                 'site_url' => $order->site_url,
-                'domain'   => $order->domain,
+                'domain' => $order->domain,
             ],
             actor: $request->user(),
             message: 'Informations du site livré définies depuis le backoffice',

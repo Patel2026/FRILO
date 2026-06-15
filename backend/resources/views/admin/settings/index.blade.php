@@ -158,7 +158,15 @@
 
     <div class="col-12">
         <div class="card">
-            <div class="card-header"><h5 class="card-title mb-0">Tarification publique</h5></div>
+            <div class="card-header d-flex align-items-center justify-content-between gap-3">
+                <div>
+                    <h5 class="card-title mb-0">Tarification publique</h5>
+                    <div class="text-muted small mt-1">Le prix de base est complété par les options payantes du tunnel de commande.</div>
+                </div>
+                <a href="{{ route('admin.order-options.index') }}" class="btn btn-sm btn-soft-primary">
+                    <i class="ri-price-tag-3-line me-1"></i> Gérer les options
+                </a>
+            </div>
             <div class="card-body">
                 <form method="POST" action="{{ route('admin.settings.update-section', 'pricing') }}" class="row g-3">
                     @csrf
@@ -182,7 +190,8 @@
 
                     <div class="col-lg-6">
                         <div class="border rounded p-3 h-100">
-                            <h6 class="mb-3">Plan Standard</h6>
+                            <h6 class="mb-1">Prix de base</h6>
+                            <p class="text-muted small mb-3">Montant de départ présenté au client avant ajout d'options.</p>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Nom</label>
@@ -201,9 +210,9 @@
                                     <input class="form-control" name="standard_cta_label" value="{{ old('standard_cta_label', data_get($pricing, 'standard.cta_label', 'Choisir')) }}" required>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Features Standard</label>
+                                    <label class="form-label">Ce qui est inclus dans le prix de base</label>
                                     <textarea class="form-control" name="standard_features_raw" rows="7" required>{{ old('standard_features_raw', implode(PHP_EOL, data_get($pricing, 'standard.features', []))) }}</textarea>
-                                    <div class="form-text">Une ligne par avantage affiché dans la carte Standard.</div>
+                                    <div class="form-text">Une ligne par élément inclus. Les options supplémentaires se gèrent dans “Options de commande”.</div>
                                 </div>
                             </div>
                         </div>
@@ -211,7 +220,8 @@
 
                     <div class="col-lg-6">
                         <div class="border rounded p-3 h-100">
-                            <h6 class="mb-3">Plan Premium</h6>
+                            <h6 class="mb-1">Référence secondaire</h6>
+                            <p class="text-muted small mb-3">Gardée pour les pages légales et les comparaisons publiques existantes.</p>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Badge</label>
@@ -234,9 +244,9 @@
                                     <input class="form-control" name="premium_cta_label" value="{{ old('premium_cta_label', data_get($pricing, 'premium.cta_label', 'Choisir')) }}" required>
                                 </div>
                                 <div class="col-12">
-                                    <label class="form-label">Features Premium</label>
+                                    <label class="form-label">Éléments de référence secondaire</label>
                                     <textarea class="form-control" name="premium_features_raw" rows="7" required>{{ old('premium_features_raw', implode(PHP_EOL, data_get($pricing, 'premium.features', []))) }}</textarea>
-                                    <div class="form-text">Une ligne par avantage affiché dans la carte Premium.</div>
+                                    <div class="form-text">Une ligne par élément. À conserver cohérent avec le discours public publié.</div>
                                 </div>
                             </div>
                         </div>

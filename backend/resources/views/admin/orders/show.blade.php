@@ -74,6 +74,40 @@
         </div>
 
         <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0">Détail du prix</h5></div>
+            <div class="card-body">
+                @php
+                    $optionsTotal = (int) $order->options->sum(fn($option) => (int) $option->pivot->price_snapshot);
+                    $basePrice = max(0, (int) $order->price - $optionsTotal);
+                @endphp
+
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Prix du template</span>
+                    <strong>{{ number_format($basePrice, 0, ',', ' ') }} FCFA</strong>
+                </div>
+
+                @forelse($order->options as $option)
+                    <div class="d-flex justify-content-between align-items-start border-bottom py-2">
+                        <div>
+                            <div class="fw-medium">{{ $option->pivot->name_snapshot }}</div>
+                            @if($option->persona_hint)
+                                <div class="text-muted small">{{ $option->persona_hint }}</div>
+                            @endif
+                        </div>
+                        <strong class="text-nowrap">+{{ number_format((int) $option->pivot->price_snapshot, 0, ',', ' ') }} FCFA</strong>
+                    </div>
+                @empty
+                    <p class="text-muted mb-2">Aucune option supplémentaire sélectionnée.</p>
+                @endforelse
+
+                <div class="d-flex justify-content-between pt-3 mt-1">
+                    <span class="fw-semibold">Total commande</span>
+                    <strong class="text-primary">{{ number_format($order->price, 0, ',', ' ') }} FCFA</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
             <div class="card-header"><h5 class="card-title mb-0">Paiement</h5></div>
             <div class="card-body">
                 <p class="mb-2">

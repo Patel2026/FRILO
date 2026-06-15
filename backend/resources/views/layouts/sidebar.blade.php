@@ -67,6 +67,14 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.order-options*') ? 'active' : '' }}"
+                       href="{{ route('admin.order-options.index') }}">
+                        <i class="ri-price-tag-3-line"></i>
+                        <span>Options de commande</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}"
                        href="{{ route('admin.reviews.index') }}">
                         <i class="ri-star-smile-line"></i>
