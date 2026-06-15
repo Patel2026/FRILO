@@ -23,6 +23,7 @@ Icon
 
 ### Local AI tooling
 .claude/
+.superpowers/
 .agents/
 .impeccable/
 docs/agents/
