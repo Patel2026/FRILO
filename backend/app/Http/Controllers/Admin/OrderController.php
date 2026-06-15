@@ -5,8 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\RecordOrderReminderRequest;
+use App\Http\Requests\Admin\UpdateOrderAssignmentRequest;
+use App\Http\Requests\Admin\UpdateOrderDeliveryRequest;
+use App\Http\Requests\Admin\UpdateOrderMaterialRequest;
+use App\Http\Requests\Admin\UpdateOrderProductionRequest;
+use App\Http\Requests\Admin\UpdateOrderQualityRequest;
 use App\Models\Order;
 use App\Services\AdminAuditLogger;
+use App\Services\OrderProductionService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +23,7 @@ class OrderController extends Controller
 {
     public function __construct(
         private readonly OrderService $orderService,
+        private readonly OrderProductionService $orderProductionService,
         private readonly AdminAuditLogger $auditLogger
     ) {}
 
@@ -40,6 +48,8 @@ class OrderController extends Controller
 
     public function show(Order $order): \Illuminate\View\View
     {
+        $this->authorize('update', $order);
+
         $order->load(['user', 'template.sector', 'instruction', 'latestPayment', 'options']);
 
         return view('admin.orders.show', compact('order'));
@@ -47,6 +57,8 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, Order $order)
     {
+        $this->authorize('update', $order);
+
         $statusValues = array_map(
             static fn (OrderStatus $status) => $status->value,
             OrderStatus::cases()
@@ -86,6 +98,8 @@ class OrderController extends Controller
 
     public function setPreviewUrl(Request $request, Order $order): \Illuminate\Http\RedirectResponse
     {
+        $this->authorize('update', $order);
+
         $request->validate([
             'preview_url' => ['nullable', 'string', 'max:500', 'regex:/^(https?:\/\/|\/).*/'],
         ]);
@@ -111,32 +125,99 @@ class OrderController extends Controller
             ->with('success', 'Lien de prévisualisation mis à jour.');
     }
 
-    public function setSiteInfo(Request $request, Order $order): \Illuminate\Http\RedirectResponse
+    public function updateAssignment(UpdateOrderAssignmentRequest $request, Order $order): \Illuminate\Http\RedirectResponse
     {
-        $validated = $request->validate([
-            'site_url' => ['nullable', 'url', 'max:255', 'regex:/^https?:\/\//i'],
-            'domain' => ['nullable', 'string', 'max:255'],
-            'hosting_expires_at' => ['nullable', 'date'],
-        ]);
+        $this->authorize('updateProduction', $order);
 
-        $order->update($validated);
-
-        $this->auditLogger->record(
-            event: 'order.site_info.updated',
-            payload: [
-                'order_id' => $order->id,
-                'site_url' => $order->site_url,
-                'domain' => $order->domain,
-            ],
-            actor: $request->user(),
-            message: 'Informations du site livré définies depuis le backoffice',
-            targetType: 'order',
-            targetId: (string) $order->id,
-            request: $request
+        $this->orderProductionService->updateAssignment(
+            $order,
+            $request->validated(),
+            $request->user(),
+            $request
         );
 
         return redirect()
             ->route('admin.orders.show', $order)
-            ->with('success', 'Informations du site mises à jour.');
+            ->with('success', 'Assignation de production mise a jour.');
+    }
+
+    public function updateMaterial(UpdateOrderMaterialRequest $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        $this->authorize('updateProduction', $order);
+
+        $this->orderProductionService->updateMaterial(
+            $order,
+            $request->productionData(),
+            $request->user(),
+            $request
+        );
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with('success', 'Elements client mis a jour.');
+    }
+
+    public function updateProduction(UpdateOrderProductionRequest $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        $this->authorize('updateProduction', $order);
+
+        $this->orderProductionService->updateProduction(
+            $order,
+            $request->productionData(),
+            $request->user(),
+            $request
+        );
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with('success', 'Suivi de production mis a jour.');
+    }
+
+    public function updateQuality(UpdateOrderQualityRequest $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        $this->authorize('updateProduction', $order);
+
+        $this->orderProductionService->updateQuality(
+            $order,
+            $request->productionData(),
+            $request->user(),
+            $request
+        );
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with('success', 'Controle qualite mis a jour.');
+    }
+
+    public function recordReminder(RecordOrderReminderRequest $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        $this->authorize('updateProduction', $order);
+
+        $this->orderProductionService->recordReminder(
+            $order,
+            $request->validated(),
+            $request->user(),
+            $request
+        );
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with('success', 'Relance client enregistree.');
+    }
+
+    public function setSiteInfo(UpdateOrderDeliveryRequest $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        $this->authorize('updateProduction', $order);
+
+        $this->orderProductionService->updateDelivery(
+            $order,
+            $request->productionData(),
+            $request->user(),
+            $request
+        );
+
+        return redirect()
+            ->route('admin.orders.show', $order)
+            ->with('success', 'Informations du site mises a jour.');
     }
 }

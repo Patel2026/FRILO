@@ -62,6 +62,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
     Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
     Route::patch('orders/{order}/preview', [AdminOrderController::class, 'setPreviewUrl'])->name('orders.preview');
     Route::patch('orders/{order}/site', [AdminOrderController::class, 'setSiteInfo'])->name('orders.site');
+    Route::patch('orders/{order}/assignment', [AdminOrderController::class, 'updateAssignment'])->name('orders.assignment');
+    Route::patch('orders/{order}/material', [AdminOrderController::class, 'updateMaterial'])->name('orders.material');
+    Route::patch('orders/{order}/production', [AdminOrderController::class, 'updateProduction'])->name('orders.production');
+    Route::patch('orders/{order}/quality', [AdminOrderController::class, 'updateQuality'])->name('orders.quality');
+    Route::patch('orders/{order}/reminder', [AdminOrderController::class, 'recordReminder'])->name('orders.reminder');
 
     // Paiements
     Route::resource('payments', AdminPaymentTransactionController::class)->only(['index', 'show']);

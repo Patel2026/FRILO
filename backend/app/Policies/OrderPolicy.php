@@ -31,6 +31,12 @@ class OrderPolicy
         return $user->isSuperAdmin();
     }
 
+    /** Alias explicite pour les surfaces de production backoffice. */
+    public function updateProduction(User $user, Order $order): bool
+    {
+        return $this->update($user, $order);
+    }
+
     /** Suppression physique interdite. */
     public function delete(User $user, Order $order): bool
     {

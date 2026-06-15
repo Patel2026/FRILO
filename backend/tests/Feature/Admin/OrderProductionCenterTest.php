@@ -74,4 +74,130 @@ class OrderProductionCenterTest extends TestCase
         $this->assertSame(0, $order->client_reminder_count);
         $this->assertSame('A completer', $order->productionCompletenessLabel());
     }
+
+    public function test_super_admin_can_update_assignment(): void
+    {
+        $admin = $this->superAdmin();
+        $order = $this->createOrder();
+
+        $this->actingAs($admin)
+            ->patch(route('admin.orders.assignment', $order), [
+                'production_owner_name' => 'Awa Production',
+                'production_assigned_at' => '2026-06-15 10:30',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'production_owner_name' => 'Awa Production',
+        ]);
+
+        $this->assertDatabaseHas('admin_audit_logs', [
+            'event' => 'order.production.assignment.updated',
+            'actor_id' => $admin->id,
+            'target_type' => 'order',
+            'target_id' => (string) $order->id,
+        ]);
+    }
+
+    public function test_super_admin_can_update_material_checks(): void
+    {
+        $admin = $this->superAdmin();
+        $order = $this->createOrder();
+
+        $this->actingAs($admin)
+            ->patch(route('admin.orders.material', $order), [
+                'material_activity_received' => '1',
+                'material_logo_received' => '1',
+                'material_photos_received' => '0',
+                'material_texts_received' => '1',
+                'material_contacts_received' => '1',
+                'material_colors_received' => '0',
+                'material_missing_note' => 'Photos et couleurs a confirmer.',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'material_activity_received' => true,
+            'material_logo_received' => true,
+            'material_photos_received' => false,
+            'material_texts_received' => true,
+            'material_contacts_received' => true,
+            'material_colors_received' => false,
+            'material_missing_note' => 'Photos et couleurs a confirmer.',
+        ]);
+    }
+
+    public function test_super_admin_can_update_production_and_quality_checks(): void
+    {
+        $admin = $this->superAdmin();
+        $order = $this->createOrder();
+
+        $this->actingAs($admin)
+            ->patch(route('admin.orders.production', $order), [
+                'production_template_adapted' => '1',
+                'production_content_integrated' => '1',
+                'production_preview_prepared' => '1',
+                'production_preview_sent_at' => '2026-06-15 12:00',
+                'production_feedback_received' => '0',
+                'production_corrections_completed' => '0',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $this->actingAs($admin)
+            ->patch(route('admin.orders.quality', $order), [
+                'quality_mobile_checked' => '1',
+                'quality_form_checked' => '1',
+                'quality_links_checked' => '1',
+                'quality_spelling_checked' => '1',
+                'quality_business_info_checked' => '1',
+                'quality_final_preview_validated' => '1',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'production_template_adapted' => true,
+            'production_content_integrated' => true,
+            'production_preview_prepared' => true,
+            'quality_mobile_checked' => true,
+            'quality_form_checked' => true,
+            'quality_links_checked' => true,
+            'quality_spelling_checked' => true,
+            'quality_business_info_checked' => true,
+            'quality_final_preview_validated' => true,
+        ]);
+    }
+
+    public function test_super_admin_can_record_client_reminder(): void
+    {
+        $admin = $this->superAdmin();
+        $order = $this->createOrder(['client_reminder_count' => 1]);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.orders.reminder', $order), [
+                'last_client_reminder_reason' => 'Logo manquant',
+                'internal_follow_up_note' => 'Relance WhatsApp envoyee au client.',
+            ])
+            ->assertRedirect(route('admin.orders.show', $order));
+
+        $order->refresh();
+
+        $this->assertSame(2, $order->client_reminder_count);
+        $this->assertSame('Logo manquant', $order->last_client_reminder_reason);
+        $this->assertNotNull($order->last_client_reminder_at);
+    }
+
+    public function test_client_cannot_update_order_production_data(): void
+    {
+        $client = $this->client();
+        $order = $this->createOrder();
+
+        $this->actingAs($client)
+            ->patch(route('admin.orders.material', $order), [
+                'material_activity_received' => '1',
+            ])
+            ->assertForbidden();
+    }
 }
