@@ -27,6 +27,10 @@ mkdir -p \
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
+if [ -n "${APP_KEY:-}" ] && ! grep -q "^APP_KEY=base64:" .env; then
+  sed -i "s|^APP_KEY=.*|APP_KEY=${APP_KEY}|" .env
+fi
+
 if [ -z "${APP_KEY:-}" ] && ! grep -q "^APP_KEY=base64:" .env; then
   php artisan key:generate --force
 fi
