@@ -20,6 +20,7 @@ class UpdateOrderDeliveryRequest extends FormRequest
             'delivery_ssl_checked' => ['sometimes', 'boolean'],
             'delivery_form_checked' => ['sometimes', 'boolean'],
             'delivery_mobile_checked' => ['sometimes', 'boolean'],
+            'delivery_access_transferred' => ['sometimes', 'boolean'],
             'delivery_note' => ['nullable', 'string', 'max:2000'],
         ];
     }
@@ -32,6 +33,7 @@ class UpdateOrderDeliveryRequest extends FormRequest
             'delivery_ssl_checked',
             'delivery_form_checked',
             'delivery_mobile_checked',
+            'delivery_access_transferred',
         ] as $field) {
             if ($this->has($field)) {
                 $data[$field] = $this->boolean($field);

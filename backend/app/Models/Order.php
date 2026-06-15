@@ -28,8 +28,16 @@ class Order extends Model
         'site_url',
         'domain',
         'hosting_expires_at',
+        'hosting_renewal_status',
+        'hosting_renewal_paid_at',
+        'hosting_renewal_last_reminder_at',
+        'hosting_renewal_reminder_count',
+        'hosting_renewal_note',
         'production_owner_name',
         'production_assigned_at',
+        'client_manager_id',
+        'technician_id',
+        'quality_validator_id',
         'material_activity_received',
         'material_logo_received',
         'material_photos_received',
@@ -52,10 +60,12 @@ class Order extends Model
         'delivery_ssl_checked',
         'delivery_form_checked',
         'delivery_mobile_checked',
+        'delivery_access_transferred',
         'delivery_note',
         'last_client_reminder_at',
         'client_reminder_count',
         'last_client_reminder_reason',
+        'last_client_reminder_message',
         'internal_follow_up_note',
     ];
 
@@ -80,7 +90,10 @@ class Order extends Model
         'delivery_ssl_checked' => false,
         'delivery_form_checked' => false,
         'delivery_mobile_checked' => false,
+        'delivery_access_transferred' => false,
         'client_reminder_count' => 0,
+        'hosting_renewal_status' => 'unpaid',
+        'hosting_renewal_reminder_count' => 0,
     ];
 
     protected $casts = [
@@ -90,6 +103,9 @@ class Order extends Model
         'paid_at' => 'datetime',
         'feedback_submitted_at' => 'datetime',
         'hosting_expires_at' => 'date',
+        'hosting_renewal_paid_at' => 'datetime',
+        'hosting_renewal_last_reminder_at' => 'datetime',
+        'hosting_renewal_reminder_count' => 'integer',
         'production_assigned_at' => 'datetime',
         'material_activity_received' => 'boolean',
         'material_logo_received' => 'boolean',
@@ -112,6 +128,7 @@ class Order extends Model
         'delivery_ssl_checked' => 'boolean',
         'delivery_form_checked' => 'boolean',
         'delivery_mobile_checked' => 'boolean',
+        'delivery_access_transferred' => 'boolean',
         'last_client_reminder_at' => 'datetime',
         'client_reminder_count' => 'integer',
     ];
@@ -153,6 +170,21 @@ class Order extends Model
         return $this->hasOne(PaymentTransaction::class)->latestOfMany();
     }
 
+    public function clientManager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'client_manager_id');
+    }
+
+    public function technician(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'technician_id');
+    }
+
+    public function qualityValidator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'quality_validator_id');
+    }
+
     public function templateReview(): HasOne
     {
         return $this->hasOne(TemplateReview::class);
@@ -188,6 +220,33 @@ class Order extends Model
             ->filter(fn (string $label, string $field) => ! $this->{$field})
             ->values()
             ->all();
+    }
+
+    public function missingDeliveryChecks(): array
+    {
+        $checks = [
+            'site_url' => 'URL du site',
+            'domain' => 'Nom de domaine',
+            'hosting_expires_at' => 'Expiration hebergement',
+            'delivery_ssl_checked' => 'SSL valide',
+            'delivery_form_checked' => 'Formulaire teste apres mise en ligne',
+            'delivery_mobile_checked' => 'Mobile teste apres mise en ligne',
+            'delivery_access_transferred' => 'Acces remis au client',
+        ];
+
+        return collect($checks)
+            ->filter(function (string $label, string $field): bool {
+                return in_array($field, ['site_url', 'domain', 'hosting_expires_at'], true)
+                    ? blank($this->{$field})
+                    : ! $this->{$field};
+            })
+            ->values()
+            ->all();
+    }
+
+    public function canBeCompletedOperationally(): bool
+    {
+        return $this->missingQualityChecks() === [] && $this->missingDeliveryChecks() === [];
     }
 
     public function productionSlaLabel(): string

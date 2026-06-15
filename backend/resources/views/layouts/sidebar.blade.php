@@ -30,6 +30,13 @@
     <div id="scrollbar">
         <div class="container-fluid">
             <ul class="navbar-nav" id="navbar-nav">
+                @php
+                    $adminUser = auth()->user();
+                    $canOps = $adminUser?->hasAnyAdminRole(['ops_admin']);
+                    $canContent = $adminUser?->hasAnyAdminRole(['content_admin']);
+                    $canFinance = $adminUser?->hasAnyAdminRole(['finance_admin']);
+                    $canSuper = $adminUser?->isSuperAdmin();
+                @endphp
 
                 <!-- Principal -->
                 <li class="menu-title"><span>Principal</span></li>
@@ -45,6 +52,7 @@
                 <li class="menu-title"><span>Gestion</span></li>
 
                 <!-- Commandes -->
+                @if($canOps)
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.orders*') ? 'active' : '' }}"
                        href="{{ route('admin.orders.index') }}">
@@ -56,8 +64,10 @@
                         @endif
                     </a>
                 </li>
+                @endif
 
                 <!-- Templates -->
+                @if($canContent)
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.templates*') ? 'active' : '' }}"
                        href="{{ route('admin.templates.index') }}">
@@ -102,8 +112,10 @@
                         <span>Secteurs</span>
                     </a>
                 </li>
+                @endif
 
                 <!-- Utilisateurs -->
+                @if($canOps)
                 <li class="menu-title"><span>Utilisateurs</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.clients*') ? 'active' : '' }}"
@@ -123,8 +135,30 @@
                         @endif
                     </a>
                 </li>
+                @endif
 
+                @if($canFinance)
+                <li class="menu-title"><span>Finance</span></li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}"
+                       href="{{ route('admin.payments.index') }}">
+                        <i class="ri-bank-card-line"></i>
+                        <span>Paiements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.renewals*') ? 'active' : '' }}"
+                       href="{{ route('admin.renewals.index') }}">
+                        <i class="ri-refresh-line"></i>
+                        <span>Renouvellements</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($canContent || $canSuper)
                 <li class="menu-title"><span>Plateforme</span></li>
+                @endif
+                @if($canContent)
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.content.pages*') ? 'active' : '' }}"
                        href="{{ route('admin.content.pages.index') }}">
@@ -139,6 +173,7 @@
                         <span>Contenu du site - Historique</span>
                     </a>
                 </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}"
                        href="{{ route('admin.notifications.index') }}">
@@ -150,6 +185,7 @@
                         @endif
                     </a>
                 </li>
+                @if($canSuper)
                 <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.backups*') ? 'active' : '' }}"
                        href="{{ route('admin.backups.index') }}">
@@ -165,12 +201,20 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link menu-link {{ request()->routeIs('admin.team*') ? 'active' : '' }}"
+                       href="{{ route('admin.team.index') }}">
+                        <i class="ri-admin-line"></i>
+                        <span>Equipe admin</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link menu-link {{ request()->routeIs('admin.audit-logs*') ? 'active' : '' }}"
                        href="{{ route('admin.audit-logs.index') }}">
                         <i class="ri-file-list-3-line"></i>
                         <span>Journal d'audit</span>
                     </a>
                 </li>
+                @endif
 
             </ul>
         </div>

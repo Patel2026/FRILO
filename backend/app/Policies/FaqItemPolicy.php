@@ -14,21 +14,21 @@ class FaqItemPolicy
 
     public function view(User $user, FaqItem $faqItem): bool
     {
-        return $user->isSuperAdmin();
+        return $user->hasAnyAdminRole(['content_admin']);
     }
 
     public function create(User $user): bool
     {
-        return $user->isSuperAdmin();
+        return $user->hasAnyAdminRole(['content_admin']);
     }
 
     public function update(User $user, FaqItem $faqItem): bool
     {
-        return $user->isSuperAdmin();
+        return $user->hasAnyAdminRole(['content_admin']);
     }
 
     public function delete(User $user, FaqItem $faqItem): bool
     {
-        return $user->isSuperAdmin();
+        return $user->hasAnyAdminRole(['content_admin']);
     }
 }

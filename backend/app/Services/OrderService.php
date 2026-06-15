@@ -125,6 +125,14 @@ class OrderService
             throw new HttpException(409, 'Paiement non confirmé: impossible de traiter ou livrer cette commande.');
         }
 
+        if ($newStatus === OrderStatus::Completed && ! $order->canBeCompletedOperationally()) {
+            $missing = array_merge($order->missingQualityChecks(), $order->missingDeliveryChecks());
+
+            throw ValidationException::withMessages([
+                'status' => 'Impossible de livrer: contrôles incomplets ('.implode(', ', $missing).').',
+            ]);
+        }
+
         $order->update(['status' => $newStatus]);
 
         Log::info('order.status.changed', [

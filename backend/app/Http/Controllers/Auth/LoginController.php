@@ -47,7 +47,7 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        if (! $user->isSuperAdmin() || ! $user->is_active) {
+        if (! $user->isAdmin() || ! $user->is_active) {
             Auth::logout();
 
             $request->session()->invalidate();

@@ -29,6 +29,6 @@ class TemplateReviewPolicy
 
     public function moderate(User $user, TemplateReview $review): bool
     {
-        return $user->isSuperAdmin();
+        return $user->hasAnyAdminRole(['content_admin']);
     }
 }

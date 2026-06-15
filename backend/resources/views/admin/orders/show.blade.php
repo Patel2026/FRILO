@@ -23,6 +23,7 @@
 
 @php
     $qualityMissing = $order->missingQualityChecks();
+    $deliveryMissing = $order->missingDeliveryChecks();
     $completenessLabel = $order->productionCompletenessLabel();
     $slaLabel = $order->productionSlaLabel();
     $slaBadge = match($slaLabel) {
@@ -54,8 +55,8 @@
             </div>
             <div class="row g-3 flex-grow-1">
                 <div class="col-sm-4">
-                    <p class="text-muted mb-1">Responsable</p>
-                    <p class="fw-semibold mb-0">{{ $order->production_owner_name ?: 'Non assigne' }}</p>
+                    <p class="text-muted mb-1">Chargé client</p>
+                    <p class="fw-semibold mb-0">{{ $order->clientManager?->name ?: ($order->production_owner_name ?: 'Non assigne') }}</p>
                 </div>
                 <div class="col-sm-4">
                     <p class="text-muted mb-1">Template</p>
@@ -97,9 +98,10 @@
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="status" value="{{ $next->value }}">
-                        @if($next->value === 'completed' && count($qualityMissing))
+                        @if($next->value === 'completed' && (count($qualityMissing) || count($deliveryMissing)))
                             <div class="alert alert-warning small mb-2">
-                                Qualite incomplete : {{ implode(', ', $qualityMissing) }}.
+                                Livraison incomplete :
+                                {{ implode(', ', array_merge($qualityMissing, $deliveryMissing)) }}.
                             </div>
                         @endif
                         <button type="submit" class="btn btn-soft-{{ match($next->value) {
@@ -133,6 +135,8 @@
                 @php
                     $optionsTotal = (int) $order->options->sum(fn($option) => (int) $option->pivot->price_snapshot);
                     $basePrice = max(0, (int) $order->price - $optionsTotal);
+                    $paidTotal = (int) $order->payments->whereIn('status', ['approved', 'paid', 'completed'])->sum('amount');
+                    $remainingTotal = max(0, (int) $order->price - $paidTotal);
                 @endphp
 
                 <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
@@ -158,6 +162,17 @@
                     <span class="fw-semibold">Total commande</span>
                     <strong class="text-primary">{{ number_format($order->price, 0, ',', ' ') }} FCFA</strong>
                 </div>
+                <div class="d-flex justify-content-between pt-2">
+                    <span class="text-muted">Total payé</span>
+                    <strong>{{ number_format($paidTotal, 0, ',', ' ') }} FCFA</strong>
+                </div>
+                <div class="d-flex justify-content-between pt-2">
+                    <span class="text-muted">Reste à payer</span>
+                    <strong class="{{ $remainingTotal > 0 ? 'text-danger' : 'text-success' }}">{{ number_format($remainingTotal, 0, ',', ' ') }} FCFA</strong>
+                </div>
+                <a href="{{ route('admin.orders.receipt', $order) }}" class="btn btn-soft-primary btn-sm w-100 mt-3" target="_blank" rel="noopener">
+                    Reçu / facture simple
+                </a>
             </div>
         </div>
 
@@ -177,6 +192,28 @@
                 <p class="mb-0"><strong>Statut transaction:</strong> {{ $order->latestPayment?->status ?? '—' }}</p>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0">Timeline commande</h5></div>
+            <div class="card-body">
+                @forelse($timeline as $event)
+                    <div class="d-flex gap-3 pb-3 mb-3 border-bottom">
+                        <div class="avatar-xs flex-shrink-0">
+                            <span class="avatar-title rounded-circle bg-primary-subtle text-primary">
+                                <i class="ri-time-line"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <p class="fw-semibold mb-1">{{ $event['label'] }}</p>
+                            <p class="text-muted mb-1">{{ $event['description'] }}</p>
+                            <small class="text-muted">{{ $event['date']?->format('d/m/Y H:i') }}</small>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-muted mb-0">Aucun historique disponible.</p>
+                @endforelse
+            </div>
+        </div>
     </div>
 
     {{-- Client + Instructions --}}
@@ -188,14 +225,39 @@
                     @csrf
                     @method('PATCH')
                     <div class="row g-3">
-                        <div class="col-md-7">
-                            <label class="form-label">Responsable production</label>
-                            <input type="text" name="production_owner_name" class="form-control @error('production_owner_name') is-invalid @enderror" value="{{ old('production_owner_name', $order->production_owner_name) }}" placeholder="Nom du responsable">
-                            @error('production_owner_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <div class="col-md-4">
+                            <label for="client_manager_id" class="form-label">Chargé client</label>
+                            <select id="client_manager_id" name="client_manager_id" class="form-select @error('client_manager_id') is-invalid @enderror">
+                                <option value="">Non assigné</option>
+                                @foreach($adminUsers as $adminUser)
+                                    <option value="{{ $adminUser->id }}" @selected((int) old('client_manager_id', $order->client_manager_id) === $adminUser->id)>{{ $adminUser->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('client_manager_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="technician_id" class="form-label">Technicien</label>
+                            <select id="technician_id" name="technician_id" class="form-select @error('technician_id') is-invalid @enderror">
+                                <option value="">Non assigné</option>
+                                @foreach($adminUsers as $adminUser)
+                                    <option value="{{ $adminUser->id }}" @selected((int) old('technician_id', $order->technician_id) === $adminUser->id)>{{ $adminUser->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('technician_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="quality_validator_id" class="form-label">Validateur qualité</label>
+                            <select id="quality_validator_id" name="quality_validator_id" class="form-select @error('quality_validator_id') is-invalid @enderror">
+                                <option value="">Non assigné</option>
+                                @foreach($adminUsers as $adminUser)
+                                    <option value="{{ $adminUser->id }}" @selected((int) old('quality_validator_id', $order->quality_validator_id) === $adminUser->id)>{{ $adminUser->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('quality_validator_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                         <div class="col-md-5">
-                            <label class="form-label">Date assignation</label>
-                            <input type="datetime-local" name="production_assigned_at" class="form-control @error('production_assigned_at') is-invalid @enderror" value="{{ old('production_assigned_at', $order->production_assigned_at?->format('Y-m-d\TH:i')) }}">
+                            <label for="production_assigned_at" class="form-label">Date assignation</label>
+                            <input id="production_assigned_at" type="datetime-local" name="production_assigned_at" class="form-control @error('production_assigned_at') is-invalid @enderror" value="{{ old('production_assigned_at', $order->production_assigned_at?->format('Y-m-d\TH:i')) }}">
                             @error('production_assigned_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
@@ -364,16 +426,21 @@
                     @csrf
                     @method('PATCH')
                     <div class="mb-2">
-                        <label class="form-label">Motif de relance</label>
-                        <input type="text" name="last_client_reminder_reason" class="form-control @error('last_client_reminder_reason') is-invalid @enderror" value="{{ old('last_client_reminder_reason') }}" placeholder="Logo manquant, photos a envoyer...">
+                        <label for="last_client_reminder_reason" class="form-label">Motif de relance</label>
+                        <input id="last_client_reminder_reason" type="text" name="last_client_reminder_reason" class="form-control @error('last_client_reminder_reason') is-invalid @enderror" value="{{ old('last_client_reminder_reason') }}" placeholder="Logo manquant, photos a envoyer...">
                         @error('last_client_reminder_reason')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
+                    <div class="mb-2">
+                        <label for="last_client_reminder_message" class="form-label">Message client</label>
+                        <textarea id="last_client_reminder_message" name="last_client_reminder_message" rows="4" class="form-control @error('last_client_reminder_message') is-invalid @enderror">{{ old('last_client_reminder_message', "Bonjour,\n\nPour avancer sur votre site FRILO, merci de nous envoyer les éléments manquants indiqués dans votre commande.\n\nL'équipe FRILO") }}</textarea>
+                        @error('last_client_reminder_message')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
                     <div class="mb-3">
-                        <label class="form-label">Note interne</label>
-                        <textarea name="internal_follow_up_note" rows="3" class="form-control @error('internal_follow_up_note') is-invalid @enderror">{{ old('internal_follow_up_note', $order->internal_follow_up_note) }}</textarea>
+                        <label for="internal_follow_up_note" class="form-label">Note interne</label>
+                        <textarea id="internal_follow_up_note" name="internal_follow_up_note" rows="3" class="form-control @error('internal_follow_up_note') is-invalid @enderror">{{ old('internal_follow_up_note', $order->internal_follow_up_note) }}</textarea>
                         @error('internal_follow_up_note')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
-                    <button type="submit" class="btn btn-soft-primary btn-sm">Enregistrer une relance</button>
+                    <button type="submit" class="btn btn-soft-primary btn-sm">Relancer le client</button>
                 </form>
             </div>
         </div>
@@ -423,6 +490,7 @@
                             'delivery_ssl_checked' => 'SSL valide',
                             'delivery_form_checked' => 'Formulaire teste apres mise en ligne',
                             'delivery_mobile_checked' => 'Mobile teste apres mise en ligne',
+                            'delivery_access_transferred' => 'Acces remis au client',
                         ] as $field => $label)
                             <div class="col-md-12">
                                 <div class="form-check form-switch">

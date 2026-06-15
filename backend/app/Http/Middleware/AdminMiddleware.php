@@ -8,10 +8,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (! auth()->check() || ! auth()->user()->isSuperAdmin()) {
-            abort(403, 'Accès réservé aux super-administrateurs FRILO.');
+        $user = auth()->user();
+
+        if (! $user || ! $user->isActive() || ! $user->isAdmin()) {
+            abort(403, 'Accès réservé à l’administration FRILO.');
+        }
+
+        if ($roles !== [] && ! $user->hasAnyAdminRole($roles)) {
+            abort(403, 'Accès réservé à un rôle administrateur autorisé.');
         }
 
         return $next($request);

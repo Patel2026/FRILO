@@ -15,6 +15,7 @@ class RecordOrderReminderRequest extends FormRequest
     {
         return [
             'last_client_reminder_reason' => ['required', 'string', 'max:180'],
+            'last_client_reminder_message' => ['nullable', 'string', 'max:2000'],
             'internal_follow_up_note' => ['nullable', 'string', 'max:2000'],
         ];
     }

@@ -25,10 +25,10 @@ class OrderPolicy
         return true;
     }
 
-    /** Seul un super-admin peut modifier une commande. */
+    /** Les administrateurs opérations pilotent la production des commandes. */
     public function update(User $user, Order $order): bool
     {
-        return $user->isSuperAdmin();
+        return $user->hasAnyAdminRole(['ops_admin']);
     }
 
     /** Alias explicite pour les surfaces de production backoffice. */

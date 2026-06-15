@@ -14,6 +14,23 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public const ROLE_CLIENT = 'client';
+
+    public const ROLE_SUPER_ADMIN = 'super_admin';
+
+    public const ROLE_OPS_ADMIN = 'ops_admin';
+
+    public const ROLE_CONTENT_ADMIN = 'content_admin';
+
+    public const ROLE_FINANCE_ADMIN = 'finance_admin';
+
+    public const ADMIN_ROLES = [
+        self::ROLE_SUPER_ADMIN,
+        self::ROLE_OPS_ADMIN,
+        self::ROLE_CONTENT_ADMIN,
+        self::ROLE_FINANCE_ADMIN,
+    ];
+
     protected $fillable = [
         'name',
         'email',
@@ -68,17 +85,37 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'super_admin';
+        return in_array($this->role, self::ADMIN_ROLES, true);
     }
 
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin';
+        return $this->role === self::ROLE_SUPER_ADMIN;
+    }
+
+    public function isOpsAdmin(): bool
+    {
+        return $this->role === self::ROLE_OPS_ADMIN;
+    }
+
+    public function isContentAdmin(): bool
+    {
+        return $this->role === self::ROLE_CONTENT_ADMIN;
+    }
+
+    public function isFinanceAdmin(): bool
+    {
+        return $this->role === self::ROLE_FINANCE_ADMIN;
+    }
+
+    public function hasAnyAdminRole(array $roles): bool
+    {
+        return $this->isSuperAdmin() || in_array($this->role, $roles, true);
     }
 
     public function isClient(): bool
     {
-        return $this->role === 'client';
+        return $this->role === self::ROLE_CLIENT;
     }
 
     public function isActive(): bool

@@ -12,9 +12,11 @@ use App\Http\Requests\Admin\UpdateOrderMaterialRequest;
 use App\Http\Requests\Admin\UpdateOrderProductionRequest;
 use App\Http\Requests\Admin\UpdateOrderQualityRequest;
 use App\Models\Order;
+use App\Models\User;
 use App\Services\AdminAuditLogger;
 use App\Services\OrderProductionService;
 use App\Services\OrderService;
+use App\Services\OrderTimelineService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -24,12 +26,13 @@ class OrderController extends Controller
     public function __construct(
         private readonly OrderService $orderService,
         private readonly OrderProductionService $orderProductionService,
+        private readonly OrderTimelineService $orderTimelineService,
         private readonly AdminAuditLogger $auditLogger
     ) {}
 
     public function index(Request $request): \Illuminate\View\View
     {
-        $query = Order::with(['user', 'template.sector', 'instruction', 'latestPayment', 'options'])->latest();
+        $query = Order::with(['user', 'template.sector', 'instruction', 'latestPayment', 'options', 'clientManager', 'technician', 'qualityValidator'])->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -50,9 +53,17 @@ class OrderController extends Controller
     {
         $this->authorize('update', $order);
 
-        $order->load(['user', 'template.sector', 'instruction', 'latestPayment', 'options']);
+        $order->load(['user', 'template.sector', 'instruction', 'latestPayment', 'payments', 'options', 'clientManager', 'technician', 'qualityValidator']);
 
-        return view('admin.orders.show', compact('order'));
+        $adminUsers = User::query()
+            ->whereIn('role', ['super_admin', 'ops_admin'])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $timeline = $this->orderTimelineService->forOrder($order);
+
+        return view('admin.orders.show', compact('order', 'adminUsers', 'timeline'));
     }
 
     public function updateStatus(Request $request, Order $order)
@@ -219,5 +230,14 @@ class OrderController extends Controller
         return redirect()
             ->route('admin.orders.show', $order)
             ->with('success', 'Informations du site mises a jour.');
+    }
+
+    public function receipt(Order $order): \Illuminate\View\View
+    {
+        abort_unless(request()->user()?->hasAnyAdminRole(['ops_admin', 'finance_admin']) === true, 403);
+
+        $order->load(['user', 'template.sector', 'latestPayment', 'payments', 'options']);
+
+        return view('admin.orders.receipt', compact('order'));
     }
 }
