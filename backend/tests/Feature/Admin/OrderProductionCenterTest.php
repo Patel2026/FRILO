@@ -223,4 +223,30 @@ class OrderProductionCenterTest extends TestCase
             ])
             ->assertForbidden();
     }
+
+    public function test_order_detail_displays_production_center_sections(): void
+    {
+        $admin = $this->superAdmin();
+        $order = $this->createOrder([
+            'production_owner_name' => 'Awa Production',
+            'material_activity_received' => true,
+            'material_logo_received' => true,
+            'quality_mobile_checked' => false,
+            'quality_form_checked' => true,
+            'client_reminder_count' => 2,
+            'last_client_reminder_reason' => 'Photos manquantes',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Centre de production', false)
+            ->assertSee('Awa Production')
+            ->assertSee('Elements client', false)
+            ->assertSee('Production interne')
+            ->assertSee('Qualite avant livraison')
+            ->assertSee('Relances client')
+            ->assertSee('Photos manquantes')
+            ->assertSee('A completer');
+    }
 }

@@ -21,6 +21,55 @@
     </div>
 @endif
 
+@php
+    $qualityMissing = $order->missingQualityChecks();
+    $completenessLabel = $order->productionCompletenessLabel();
+    $slaLabel = $order->productionSlaLabel();
+    $slaBadge = match($slaLabel) {
+        'En retard' => 'danger',
+        'Attention' => 'warning',
+        'Livre' => 'success',
+        'Annule' => 'secondary',
+        default => 'success',
+    };
+@endphp
+
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-xl-row justify-content-between gap-3">
+            <div>
+                <p class="text-muted text-uppercase fw-semibold mb-1">Centre de production</p>
+                <h5 class="mb-2">Commande #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge badge-soft-{{ match($order->status->value) {
+                        'pending' => 'warning',
+                        'processing' => 'info',
+                        'completed' => 'success',
+                        'cancelled' => 'danger',
+                        default => 'secondary'
+                    } }}">{{ $order->status->label() }}</span>
+                    <span class="badge badge-soft-{{ $completenessLabel === 'Complet' ? 'success' : 'warning' }}">{{ $completenessLabel }}</span>
+                    <span class="badge badge-soft-{{ $slaBadge }}">{{ $slaLabel }}</span>
+                </div>
+            </div>
+            <div class="row g-3 flex-grow-1">
+                <div class="col-sm-4">
+                    <p class="text-muted mb-1">Responsable</p>
+                    <p class="fw-semibold mb-0">{{ $order->production_owner_name ?: 'Non assigne' }}</p>
+                </div>
+                <div class="col-sm-4">
+                    <p class="text-muted mb-1">Template</p>
+                    <p class="fw-semibold mb-0">{{ $order->template->name ?? '—' }}</p>
+                </div>
+                <div class="col-sm-4">
+                    <p class="text-muted mb-1">Total</p>
+                    <p class="fw-semibold mb-0">{{ number_format($order->price, 0, ',', ' ') }} FCFA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     {{-- Infos commande + changement de statut --}}
     <div class="col-lg-4">
@@ -48,6 +97,11 @@
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="status" value="{{ $next->value }}">
+                        @if($next->value === 'completed' && count($qualityMissing))
+                            <div class="alert alert-warning small mb-2">
+                                Qualite incomplete : {{ implode(', ', $qualityMissing) }}.
+                            </div>
+                        @endif
                         <button type="submit" class="btn btn-soft-{{ match($next->value) {
                             'processing' => 'info',
                             'completed' => 'success',
@@ -128,6 +182,29 @@
     {{-- Client + Instructions --}}
     <div class="col-lg-8">
         <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0">Assignation interne</h5></div>
+            <div class="card-body">
+                <form action="{{ route('admin.orders.assignment', $order) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="row g-3">
+                        <div class="col-md-7">
+                            <label class="form-label">Responsable production</label>
+                            <input type="text" name="production_owner_name" class="form-control @error('production_owner_name') is-invalid @enderror" value="{{ old('production_owner_name', $order->production_owner_name) }}" placeholder="Nom du responsable">
+                            @error('production_owner_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Date assignation</label>
+                            <input type="datetime-local" name="production_assigned_at" class="form-control @error('production_assigned_at') is-invalid @enderror" value="{{ old('production_assigned_at', $order->production_assigned_at?->format('Y-m-d\TH:i')) }}">
+                            @error('production_assigned_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-soft-primary btn-sm mt-3">Enregistrer l'assignation</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
             <div class="card-header"><h5 class="card-title mb-0">Client</h5></div>
             <div class="card-body">
                 <p class="mb-1"><i class="ri-user-line me-1 text-muted"></i> {{ $order->user->name ?? '—' }}</p>
@@ -166,6 +243,138 @@
                 @else
                     <p class="text-muted fst-italic">Aucune instruction renseignée.</p>
                 @endif
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header"><h5 class="card-title mb-0">Elements client</h5></div>
+            <div class="card-body">
+                <form action="{{ route('admin.orders.material', $order) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="row g-2">
+                        @foreach([
+                            'material_activity_received' => 'Description activite',
+                            'material_logo_received' => 'Logo',
+                            'material_photos_received' => 'Photos / visuels',
+                            'material_texts_received' => 'Textes',
+                            'material_contacts_received' => 'Contacts',
+                            'material_colors_received' => 'Couleurs',
+                        ] as $field => $label)
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="{{ $field }}" value="0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="{{ $field }}" name="{{ $field }}" value="1" @checked(old($field, $order->{$field}))>
+                                    <label class="form-check-label" for="{{ $field }}">{{ $label }}</label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Note sur les elements manquants</label>
+                        <textarea name="material_missing_note" rows="3" class="form-control @error('material_missing_note') is-invalid @enderror">{{ old('material_missing_note', $order->material_missing_note) }}</textarea>
+                        @error('material_missing_note')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <button type="submit" class="btn btn-soft-primary btn-sm mt-3">Enregistrer les elements</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header"><h5 class="card-title mb-0">Production interne</h5></div>
+            <div class="card-body">
+                <form action="{{ route('admin.orders.production', $order) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="row g-2">
+                        @foreach([
+                            'production_template_adapted' => 'Template adapte',
+                            'production_content_integrated' => 'Contenu integre',
+                            'production_preview_prepared' => 'Preview preparee',
+                            'production_feedback_received' => 'Retours client recus',
+                            'production_corrections_completed' => 'Corrections terminees',
+                        ] as $field => $label)
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="{{ $field }}" value="0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="{{ $field }}" name="{{ $field }}" value="1" @checked(old($field, $order->{$field}))>
+                                    <label class="form-check-label" for="{{ $field }}">{{ $label }}</label>
+                                </div>
+                            </div>
+                        @endforeach
+                        <div class="col-md-6">
+                            <label class="form-label">Preview envoyee le</label>
+                            <input type="datetime-local" name="production_preview_sent_at" class="form-control @error('production_preview_sent_at') is-invalid @enderror" value="{{ old('production_preview_sent_at', $order->production_preview_sent_at?->format('Y-m-d\TH:i')) }}">
+                            @error('production_preview_sent_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-soft-primary btn-sm mt-3">Enregistrer la production</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Qualite avant livraison</h5>
+                @if(count($qualityMissing))
+                    <span class="badge badge-soft-warning">{{ count($qualityMissing) }} point(s) restant(s)</span>
+                @else
+                    <span class="badge badge-soft-success">Pret a livrer</span>
+                @endif
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.orders.quality', $order) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="row g-2">
+                        @foreach([
+                            'quality_mobile_checked' => 'Mobile responsive',
+                            'quality_form_checked' => 'Formulaire teste',
+                            'quality_links_checked' => 'Liens verifies',
+                            'quality_spelling_checked' => 'Orthographe relue',
+                            'quality_business_info_checked' => 'Infos client validees',
+                            'quality_final_preview_validated' => 'Preview finale validee',
+                        ] as $field => $label)
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="{{ $field }}" value="0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="{{ $field }}" name="{{ $field }}" value="1" @checked(old($field, $order->{$field}))>
+                                    <label class="form-check-label" for="{{ $field }}">{{ $label }}</label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <button type="submit" class="btn btn-soft-primary btn-sm mt-3">Enregistrer la qualite</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header"><h5 class="card-title mb-0">Relances client</h5></div>
+            <div class="card-body">
+                <p class="text-muted mb-2">
+                    Derniere relance :
+                    <strong>{{ $order->last_client_reminder_at?->format('d/m/Y H:i') ?? '—' }}</strong>
+                    · Total : <strong>{{ $order->client_reminder_count }}</strong>
+                </p>
+                @if($order->last_client_reminder_reason)
+                    <p class="mb-3"><strong>Dernier motif :</strong> {{ $order->last_client_reminder_reason }}</p>
+                @endif
+                <form action="{{ route('admin.orders.reminder', $order) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <div class="mb-2">
+                        <label class="form-label">Motif de relance</label>
+                        <input type="text" name="last_client_reminder_reason" class="form-control @error('last_client_reminder_reason') is-invalid @enderror" value="{{ old('last_client_reminder_reason') }}" placeholder="Logo manquant, photos a envoyer...">
+                        @error('last_client_reminder_reason')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Note interne</label>
+                        <textarea name="internal_follow_up_note" rows="3" class="form-control @error('internal_follow_up_note') is-invalid @enderror">{{ old('internal_follow_up_note', $order->internal_follow_up_note) }}</textarea>
+                        @error('internal_follow_up_note')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <button type="submit" class="btn btn-soft-primary btn-sm">Enregistrer une relance</button>
+                </form>
             </div>
         </div>
 
@@ -208,6 +417,26 @@
                         <input type="date" name="hosting_expires_at" class="form-control form-control-sm @error('hosting_expires_at') is-invalid @enderror"
                             value="{{ old('hosting_expires_at', $order->hosting_expires_at?->format('Y-m-d')) }}">
                         @error('hosting_expires_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="row g-2 mb-3">
+                        @foreach([
+                            'delivery_ssl_checked' => 'SSL valide',
+                            'delivery_form_checked' => 'Formulaire teste apres mise en ligne',
+                            'delivery_mobile_checked' => 'Mobile teste apres mise en ligne',
+                        ] as $field => $label)
+                            <div class="col-md-12">
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="{{ $field }}" value="0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="{{ $field }}" name="{{ $field }}" value="1" @checked(old($field, $order->{$field}))>
+                                    <label class="form-check-label" for="{{ $field }}">{{ $label }}</label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Note de livraison</label>
+                        <textarea name="delivery_note" rows="3" class="form-control @error('delivery_note') is-invalid @enderror">{{ old('delivery_note', $order->delivery_note) }}</textarea>
+                        @error('delivery_note')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <button type="submit" class="btn btn-soft-primary btn-sm w-100">Enregistrer</button>
                 </form>
