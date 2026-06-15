@@ -102,7 +102,7 @@
                             <span class="align-middle">Paramètres</span>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
                             <button type="submit" class="dropdown-item">
                                 <i class="ri-logout-box-r-line text-muted fs-16 align-middle me-1"></i>

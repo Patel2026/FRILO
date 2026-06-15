@@ -3,12 +3,12 @@
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\ContentBlockController as AdminContentBlockController;
 use App\Http\Controllers\Admin\ContentRevisionController as AdminContentRevisionController;
-use App\Http\Controllers\Admin\DeadlineController as AdminDeadlineController;
-use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DataBackupController;
+use App\Http\Controllers\Admin\DeadlineController as AdminDeadlineController;
 use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentTransactionController as AdminPaymentTransactionController;
@@ -18,7 +18,7 @@ use App\Http\Controllers\Admin\SectorController as AdminSectorController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Admin\TemplateReviewController as AdminTemplateReviewController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,7 +26,24 @@ use Illuminate\Support\Facades\Route;
 | Auth — session-based pour le backoffice admin
 |--------------------------------------------------------------------------
 */
-Auth::routes(['register' => false]);
+$adminEntryPath = (string) config('frilo.admin_entry_path', 'frilo-console');
+
+Route::prefix($adminEntryPath)->name('admin.')->group(function () {
+    Route::middleware('guest')->group(function () {
+        Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+        Route::post('/', [LoginController::class, 'login'])
+            ->middleware('throttle:admin-login')
+            ->name('login.submit');
+    });
+});
+
+Route::get('/admin/login', function () {
+    abort(404);
+});
+
+Route::post('/admin/logout', [LoginController::class, 'logout'])
+    ->middleware('auth')
+    ->name('admin.logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -121,5 +138,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('admin.dashboard') : redirect()->route('login');
+    return auth()->check() ? redirect()->route('admin.dashboard') : redirect()->route('admin.login');
 });

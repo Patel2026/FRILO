@@ -19,6 +19,7 @@ Icon
 
 ### Production secrets (ne jamais commiter)
 .env.prod
+.deploy/
 
 ### Local AI tooling
 .claude/

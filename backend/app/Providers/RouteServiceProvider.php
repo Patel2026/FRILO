@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/';
+    public const HOME = '/admin/dashboard';
 
     /**
      * The controller namespace for the application.
@@ -61,6 +61,13 @@ class RouteServiceProvider extends ServiceProvider
             $key = sprintf('%s|%s', $request->ip(), strtolower($email));
 
             return Limit::perMinute(10)->by($key);
+        });
+
+        RateLimiter::for('admin-login', function (Request $request) {
+            $email = (string) $request->input('email', '');
+            $key = sprintf('admin-login|%s|%s', $request->ip(), strtolower($email));
+
+            return Limit::perMinute(5)->by($key);
         });
 
         RateLimiter::for('contact', function (Request $request) {

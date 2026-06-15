@@ -31,7 +31,7 @@
                                 <p class="text-muted">Connectez-vous pour accéder à l'administration.</p>
                             </div>
                             <div class="p-2 mt-4">
-                                <form action="{{ route('login') }}" method="POST">
+                                <form action="{{ route('admin.login.submit') }}" method="POST">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Adresse e-mail <span class="text-danger">*</span></label>
