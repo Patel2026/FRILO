@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Check, Heart, MessageSquare, Monitor, Scale, Smartphone, Star } from 'lucide-react';
+import { ArrowLeft, Check, Heart, MessageSquare, Monitor, Scale, Smartphone, Star, Tablet } from 'lucide-react';
 import { TestimonialCard } from '@/components/business/TestimonialCard';
 import { useAuthState } from '@/hooks/useAuthState';
 import { businessService, Template, TemplateReview, TemplateReviewEligibility, TemplateReviewSummary } from '@/services/business.service';
-import { cn, parseFeatures } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { buildPreviewUrl, hasLivePreview, parsePreviewGallery, parsePreviewPages } from '@/lib/templatePreview';
 import { trackFunnelEvent } from '@/lib/analytics';
 import { useTemplateCollections } from '@/hooks/useTemplateCollections';
@@ -29,7 +29,7 @@ export default function TemplateDetailPage() {
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [reviewNotice, setReviewNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [activePreviewPath, setActivePreviewPath] = useState('/');
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [compareNotice, setCompareNotice] = useState<string | null>(null);
@@ -149,7 +149,6 @@ export default function TemplateDetailPage() {
     );
   }
 
-  const legacyFeatures = parseFeatures(template.features);
   const previewPages = parsePreviewPages(template.preview_pages);
   const previewGallery = parsePreviewGallery(template.preview_gallery);
   const livePreviewEnabled = hasLivePreview(template.preview_url);
@@ -160,12 +159,8 @@ export default function TemplateDetailPage() {
   const canBrowseGallery = !livePreviewEnabled && previewGallery.length > 1;
   const galleryImage = previewGallery[activeGalleryIndex] ?? previewGallery[0] ?? null;
   const price = typeof template.price === 'string' ? parseInt(template.price) : template.price;
-  const targetAudience = Array.isArray(template.target_audience) && template.target_audience.length > 0
-    ? template.target_audience
-    : legacyFeatures.slice(0, 4);
-  const includedItems = Array.isArray(template.included_features) && template.included_features.length > 0
-    ? template.included_features
-    : [...legacyFeatures, 'Hébergement inclus', 'Responsive mobile', 'Support 30 jours'];
+  const targetAudience = Array.isArray(template.target_audience) ? template.target_audience : [];
+  const includedItems = Array.isArray(template.included_features) ? template.included_features : [];
   const visibleFeatures = targetAudience.slice(0, 4);
   const includedPreview = includedItems.slice(0, 6);
   const favoriteActive = isFavorite(template.id);
@@ -259,6 +254,18 @@ export default function TemplateDetailPage() {
               </button>
               <button
                 type="button"
+                onClick={() => setViewMode('tablet')}
+                className={cn(
+                  'inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors',
+                  viewMode === 'tablet' ? 'bg-slate-950 text-white' : 'text-slate-400 hover:text-slate-950'
+                )}
+                aria-label="Affichage tablette"
+                aria-pressed={viewMode === 'tablet'}
+              >
+                <Tablet className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
                 onClick={() => setViewMode('mobile')}
                 className={cn(
                   'inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors',
@@ -294,9 +301,9 @@ export default function TemplateDetailPage() {
             <div
               className={cn(
                 'relative overflow-hidden bg-white shadow-[0_24px_70px_rgba(15,23,42,0.12)] transition-all duration-300',
-                viewMode === 'desktop'
-                  ? 'h-[320px] w-full max-w-5xl rounded-2xl border border-slate-200 md:h-[560px] lg:h-[calc(100vh-8rem)]'
-                  : 'h-[520px] w-[290px] rounded-[2.2rem] border-[10px] border-slate-950 md:h-[680px] md:w-[360px]'
+                viewMode === 'desktop' && 'h-[320px] w-full max-w-5xl rounded-2xl border border-slate-200 md:h-[560px] lg:h-[calc(100vh-8rem)]',
+                viewMode === 'tablet' && 'h-[560px] w-full max-w-[760px] rounded-[1.8rem] border-[10px] border-slate-900 md:h-[720px] md:w-[560px] lg:h-[calc(100vh-8rem)] lg:w-[min(760px,80%)]',
+                viewMode === 'mobile' && 'h-[520px] w-[290px] rounded-[2.2rem] border-[10px] border-slate-950 md:h-[680px] md:w-[360px]'
               )}
             >
               {iframeSrc ? (
@@ -457,6 +464,7 @@ export default function TemplateDetailPage() {
                 </div>
               )}
 
+              {includedPreview.length > 0 && (
               <div className="hidden sm:block">
                 <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-slate-400">Inclus</p>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-500">
@@ -468,6 +476,7 @@ export default function TemplateDetailPage() {
                   ))}
                 </div>
               </div>
+              )}
 
               <div className="rounded-3xl bg-slate-950 p-5 text-white">
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-white/50">Après commande</p>

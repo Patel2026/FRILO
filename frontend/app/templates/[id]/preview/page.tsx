@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Monitor, Smartphone } from 'lucide-react';
+import { ArrowLeft, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { businessService, Template } from '@/services/business.service';
 import { cn } from '@/lib/utils';
 import { buildPreviewUrl, hasLivePreview, parsePreviewPages } from '@/lib/templatePreview';
@@ -14,7 +14,7 @@ export default function TemplateImmersivePreviewPage() {
   const id = params?.id as string;
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [activePreviewPath, setActivePreviewPath] = useState('/');
 
   useEffect(() => {
@@ -109,6 +109,17 @@ export default function TemplateImmersivePreviewPage() {
           </button>
           <button
             type="button"
+            onClick={() => setViewMode('tablet')}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black transition-colors",
+              viewMode === 'tablet' ? "bg-white text-slate-950" : "text-white/60 hover:text-white"
+            )}
+          >
+            <Tablet className="h-4 w-4" />
+            Tablette
+          </button>
+          <button
+            type="button"
             onClick={() => setViewMode('mobile')}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black transition-colors",
@@ -143,6 +154,18 @@ export default function TemplateImmersivePreviewPage() {
             </button>
             <button
               type="button"
+              onClick={() => setViewMode('tablet')}
+              className={cn(
+                "inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                viewMode === 'tablet' ? "bg-white text-slate-950" : "text-white/55"
+              )}
+              aria-label="Affichage tablette"
+              aria-pressed={viewMode === 'tablet'}
+            >
+              <Tablet className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
               onClick={() => setViewMode('mobile')}
               className={cn(
                 "inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors",
@@ -173,9 +196,9 @@ export default function TemplateImmersivePreviewPage() {
       <div className="flex flex-1 items-stretch justify-center overflow-hidden p-3 md:p-5">
         <div className={cn(
           "overflow-hidden bg-white shadow-2xl transition-all duration-300",
-          viewMode === 'desktop'
-            ? "h-full w-full max-w-[1680px] rounded-2xl border border-white/10"
-            : "h-full max-h-[760px] w-[360px] rounded-[2.5rem] border-[10px] border-zinc-900"
+          viewMode === 'desktop' && "h-full w-full max-w-[1680px] rounded-2xl border border-white/10",
+          viewMode === 'tablet' && "h-full max-h-[900px] w-full max-w-[820px] rounded-[2rem] border-[10px] border-zinc-900",
+          viewMode === 'mobile' && "h-full max-h-[760px] w-[360px] rounded-[2.5rem] border-[10px] border-zinc-900"
         )}>
           <iframe
             src={buildPreviewUrl(template.preview_url!, activePreviewPath)}

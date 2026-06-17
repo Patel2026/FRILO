@@ -159,6 +159,8 @@ class TemplateAdminTest extends TestCase
             ->assertSee('Pensé pour')
             ->assertSeeText("Inclus dans l'offre", false)
             ->assertSee('Thumbnail')
+            ->assertSee('Format recommandé')
+            ->assertSee('Aperçu de la miniature')
             ->assertSee('Mode de prévisualisation');
     }
 }

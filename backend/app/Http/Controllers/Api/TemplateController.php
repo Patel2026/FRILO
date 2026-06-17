@@ -50,7 +50,7 @@ class TemplateController extends Controller
             'promo_price' => $template->promo_price !== null ? (int) $template->promo_price : null,
             'features' => $template->features ?? [],
             'target_audience' => $template->target_audience ?? [],
-            'included_features' => $template->included_features ?? ($template->features ?? []),
+            'included_features' => $template->included_features ?? [],
             'thumbnail' => $template->thumbnail,
             'full_thumbnail_url' => $template->full_thumbnail_url,
             'preview_url' => $template->preview_url,

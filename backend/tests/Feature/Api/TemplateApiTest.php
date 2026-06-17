@@ -128,4 +128,33 @@ class TemplateApiTest extends TestCase
             ->assertJsonPath('target_audience.0', 'Restaurants')
             ->assertJsonPath('included_features.1', 'Hebergement 1 an');
     }
+
+    public function test_template_show_does_not_fallback_public_content_to_legacy_features(): void
+    {
+        $sector = Sector::create([
+            'name' => 'Services',
+            'slug' => 'services',
+            'description' => 'Secteur test',
+            'icon' => 'Briefcase',
+            'gradient' => 'from-blue-500 to-purple-600',
+            'is_active' => true,
+        ]);
+
+        $template = Template::create([
+            'sector_id' => $sector->id,
+            'name' => 'Service Legacy',
+            'slug' => 'service-legacy',
+            'description' => 'Visible',
+            'price' => 50000,
+            'normal_price' => 50000,
+            'features' => ['Legacy inclus 1', 'Legacy inclus 2'],
+            'is_active' => true,
+        ]);
+
+        $this->getJson('/api/templates/'.$template->id)
+            ->assertOk()
+            ->assertJsonPath('features.0', 'Legacy inclus 1')
+            ->assertJsonPath('target_audience', [])
+            ->assertJsonPath('included_features', []);
+    }
 }

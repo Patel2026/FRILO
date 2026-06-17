@@ -36,6 +36,10 @@ function getTemplatePrice(template: Template): number {
   return typeof template.price === 'string' ? parseInt(template.price, 10) : template.price;
 }
 
+function getTemplateImage(template: Template): string {
+  return template.full_thumbnail_url || parsePreviewGallery(template.preview_gallery)[0] || '';
+}
+
 function selectFeaturedTemplates(templates: Template[]): Template[] {
   const rankedTemplates = [...templates].sort((left, right) => {
     const livePreviewDelta = Number(hasLivePreview(right.preview_url)) - Number(hasLivePreview(left.preview_url));
@@ -331,60 +335,64 @@ export default function Home() {
             )}
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {featuredTemplates.slice(0, 4).map((template, index) => (
-              <Link
-                key={template.id}
-                href={`/templates/${template.id}`}
-                className="group flex min-h-full flex-col overflow-hidden rounded-[1.35rem] border border-slate-100 bg-slate-50 transition-colors hover:border-slate-950"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                  {template.full_thumbnail_url ? (
-                    <img
-                      src={template.full_thumbnail_url}
-                      alt={template.name}
-                      className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-slate-200" />
-                  )}
-                  <div className="absolute left-3 top-3 rounded-full bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-slate-950">
-                    {index === 0 ? 'Exemple de départ' : 'Base métier'}
-                  </div>
-                </div>
+              {featuredTemplates.slice(0, 4).map((template, index) => {
+                const templateImage = getTemplateImage(template);
 
-                <div className="flex flex-1 flex-col p-4">
-                  <div className="flex-1">
-                    {template.sector?.name && (
-                      <p className="mb-2 text-[11px] font-black uppercase tracking-[0.12em] text-[oklch(57%_0.24_29)]">
-                        {template.sector.name}
-                      </p>
-                    )}
-                    <h3 className="text-xl font-black leading-tight tracking-tight text-slate-950">
-                      {template.name}
-                    </h3>
-                    <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">
-                      {templateSummary(template)}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {['Mobile', 'Contact', '48h'].map((label) => (
-                        <span key={label} className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-600">
-                          {label}
-                        </span>
-                      ))}
+                return (
+                  <Link
+                    key={template.id}
+                    href={`/templates/${template.id}`}
+                    className="group flex min-h-full flex-col overflow-hidden rounded-[1.35rem] border border-slate-100 bg-slate-50 transition-colors hover:border-slate-950"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                      {templateImage ? (
+                        <img
+                          src={templateImage}
+                          alt={template.name}
+                          className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-slate-200" />
+                      )}
+                      <div className="absolute left-3 top-3 rounded-full bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-slate-950">
+                        {index === 0 ? 'Exemple de départ' : 'Base métier'}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
-                    <span className="text-base font-black text-slate-950">
-                      {getTemplatePrice(template).toLocaleString('fr-FR')} <span className="text-xs font-semibold text-slate-400">FCFA</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-sm font-black text-slate-950">
-                      Voir cet exemple <ArrowRight className="h-4 w-4" />
-                    </span>
-                  </div>
-                </div>
-              </Link>
-              ))}
+                    <div className="flex flex-1 flex-col p-4">
+                      <div className="flex-1">
+                        {template.sector?.name && (
+                          <p className="mb-2 text-[11px] font-black uppercase tracking-[0.12em] text-[oklch(57%_0.24_29)]">
+                            {template.sector.name}
+                          </p>
+                        )}
+                        <h3 className="text-xl font-black leading-tight tracking-tight text-slate-950">
+                          {template.name}
+                        </h3>
+                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">
+                          {templateSummary(template)}
+                        </p>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {['Mobile', 'Contact', '48h'].map((label) => (
+                            <span key={label} className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-600">
+                              {label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
+                        <span className="text-base font-black text-slate-950">
+                          {getTemplatePrice(template).toLocaleString('fr-FR')} <span className="text-xs font-semibold text-slate-400">FCFA</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-sm font-black text-slate-950">
+                          Voir cet exemple <ArrowRight className="h-4 w-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
 
             <div className="flex flex-col gap-3 rounded-[1.35rem] border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">

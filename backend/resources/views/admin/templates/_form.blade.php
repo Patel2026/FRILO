@@ -77,7 +77,7 @@
     <div class="col-md-6 mb-3">
         <label class="form-label">Inclus dans l'offre</label>
         <textarea name="included_features_raw" class="form-control" rows="4"
-                  placeholder="Site 5 pages&#10;Hébergement 1 an&#10;SSL sécurisé">{{ old('included_features_raw', implode("\n", $template?->included_features ?? $template?->features ?? [])) }}</textarea>
+                  placeholder="Site 5 pages&#10;Hébergement 1 an&#10;SSL sécurisé">{{ old('included_features_raw', implode("\n", $template?->included_features ?? [])) }}</textarea>
         <div class="form-text">Chaque ligne apparaît dans la section publique "Inclus".</div>
     </div>
 </div>
@@ -91,13 +91,29 @@
 
 <div class="mb-3">
     <label class="form-label">Thumbnail</label>
-    @if($template?->full_thumbnail_url)
-        <div class="mb-2">
-            <img src="{{ $template->full_thumbnail_url }}" height="80" class="rounded border" alt="">
+    <div class="row g-3 align-items-start">
+        <div class="col-md-5">
+            <div class="rounded border bg-light p-2">
+                <div class="ratio ratio-4x3 rounded overflow-hidden bg-white">
+                    <img
+                        id="template-thumbnail-preview"
+                        src="{{ $template?->full_thumbnail_url ?: '' }}"
+                        class="h-100 w-100 object-fit-cover {{ $template?->full_thumbnail_url ? '' : 'd-none' }}"
+                        alt="Aperçu de la miniature"
+                    >
+                    <div id="template-thumbnail-empty" class="d-flex h-100 w-100 align-items-center justify-content-center text-muted small {{ $template?->full_thumbnail_url ? 'd-none' : '' }}">
+                        Aperçu de la miniature
+                    </div>
+                </div>
+            </div>
         </div>
-    @endif
-    <input type="file" name="thumbnail" class="form-control" accept="image/jpeg,image/png,image/webp">
-    <div class="form-text">JPG, PNG ou WebP — max 2 Mo.</div>
+        <div class="col-md-7">
+            <input id="template-thumbnail-input" type="file" name="thumbnail" class="form-control" accept="image/jpeg,image/png,image/webp">
+            <div class="form-text">
+                Format recommandé : image horizontale 4:3, 1200 × 900 px minimum. JPG, PNG ou WebP — max 2 Mo.
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="mb-3">
@@ -164,3 +180,29 @@
            {{ old('is_active', $template?->is_active ?? true) ? 'checked' : '' }}>
     <label class="form-check-label" for="is_active">Template actif (visible dans le catalogue)</label>
 </div>
+
+@section('script')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('template-thumbnail-input');
+            const preview = document.getElementById('template-thumbnail-preview');
+            const empty = document.getElementById('template-thumbnail-empty');
+
+            if (!input || !preview || !empty) {
+                return;
+            }
+
+            input.addEventListener('change', function () {
+                const file = input.files && input.files[0] ? input.files[0] : null;
+
+                if (!file) {
+                    return;
+                }
+
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('d-none');
+                empty.classList.add('d-none');
+            });
+        });
+    </script>
+@endsection

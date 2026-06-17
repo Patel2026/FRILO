@@ -28,6 +28,10 @@ function getTemplatePrice(template: Template): number {
   return typeof template.price === 'string' ? parseInt(template.price, 10) : template.price;
 }
 
+function getTemplateImage(template: Template): string {
+  return template.full_thumbnail_url || parsePreviewGallery(template.preview_gallery)[0] || '';
+}
+
 export default function TemplatesPage() {
   const { pricing } = usePublicPricing();
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -403,7 +407,7 @@ export default function TemplatesPage() {
                   sectorName={template.sector?.name}
                   price={getTemplatePrice(template)}
                   features={parseFeatures(template.features)}
-                  image={template.full_thumbnail_url}
+                  image={getTemplateImage(template)}
                   hasLivePreview={hasLivePreview(template.preview_url)}
                   previewScreens={parsePreviewGallery(template.preview_gallery).length}
                   isFavorite={isFavorite(template.id)}
