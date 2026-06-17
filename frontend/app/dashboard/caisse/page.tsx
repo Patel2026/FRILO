@@ -96,7 +96,7 @@ export default function CaissePage() {
             onChange={(e) => setMonth(e.target.value)}
             className="h-11 w-full rounded-lg border border-gray-200 px-3 text-sm sm:w-auto" />
           <button onClick={openCreate}
-            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto">
+            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#e11d2e] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto">
             Ajouter un mouvement
           </button>
         </div>
@@ -169,7 +169,7 @@ export default function CaissePage() {
             </div>
             <div className="flex flex-col gap-2 pt-2 sm:col-span-2 sm:flex-row sm:justify-end">
               <button type="submit" disabled={saving}
-                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60 sm:w-auto">
+                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#e11d2e] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60 sm:w-auto">
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </button>
               <button type="button" onClick={() => setShowForm(false)}
@@ -183,14 +183,14 @@ export default function CaissePage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e11d2e] border-t-transparent" />
         </div>
       ) : error ? (
         <p className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</p>
       ) : entries.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-gray-500">Aucun mouvement ce mois-ci.</p>
-          <button onClick={openCreate} className="mt-3 text-sm text-[var(--color-primary)] underline">
+          <button onClick={openCreate} className="mt-3 text-sm text-[#e11d2e] underline">
             Enregistrer votre premier mouvement
           </button>
         </div>

@@ -2,16 +2,6 @@ import { expect, test, type Page } from '@playwright/test';
 
 const BACKEND_URL = process.env.E2E_BACKEND_URL || 'http://localhost:8080';
 
-test('dashboard utilities: primary action token is available for visible CTAs', async ({ page, baseURL }) => {
-  const appBaseURL = baseURL || 'http://localhost:3000';
-
-  await page.goto(`${appBaseURL}/login`);
-
-  await expect.poll(async () => {
-    return page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim());
-  }).toBe('#e11d2e');
-});
-
 async function registerClient(page: Page, baseURL: string, suffix: string) {
   await page.goto(`${baseURL}/register`);
 

@@ -20,7 +20,7 @@ export default function MonSitePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e11d2e] border-t-transparent" />
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function MonSitePage() {
         <p className="mt-1 text-sm text-gray-500">
           Vous retrouverez ici toutes les informations une fois la livraison effectuée.
         </p>
-        <Link href="/dashboard/orders" className="mt-4 inline-block text-sm text-[var(--color-primary)] underline">
+        <Link href="/dashboard/orders" className="mt-4 inline-block text-sm text-[#e11d2e] underline">
           Voir l&apos;état de ma commande →
         </Link>
       </div>
@@ -74,7 +74,7 @@ export default function MonSitePage() {
                   href={safeHref(site.site_url)!}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-1 block truncate text-sm font-medium text-[var(--color-primary)] underline"
+                  className="mt-1 block truncate text-sm font-medium text-[#e11d2e] underline"
                 >
                   {site.site_url}
                 </a>
@@ -106,7 +106,7 @@ export default function MonSitePage() {
                   href={safeHref(site.preview_url)!}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-1 block text-sm text-[var(--color-primary)] underline"
+                  className="mt-1 block text-sm text-[#e11d2e] underline"
                 >
                   Voir la maquette →
                 </a>

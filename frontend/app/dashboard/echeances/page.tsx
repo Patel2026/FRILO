@@ -89,7 +89,7 @@ export default function EcheancesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-gray-900">Mes Échéances</h1>
         <button onClick={openCreate}
-          className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90">
+          className="rounded-lg bg-[#e11d2e] px-4 py-2 text-sm font-medium text-white hover:opacity-90">
           + Ajouter
         </button>
       </div>
@@ -116,7 +116,7 @@ export default function EcheancesPage() {
             </div>
             <div className="flex items-end gap-2">
               <button type="submit" disabled={saving}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
+                className="rounded-lg bg-[#e11d2e] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </button>
               <button type="button" onClick={() => setShowForm(false)}
@@ -136,14 +136,14 @@ export default function EcheancesPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e11d2e] border-t-transparent" />
         </div>
       ) : error ? (
         <p className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</p>
       ) : deadlines.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-gray-500">Aucune échéance pour le moment.</p>
-          <button onClick={openCreate} className="mt-3 text-sm text-[var(--color-primary)] underline">
+          <button onClick={openCreate} className="mt-3 text-sm text-[#e11d2e] underline">
             Ajouter votre première échéance →
           </button>
         </div>

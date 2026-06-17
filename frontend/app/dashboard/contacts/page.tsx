@@ -89,7 +89,7 @@ export default function ContactsPage() {
           Mes Clients <span className="ml-2 text-base font-normal text-gray-400">({total})</span>
         </h1>
         <button onClick={openCreate}
-          className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto">
+          className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#e11d2e] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto">
           Ajouter un client
         </button>
       </div>
@@ -138,7 +138,7 @@ export default function ContactsPage() {
             </div>
             <div className="flex flex-col gap-2 pt-2 sm:col-span-2 sm:flex-row sm:justify-end">
               <button type="submit" disabled={saving}
-                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60 sm:w-auto">
+                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#e11d2e] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60 sm:w-auto">
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </button>
               <button type="button" onClick={() => setShowForm(false)}
@@ -152,14 +152,14 @@ export default function ContactsPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e11d2e] border-t-transparent" />
         </div>
       ) : error ? (
         <p className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</p>
       ) : contacts.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-gray-500">Vous n&apos;avez pas encore enregistré de clients.</p>
-          <button onClick={openCreate} className="mt-3 text-sm text-[var(--color-primary)] underline">
+          <button onClick={openCreate} className="mt-3 text-sm text-[#e11d2e] underline">
             Ajouter votre premier client
           </button>
         </div>
@@ -191,7 +191,7 @@ export default function ContactsPage() {
           {Array.from({ length: lastPage }, (_, i) => i + 1).map((p) => (
             <button key={p} onClick={() => load(p)}
               className={`h-8 w-8 rounded text-sm ${page === p
-                ? 'bg-[var(--color-primary)] text-white'
+                ? 'bg-[#e11d2e] text-white'
                 : 'border border-gray-200 text-gray-600'
               }`}>
               {p}
