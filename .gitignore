@@ -23,6 +23,7 @@ Icon
 
 ### Local AI tooling
 .superpowers/
+.worktrees/
 .agents/
 .impeccable/
 docs/agents/
