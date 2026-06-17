@@ -3,202 +3,238 @@
 @section('title') Tableau de bord @endsection
 
 @section('content')
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0">Tableau de bord</h4>
-        </div>
+@php
+    $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
+    $adminUser = auth()->user();
+    $canOps = $adminUser?->hasAnyAdminRole(['ops_admin']);
+    $canContent = $adminUser?->hasAnyAdminRole(['content_admin']);
+    $statusBadge = static fn (string $status): string => match($status) {
+        'pending' => 'warning',
+        'processing' => 'info',
+        'completed' => 'success',
+        'cancelled' => 'danger',
+        default => 'secondary',
+    };
+@endphp
+
+<div class="frilo-op-header">
+    <div>
+        <span class="frilo-section-eyebrow">Console opérationnelle</span>
+        <h1>Tableau de bord FRILO</h1>
+        <p>Suivi des commandes, alertes SLA et production client. Les priorités du jour doivent être visibles en moins de dix secondes.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        @if($canOps)
+            <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="btn btn-frilo">
+                <i class="ri-shopping-bag-3-line align-middle me-1"></i> Commandes en attente
+            </a>
+        @endif
+        @if($frontendUrl !== '')
+            <a href="{{ $frontendUrl }}" target="_blank" rel="noreferrer" class="btn btn-frilo-outline">
+                <i class="ri-external-link-line align-middle me-1"></i> Site client
+            </a>
+        @endif
     </div>
 </div>
 
-{{-- KPI Cards --}}
-<div class="row">
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
+<div class="row g-3">
+    <div class="col-xl-4 col-md-6">
+        <div class="card frilo-kpi-card is-critical h-100">
             <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1 overflow-hidden">
-                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">En attente</p>
-                    </div>
-                    <div class="flex-shrink-0">
-                        <span class="badge bg-warning-subtle text-warning">Pending</span>
-                    </div>
-                </div>
-                <div class="d-flex align-items-end justify-content-between mt-4">
+                <div class="d-flex justify-content-between gap-3">
                     <div>
-                        <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{ $stats['pending'] }}</h4>
-                        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="text-decoration-underline">Voir les commandes</a>
+                        <div class="frilo-kpi-label">À confirmer</div>
+                        <p class="frilo-kpi-value">{{ $stats['pending'] }}</p>
+                        <span class="frilo-kpi-meta">Commandes en attente de prise en charge</span>
                     </div>
-                    <div class="avatar-sm flex-shrink-0">
-                        <span class="avatar-title bg-warning-subtle rounded fs-3">
-                            <i class="ri-time-line text-warning"></i>
-                        </span>
+                    <span class="frilo-kpi-icon"><i class="ri-time-line"></i></span>
+                </div>
+                @if($canOps)
+                    <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="btn btn-sm btn-soft-primary mt-3">
+                        Voir les commandes
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="card frilo-kpi-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <div class="frilo-kpi-label">En production</div>
+                        <p class="frilo-kpi-value">{{ $stats['processing'] }}</p>
+                        <span class="frilo-kpi-meta">Sites en cours de préparation</span>
                     </div>
+                    <span class="frilo-kpi-icon"><i class="ri-loader-4-line"></i></span>
+                </div>
+                @if($canOps)
+                    <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="btn btn-sm btn-soft-secondary mt-3">
+                        Ouvrir la file
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="card frilo-kpi-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <div class="frilo-kpi-label">Livrées</div>
+                        <p class="frilo-kpi-value">{{ $stats['completed'] }}</p>
+                        <span class="frilo-kpi-meta">Commandes finalisées</span>
+                    </div>
+                    <span class="frilo-kpi-icon"><i class="ri-checkbox-circle-line"></i></span>
+                </div>
+                @if($canOps)
+                    <a href="{{ route('admin.orders.index', ['status' => 'completed']) }}" class="btn btn-sm btn-soft-secondary mt-3">
+                        Consulter
+                    </a>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6">
+        <div class="card frilo-kpi-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <div class="frilo-kpi-label">Chiffre d'affaires</div>
+                        <p class="frilo-kpi-value">{{ number_format($stats['revenue'], 0, ',', ' ') }}</p>
+                        <span class="frilo-kpi-meta">FCFA sur commandes livrées</span>
+                    </div>
+                    <span class="frilo-kpi-icon"><i class="ri-money-franc-circle-line"></i></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
+    <div class="col-xl-4 col-md-6">
+        <div class="card frilo-kpi-card h-100">
             <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1 overflow-hidden">
-                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">En production</p>
-                    </div>
-                </div>
-                <div class="d-flex align-items-end justify-content-between mt-4">
+                <div class="d-flex justify-content-between gap-3">
                     <div>
-                        <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{ $stats['processing'] }}</h4>
-                        <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="text-decoration-underline">Voir les commandes</a>
+                        <div class="frilo-kpi-label">Clients inscrits</div>
+                        <p class="frilo-kpi-value">{{ $stats['clients'] }}</p>
+                        <span class="frilo-kpi-meta">Comptes client actifs dans FRILO</span>
                     </div>
-                    <div class="avatar-sm flex-shrink-0">
-                        <span class="avatar-title bg-info-subtle rounded fs-3">
-                            <i class="ri-loader-4-line text-info"></i>
-                        </span>
-                    </div>
+                    <span class="frilo-kpi-icon"><i class="ri-group-line"></i></span>
                 </div>
+                @if($canOps)
+                    <a href="{{ route('admin.clients.index') }}" class="btn btn-sm btn-soft-secondary mt-3">
+                        Voir les clients
+                    </a>
+                @endif
             </div>
         </div>
     </div>
 
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
+    <div class="col-xl-4 col-md-6">
+        <div class="card frilo-kpi-card h-100">
             <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1 overflow-hidden">
-                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Livrées</p>
-                    </div>
-                </div>
-                <div class="d-flex align-items-end justify-content-between mt-4">
+                <div class="d-flex justify-content-between gap-3">
                     <div>
-                        <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{ $stats['completed'] }}</h4>
-                        <a href="{{ route('admin.orders.index', ['status' => 'completed']) }}" class="text-decoration-underline">Voir les commandes</a>
+                        <div class="frilo-kpi-label">Templates actifs</div>
+                        <p class="frilo-kpi-value">{{ $stats['templates'] }}</p>
+                        <span class="frilo-kpi-meta">Modèles disponibles côté public</span>
                     </div>
-                    <div class="avatar-sm flex-shrink-0">
-                        <span class="avatar-title bg-success-subtle rounded fs-3">
-                            <i class="ri-checkbox-circle-line text-success"></i>
-                        </span>
-                    </div>
+                    <span class="frilo-kpi-icon"><i class="ri-layout-3-line"></i></span>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1 overflow-hidden">
-                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Chiffre d'affaires</p>
-                    </div>
-                </div>
-                <div class="d-flex align-items-end justify-content-between mt-4">
-                    <div>
-                        <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{ number_format($stats['revenue'], 0, ',', ' ') }} FCFA</h4>
-                        <span class="text-muted">Commandes livrées</span>
-                    </div>
-                    <div class="avatar-sm flex-shrink-0">
-                        <span class="avatar-title bg-primary-subtle rounded fs-3">
-                            <i class="ri-money-franc-circle-line text-primary"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Ligne 2 : clients + templates --}}
-<div class="row">
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
-            <div class="card-body">
-                <div class="d-flex align-items-end justify-content-between mt-2">
-                    <div>
-                        <p class="text-uppercase fw-medium text-muted mb-0">Clients inscrits</p>
-                        <h4 class="fs-22 fw-semibold ff-secondary mt-2 mb-0">{{ $stats['clients'] }}</h4>
-                    </div>
-                    <div class="avatar-sm flex-shrink-0">
-                        <span class="avatar-title bg-primary-subtle rounded fs-3">
-                            <i class="ri-group-line text-primary"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
-            <div class="card-body">
-                <div class="d-flex align-items-end justify-content-between mt-2">
-                    <div>
-                        <p class="text-uppercase fw-medium text-muted mb-0">Templates actifs</p>
-                        <h4 class="fs-22 fw-semibold ff-secondary mt-2 mb-0">{{ $stats['templates'] }}</h4>
-                    </div>
-                    <div class="avatar-sm flex-shrink-0">
-                        <span class="avatar-title bg-primary-subtle rounded fs-3">
-                            <i class="ri-layout-3-line text-primary"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Alertes SLA --}}
-<div class="row">
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
-            <div class="card-body">
-                <p class="text-uppercase fw-medium text-muted mb-1">SLA confirmation</p>
-                <h4 class="fs-22 fw-semibold mb-1">{{ $slaAlerts['overdue_confirmation_count'] }}</h4>
-                <p class="text-muted mb-0">Commandes pending en retard (> {{ $slaAlerts['confirmation_minutes'] }} min)</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card card-animate">
-            <div class="card-body">
-                <p class="text-uppercase fw-medium text-muted mb-1">SLA livraison</p>
-                <h4 class="fs-22 fw-semibold mb-1">{{ $slaAlerts['overdue_delivery_count'] }}</h4>
-                <p class="text-muted mb-0">Commandes processing en retard (> {{ $slaAlerts['delivery_hours'] }} h)</p>
+                @if($canContent)
+                    <a href="{{ route('admin.templates.index') }}" class="btn btn-sm btn-soft-secondary mt-3">
+                        Gérer le catalogue
+                    </a>
+                @endif
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+<div class="row g-3 mt-1">
+    <div class="col-xl-6">
+        <div class="card frilo-sla-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <span class="frilo-section-eyebrow">SLA confirmation</span>
+                        <h5 class="card-title mt-2 mb-1">{{ $slaAlerts['overdue_confirmation_count'] }} commande(s) en retard</h5>
+                        <p class="text-muted mb-0">Pending depuis plus de {{ $slaAlerts['confirmation_minutes'] }} minutes.</p>
+                    </div>
+                    @if($canOps)
+                        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="btn btn-sm btn-soft-primary align-self-start">
+                            Traiter
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card frilo-sla-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between gap-3">
+                    <div>
+                        <span class="frilo-section-eyebrow">SLA livraison</span>
+                        <h5 class="card-title mt-2 mb-1">{{ $slaAlerts['overdue_delivery_count'] }} commande(s) en retard</h5>
+                        <p class="text-muted mb-0">Processing depuis plus de {{ $slaAlerts['delivery_hours'] }} heures.</p>
+                    </div>
+                    @if($canOps)
+                        <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="btn btn-sm btn-soft-primary align-self-start">
+                            Suivre
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
     <div class="col-12">
         <div class="card">
-            <div class="card-header d-flex align-items-center">
-                <h5 class="card-title flex-grow-1 mb-0">Alertes SLA — commandes en retard</h5>
-                <a href="{{ route('admin.orders.index') }}" class="btn btn-soft-primary btn-sm">Voir commandes</a>
+            <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div>
+                    <span class="frilo-section-eyebrow">Priorités</span>
+                    <h5 class="card-title mb-0 mt-1">Commandes en retard SLA</h5>
+                </div>
+                @if($canOps)
+                    <a href="{{ route('admin.orders.index') }}" class="btn btn-soft-primary btn-sm">
+                        Voir toutes les commandes
+                    </a>
+                @endif
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-nowrap align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>#</th>
+                                <th>Commande</th>
                                 <th>Client</th>
                                 <th>Template</th>
                                 <th>Statut</th>
                                 <th>Créée le</th>
                                 <th>Retard</th>
-                                <th></th>
+                                <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($slaOverdueOrders as $order)
                                 <tr>
-                                    <td>#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="fw-bold">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
                                     <td>{{ $order->user->name ?? '—' }}</td>
                                     <td>{{ $order->template->name ?? '—' }}</td>
-                                    <td><span class="badge {{ $order->status->badgeClass() }}">{{ $order->status->label() }}</span></td>
-                                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                     <td>
+                                        <span class="badge badge-soft-{{ $statusBadge($order->status->value) }}">
+                                            {{ $order->status->label() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                                    <td class="fw-bold">
                                         @if($order->status->value === 'pending')
                                             {{ max(0, now()->diffInMinutes($order->created_at) - $slaAlerts['confirmation_minutes']) }} min
                                         @elseif($order->status->value === 'processing')
@@ -207,15 +243,15 @@
                                             —
                                         @endif
                                     </td>
-                                    <td>
-                                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-secondary">
+                                    <td class="text-end">
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-secondary" aria-label="Ouvrir la commande #{{ $order->id }}">
                                             <i class="ri-eye-line"></i>
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">Aucune alerte SLA active.</td>
+                                    <td colspan="7" class="frilo-empty-state">Aucune alerte SLA active.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -226,57 +262,63 @@
     </div>
 </div>
 
-{{-- Dernières commandes --}}
-<div class="row">
+<div class="row g-3 mt-1">
     <div class="col-12">
         <div class="card">
-            <div class="card-header d-flex align-items-center">
-                <h5 class="card-title flex-grow-1 mb-0">Dernières commandes</h5>
-                <a href="{{ route('admin.orders.index') }}" class="btn btn-soft-primary btn-sm">Voir tout</a>
+            <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div>
+                    <span class="frilo-section-eyebrow">Activité récente</span>
+                    <h5 class="card-title mb-0 mt-1">Dernières commandes</h5>
+                </div>
+                @if($canOps)
+                    <a href="{{ route('admin.orders.index') }}" class="btn btn-soft-secondary btn-sm">
+                        Voir tout
+                    </a>
+                @endif
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-nowrap align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>#</th>
+                                <th>Commande</th>
                                 <th>Client</th>
                                 <th>Template</th>
                                 <th>Secteur</th>
                                 <th>Prix</th>
                                 <th>Statut</th>
                                 <th>Date</th>
-                                <th></th>
+                                <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($recentOrders as $order)
-                            <tr>
-                                <td><a href="{{ route('admin.orders.show', $order) }}">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</a></td>
-                                <td>{{ $order->user->name ?? '—' }}</td>
-                                <td>{{ $order->template->name ?? '—' }}</td>
-                                <td>{{ $order->template->sector->name ?? '—' }}</td>
-                                <td>{{ number_format($order->price, 0, ',', ' ') }} FCFA</td>
-                                <td>
-                                    <span class="badge badge-soft-{{ match($order->status->value) {
-                                        'pending' => 'warning',
-                                        'processing' => 'info',
-                                        'completed' => 'success',
-                                        'cancelled' => 'danger',
-                                        default => 'secondary'
-                                    } }}">
-                                        {{ $order->status->label() }}
-                                    </span>
-                                </td>
-                                <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                                <td>
-                                    <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-secondary">
-                                        <i class="ri-eye-line"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="fw-bold">
+                                            #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $order->user->name ?? '—' }}</td>
+                                    <td>{{ $order->template->name ?? '—' }}</td>
+                                    <td>{{ $order->template->sector->name ?? '—' }}</td>
+                                    <td class="fw-bold">{{ number_format($order->price, 0, ',', ' ') }} FCFA</td>
+                                    <td>
+                                        <span class="badge badge-soft-{{ $statusBadge($order->status->value) }}">
+                                            {{ $order->status->label() }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $order->created_at->format('d/m/Y') }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-secondary" aria-label="Ouvrir la commande #{{ $order->id }}">
+                                            <i class="ri-eye-line"></i>
+                                        </a>
+                                    </td>
+                                </tr>
                             @empty
-                            <tr><td colspan="8" class="text-center text-muted py-4">Aucune commande pour le moment.</td></tr>
+                                <tr>
+                                    <td colspan="8" class="frilo-empty-state">Aucune commande pour le moment.</td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>

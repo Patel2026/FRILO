@@ -1,5 +1,5 @@
 <!doctype html >
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="frilo-admin-shell" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 
 <head>
     <meta charset="utf-8" />
@@ -16,7 +16,7 @@
     @include('layouts.body')
 @show
     <!-- Begin page -->
-    <div id="layout-wrapper">
+    <div id="layout-wrapper" class="frilo-admin-layout">
         @include('layouts.topbar')
         @include('layouts.sidebar')
         <!-- ============================================================== -->

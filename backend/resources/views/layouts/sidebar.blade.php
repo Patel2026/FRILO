@@ -5,21 +5,21 @@
         <!-- Dark Logo-->
         <a href="{{ route('admin.dashboard') }}" class="logo logo-dark">
             <span class="logo-sm">
-                <span class="fw-bold text-primary fs-18">F</span>
+                <span class="frilo-brand-mark">F</span>
             </span>
             <span class="logo-lg">
-                <span class="fw-bold text-primary fs-20">FRILO</span>
-                <span class="text-muted fs-12 ms-1">Admin</span>
+                <span class="frilo-brand-name">FRILO</span>
+                <span class="frilo-brand-context">Admin</span>
             </span>
         </a>
         <!-- Light Logo-->
         <a href="{{ route('admin.dashboard') }}" class="logo logo-light">
             <span class="logo-sm">
-                <span class="fw-bold text-white fs-18">F</span>
+                <span class="frilo-brand-mark">F</span>
             </span>
             <span class="logo-lg">
-                <span class="fw-bold text-white fs-20">FRILO</span>
-                <span class="text-white-50 fs-12 ms-1">Admin</span>
+                <span class="frilo-brand-name">FRILO</span>
+                <span class="frilo-brand-context">Ops</span>
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">

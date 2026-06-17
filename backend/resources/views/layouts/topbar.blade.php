@@ -18,19 +18,19 @@
                     </span>
                 </button>
 
-                <div class="ms-2">
-                    <h6 class="mb-0 fw-semibold">FRILO Admin</h6>
-                    <small class="text-muted">Backoffice opérationnel</small>
+                <div class="ms-2 frilo-topbar-context">
+                    <h6 class="mb-0 fw-semibold">Console FRILO</h6>
+                    <small class="text-muted">Pilotage commandes et production</small>
                 </div>
             </div>
 
             <div class="d-flex align-items-center">
-                <a href="{{ rtrim((string) config('app.frontend_url'), '/') }}" target="_blank" rel="noreferrer" class="btn btn-sm btn-soft-primary me-2">
+                <a href="{{ rtrim((string) config('app.frontend_url'), '/') }}" target="_blank" rel="noreferrer" class="btn btn-sm btn-frilo-outline me-2">
                     <i class="ri-external-link-line align-middle me-1"></i> Site client
                 </a>
 
                 <div class="dropdown topbar-head-dropdown ms-1 header-item">
-                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle frilo-notification-trigger" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="bx bx-bell fs-22"></i>
                         @if($adminUnreadCount > 0)
                             <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
