@@ -61,7 +61,7 @@
                         <th>Réponse</th>
                         <th>Statut</th>
                         <th>Mise à jour</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

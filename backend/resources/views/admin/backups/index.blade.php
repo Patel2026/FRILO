@@ -67,7 +67,7 @@
                                 <th>Taille</th>
                                 <th>Tables/Lignes</th>
                                 <th>Créée le</th>
-                                <th></th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>

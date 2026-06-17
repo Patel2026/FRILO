@@ -31,7 +31,7 @@
                         <th>Route publique</th>
                         <th>SEO</th>
                         <th>Indexation</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -210,16 +210,14 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-nowrap align-middle mb-0">
+                    <table class="table table-nowrap align-middle mb-0 frilo-admin-table">
                         <thead class="table-light">
                             <tr>
-                                <th>Commande</th>
+                                <th class="frilo-table-id">Commande</th>
                                 <th>Client</th>
-                                <th>Template</th>
-                                <th>Statut</th>
-                                <th>Créée le</th>
-                                <th>Retard</th>
-                                <th class="text-end">Action</th>
+                                <th class="frilo-table-status">Statut</th>
+                                <th class="frilo-table-date">Retard</th>
+                                <th class="frilo-table-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -227,13 +225,11 @@
                                 <tr>
                                     <td class="fw-bold">#{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}</td>
                                     <td>{{ $order->user->name ?? '—' }}</td>
-                                    <td>{{ $order->template->name ?? '—' }}</td>
                                     <td>
                                         <span class="badge badge-soft-{{ $statusBadge($order->status->value) }}">
                                             {{ $order->status->label() }}
                                         </span>
                                     </td>
-                                    <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                     <td class="fw-bold">
                                         @if($order->status->value === 'pending')
                                             {{ max(0, now()->diffInMinutes($order->created_at) - $slaAlerts['confirmation_minutes']) }} min
@@ -243,7 +239,7 @@
                                             —
                                         @endif
                                     </td>
-                                    <td class="text-end">
+                                    <td class="frilo-table-actions">
                                         <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-secondary" aria-label="Ouvrir la commande #{{ $order->id }}">
                                             <i class="ri-eye-line"></i>
                                         </a>
@@ -251,7 +247,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="frilo-empty-state">Aucune alerte SLA active.</td>
+                                    <td colspan="5" class="frilo-empty-state">Aucune alerte SLA active.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -278,17 +274,15 @@
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-nowrap align-middle mb-0">
+                    <table class="table table-nowrap align-middle mb-0 frilo-admin-table">
                         <thead class="table-light">
                             <tr>
-                                <th>Commande</th>
+                                <th class="frilo-table-id">Commande</th>
                                 <th>Client</th>
-                                <th>Template</th>
-                                <th>Secteur</th>
-                                <th>Prix</th>
-                                <th>Statut</th>
-                                <th>Date</th>
-                                <th class="text-end">Action</th>
+                                <th class="frilo-table-money">Prix</th>
+                                <th class="frilo-table-status">Statut</th>
+                                <th class="frilo-table-date">Date</th>
+                                <th class="frilo-table-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -300,8 +294,6 @@
                                         </a>
                                     </td>
                                     <td>{{ $order->user->name ?? '—' }}</td>
-                                    <td>{{ $order->template->name ?? '—' }}</td>
-                                    <td>{{ $order->template->sector->name ?? '—' }}</td>
                                     <td class="fw-bold">{{ number_format($order->price, 0, ',', ' ') }} FCFA</td>
                                     <td>
                                         <span class="badge badge-soft-{{ $statusBadge($order->status->value) }}">
@@ -309,7 +301,7 @@
                                         </span>
                                     </td>
                                     <td>{{ $order->created_at->format('d/m/Y') }}</td>
-                                    <td class="text-end">
+                                    <td class="frilo-table-actions">
                                         <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-secondary" aria-label="Ouvrir la commande #{{ $order->id }}">
                                             <i class="ri-eye-line"></i>
                                         </a>
@@ -317,7 +309,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="frilo-empty-state">Aucune commande pour le moment.</td>
+                                    <td colspan="6" class="frilo-empty-state">Aucune commande pour le moment.</td>
                                 </tr>
                             @endforelse
                         </tbody>

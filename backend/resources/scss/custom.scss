@@ -209,6 +209,52 @@ File: Custom Css File
   color: var(--frilo-admin-ink);
 }
 
+.frilo-admin-shell .table-responsive {
+  overflow-x: visible;
+}
+
+.frilo-admin-shell .table-responsive > .table,
+.frilo-admin-shell .frilo-admin-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.frilo-admin-shell .table-responsive > .table th,
+.frilo-admin-shell .table-responsive > .table td,
+.frilo-admin-shell .frilo-admin-table th,
+.frilo-admin-shell .frilo-admin-table td,
+.frilo-admin-shell .table-nowrap th,
+.frilo-admin-shell .table-nowrap td {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.frilo-admin-shell .frilo-admin-table .frilo-table-id {
+  width: 96px;
+}
+
+.frilo-admin-shell .frilo-admin-table .frilo-table-money {
+  width: 132px;
+}
+
+.frilo-admin-shell .frilo-admin-table .frilo-table-status {
+  width: 126px;
+}
+
+.frilo-admin-shell .frilo-admin-table .frilo-table-date {
+  width: 132px;
+}
+
+.frilo-admin-shell .frilo-admin-table .frilo-table-actions {
+  text-align: right;
+  width: 118px;
+}
+
+.frilo-admin-shell .frilo-admin-table .frilo-table-actions .btn,
+.frilo-admin-shell .frilo-admin-table .frilo-table-actions form {
+  white-space: nowrap;
+}
+
 .frilo-admin-shell .table > :not(caption) > * > * {
   border-bottom-color: var(--frilo-admin-border);
   padding: 0.78rem 0.85rem;
@@ -521,5 +567,22 @@ File: Custom Css File
   .frilo-admin-shell .table-responsive {
     border: 1px solid var(--frilo-admin-border);
     border-radius: var(--frilo-admin-radius);
+  }
+
+  .frilo-admin-shell .frilo-admin-table {
+    table-layout: auto;
+  }
+
+  .frilo-admin-shell .frilo-admin-table .frilo-table-secondary,
+  .frilo-admin-shell .frilo-admin-table .frilo-table-tertiary {
+    display: none;
+  }
+
+  .frilo-admin-shell .frilo-admin-table .frilo-table-id {
+    width: 82px;
+  }
+
+  .frilo-admin-shell .frilo-admin-table .frilo-table-actions {
+    width: 92px;
   }
 }

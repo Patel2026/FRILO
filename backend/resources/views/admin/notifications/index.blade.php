@@ -159,7 +159,7 @@
                                 <th>Destinataire</th>
                                 <th>Contenu</th>
                                 <th>État</th>
-                                <th></th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>

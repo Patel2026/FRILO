@@ -53,36 +53,34 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-nowrap align-middle mb-0">
+            <table class="table table-nowrap align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
-                        <th>Ordre</th>
+                        <th class="frilo-table-id">Ordre</th>
                         <th>Option</th>
-                        <th>Persona cible</th>
-                        <th>Prix</th>
-                        <th>Statut</th>
-                        <th></th>
+                        <th class="frilo-table-money">Prix</th>
+                        <th class="frilo-table-status">Statut</th>
+                        <th class="frilo-table-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($orderOptions as $orderOption)
                         <tr>
                             <td><span class="badge badge-soft-dark">{{ $orderOption->sort_order }}</span></td>
-                            <td class="text-wrap" style="min-width: 320px;">
+                            <td class="text-wrap">
                                 <div class="fw-semibold">{{ $orderOption->name }}</div>
                                 <div class="text-muted small">{{ $orderOption->slug }}</div>
                                 @if($orderOption->description)
                                     <div class="text-muted small mt-1">{{ \Illuminate\Support\Str::limit($orderOption->description, 120) }}</div>
                                 @endif
                             </td>
-                            <td class="text-wrap" style="min-width: 220px;">{{ $orderOption->persona_hint ?: '—' }}</td>
                             <td class="fw-semibold">{{ number_format($orderOption->price, 0, ',', ' ') }} FCFA</td>
                             <td>
                                 <span class="badge badge-soft-{{ $orderOption->is_active ? 'success' : 'secondary' }}">
                                     {{ $orderOption->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
-                            <td class="text-end">
+                            <td class="frilo-table-actions">
                                 <a href="{{ route('admin.order-options.edit', $orderOption) }}" class="btn btn-sm btn-soft-primary me-1">
                                     <i class="ri-edit-line"></i>
                                 </a>
@@ -102,7 +100,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Aucune option de commande configurée.</td>
+                            <td colspan="5" class="text-center text-muted py-4">Aucune option de commande configurée.</td>
                         </tr>
                     @endforelse
                 </tbody>

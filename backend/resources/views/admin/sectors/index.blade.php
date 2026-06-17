@@ -24,30 +24,28 @@
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
                         <th>Nom</th>
-                        <th>Slug</th>
-                        <th>Icône</th>
+                        <th class="frilo-table-secondary">Slug</th>
                         <th>Templates</th>
-                        <th>Actif</th>
-                        <th></th>
+                        <th class="frilo-table-status">Statut</th>
+                        <th class="frilo-table-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($sectors as $sector)
                     <tr>
                         <td><strong>{{ $sector->name }}</strong></td>
-                        <td><code>{{ $sector->slug }}</code></td>
-                        <td>{{ $sector->icon ?: '—' }}</td>
+                        <td class="frilo-table-secondary"><code>{{ $sector->slug }}</code></td>
                         <td>{{ $sector->templates_count }}</td>
                         <td>
                             <span class="badge badge-soft-{{ $sector->is_active ? 'success' : 'danger' }}">
                                 {{ $sector->is_active ? 'Actif' : 'Inactif' }}
                             </span>
                         </td>
-                        <td>
+                        <td class="frilo-table-actions">
                             <a href="{{ route('admin.sectors.edit', $sector) }}" class="btn btn-sm btn-soft-primary me-1">
                                 <i class="ri-edit-line"></i>
                             </a>
@@ -59,7 +57,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-center text-muted py-4">Aucun secteur.</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted py-4">Aucun secteur.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -51,18 +51,17 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-nowrap align-middle mb-0">
+            <table class="table table-nowrap align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
-                        <th>#</th>
+                        <th class="frilo-table-id">Commande</th>
                         <th>Client</th>
-                        <th>Template</th>
-                        <th>Secteur</th>
-                        <th>Prix</th>
-                        <th>Statut</th>
-                        <th>Paiement</th>
-                        <th>Date</th>
-                        <th></th>
+                        <th class="frilo-table-secondary">Offre</th>
+                        <th class="frilo-table-money">Prix</th>
+                        <th class="frilo-table-status">Statut</th>
+                        <th class="frilo-table-status frilo-table-secondary">Paiement</th>
+                        <th class="frilo-table-date frilo-table-tertiary">Date</th>
+                        <th class="frilo-table-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -73,8 +72,7 @@
                             <div>{{ $order->user->name ?? '—' }}</div>
                             <small class="text-muted">{{ $order->user->email ?? '' }}</small>
                         </td>
-                        <td>{{ $order->template->name ?? '—' }}</td>
-                        <td>{{ $order->template->sector->name ?? '—' }}</td>
+                        <td class="frilo-table-secondary">{{ $order->template->name ?? '—' }}</td>
                         <td>{{ number_format($order->price, 0, ',', ' ') }} FCFA</td>
                         <td>
                             <span class="badge badge-soft-{{ match($order->status->value) {
@@ -87,20 +85,20 @@
                                 {{ $order->status->label() }}
                             </span>
                         </td>
-                        <td>
+                        <td class="frilo-table-secondary">
                             <span class="badge {{ $order->payment_status->badgeClass() }}">
                                 {{ $order->payment_status->label() }}
                             </span>
                         </td>
-                        <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-                        <td>
+                        <td class="frilo-table-tertiary">{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="frilo-table-actions">
                             <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-soft-primary">
                                 <i class="ri-eye-line align-middle"></i> Voir
                             </a>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="9" class="text-center text-muted py-4">Aucune commande.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">Aucune commande.</td></tr>
                     @endforelse
                 </tbody>
             </table>

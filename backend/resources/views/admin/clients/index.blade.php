@@ -17,22 +17,22 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
                         <th>Nom</th>
-                        <th>Email</th>
-                        <th>Statut</th>
-                        <th>Inscription</th>
+                        <th class="frilo-table-secondary">Email</th>
+                        <th class="frilo-table-status">Statut</th>
+                        <th class="frilo-table-date frilo-table-tertiary">Inscription</th>
                         <th>Commandes</th>
-                        <th></th>
+                        <th class="frilo-table-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($clients as $client)
                     <tr>
                         <td>{{ $client->name }}</td>
-                        <td>{{ $client->email }}</td>
+                        <td class="frilo-table-secondary">{{ $client->email }}</td>
                         <td>
                             @if($client->is_active)
                                 <span class="badge badge-soft-success">Actif</span>
@@ -40,11 +40,11 @@
                                 <span class="badge badge-soft-danger">Désactivé</span>
                             @endif
                         </td>
-                        <td>{{ $client->created_at->format('d/m/Y') }}</td>
+                        <td class="frilo-table-date frilo-table-tertiary">{{ $client->created_at->format('d/m/Y') }}</td>
                         <td>
                             <span class="badge bg-primary-subtle text-primary">{{ $client->orders_count }}</span>
                         </td>
-                        <td>
+                        <td class="frilo-table-actions">
                             <a href="{{ route('admin.clients.show', $client) }}" class="btn btn-sm btn-soft-primary">
                                 <i class="ri-eye-line"></i> Voir
                             </a>

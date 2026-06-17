@@ -58,18 +58,16 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-nowrap align-middle mb-0">
+            <table class="table table-nowrap align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
-                        <th>#</th>
+                        <th class="frilo-table-id">Transaction</th>
                         <th>Commande</th>
                         <th>Client</th>
-                        <th>Montant</th>
-                        <th>Mode</th>
-                        <th>Statut</th>
-                        <th>Référence</th>
-                        <th>Date</th>
-                        <th></th>
+                        <th class="frilo-table-money">Montant</th>
+                        <th class="frilo-table-status">Statut</th>
+                        <th class="frilo-table-date">Date</th>
+                        <th class="frilo-table-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,11 +88,9 @@
                                 <small class="d-block text-muted">{{ $payment->order?->user?->email ?? '' }}</small>
                             </td>
                             <td>{{ number_format($payment->amount, 0, ',', ' ') }} {{ $payment->currency }}</td>
-                            <td>{{ $payment->mode ?? '—' }}</td>
                             <td><span class="badge badge-soft-secondary">{{ $payment->status }}</span></td>
-                            <td>{{ $payment->fedapay_reference ?? '—' }}</td>
                             <td>{{ $payment->created_at?->format('d/m/Y H:i') }}</td>
-                            <td>
+                            <td class="frilo-table-actions">
                                 <a href="{{ route('admin.payments.show', $payment) }}" class="btn btn-sm btn-soft-primary">
                                     <i class="ri-eye-line align-middle"></i> Voir
                                 </a>
@@ -102,7 +98,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">Aucune transaction paiement.</td>
+                            <td colspan="7" class="text-center text-muted py-4">Aucune transaction paiement.</td>
                         </tr>
                     @endforelse
                 </tbody>

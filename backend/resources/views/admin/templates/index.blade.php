@@ -24,16 +24,15 @@
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-nowrap align-middle mb-0">
+            <table class="table table-nowrap align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
                         <th>Nom</th>
-                        <th>Secteur</th>
-                        <th>Prix (FCFA)</th>
-                        <th>Aperçu</th>
-                        <th>Actif</th>
+                        <th class="frilo-table-secondary">Secteur</th>
+                        <th class="frilo-table-money">Prix</th>
+                        <th class="frilo-table-status">Statut</th>
                         <th>Commandes</th>
-                        <th></th>
+                        <th class="frilo-table-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,7 +49,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td>{{ $template->sector->name ?? '—' }}</td>
+                        <td class="frilo-table-secondary">{{ $template->sector->name ?? '—' }}</td>
                         <td>
                             <div class="fw-semibold">{{ number_format($template->effective_price, 0, ',', ' ') }} FCFA</div>
                             <div class="text-muted small">Normal : {{ number_format($template->normal_price ?? $template->price, 0, ',', ' ') }} FCFA</div>
@@ -59,28 +58,12 @@
                             @endif
                         </td>
                         <td>
-                            <div class="d-flex flex-wrap gap-1">
-                                @if($template->preview_url)
-                                    <span class="badge badge-soft-success">Démo live</span>
-                                @endif
-                                @if(!empty($template->preview_pages))
-                                    <span class="badge badge-soft-info">{{ count($template->preview_pages) }} page(s)</span>
-                                @endif
-                                @if(!empty($template->preview_gallery))
-                                    <span class="badge badge-soft-primary">{{ count($template->preview_gallery) }} capture(s)</span>
-                                @endif
-                                @if(!$template->preview_url && empty($template->preview_pages) && empty($template->preview_gallery))
-                                    <span class="text-muted">—</span>
-                                @endif
-                            </div>
-                        </td>
-                        <td>
                             <span class="badge badge-soft-{{ $template->is_active ? 'success' : 'danger' }}">
                                 {{ $template->is_active ? 'Actif' : 'Inactif' }}
                             </span>
                         </td>
                         <td>{{ $template->orders_count ?? 0 }}</td>
-                        <td>
+                        <td class="frilo-table-actions">
                             <a href="{{ route('admin.templates.edit', $template) }}" class="btn btn-sm btn-soft-primary me-1">
                                 <i class="ri-edit-line"></i>
                             </a>
@@ -92,7 +75,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="text-center text-muted py-4">Aucun template.</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4">Aucun template.</td></tr>
                     @endforelse
                 </tbody>
             </table>

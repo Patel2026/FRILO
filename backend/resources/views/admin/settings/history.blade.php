@@ -89,7 +89,7 @@
                         <th>Testée le</th>
                         <th>Publiée le</th>
                         <th>Note</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>

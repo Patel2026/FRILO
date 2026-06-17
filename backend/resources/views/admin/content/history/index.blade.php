@@ -41,7 +41,7 @@
                         <th>Événement</th>
                         <th>Ressource</th>
                         <th>Auteur</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
