@@ -107,7 +107,7 @@
                         <p class="frilo-kpi-value">{{ number_format($stats['revenue'], 0, ',', ' ') }}</p>
                         <span class="frilo-kpi-meta">FCFA sur commandes livrées</span>
                     </div>
-                    <span class="frilo-kpi-icon"><i class="ri-money-franc-circle-line"></i></span>
+                    <span class="frilo-kpi-icon"><i class="ri-money-dollar-circle-line"></i></span>
                 </div>
             </div>
         </div>
