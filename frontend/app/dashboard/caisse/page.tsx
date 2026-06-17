@@ -88,16 +88,16 @@ export default function CaissePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold text-gray-900">Ma Caisse</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <input type="month" value={month}
             aria-label="Mois sélectionné"
             onChange={(e) => setMonth(e.target.value)}
-            className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm" />
+            className="h-11 w-full rounded-lg border border-gray-200 px-3 text-sm sm:w-auto" />
           <button onClick={openCreate}
-            className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90">
-            + Ajouter
+            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto">
+            Ajouter un mouvement
           </button>
         </div>
       </div>
@@ -161,13 +161,19 @@ export default function CaissePage() {
                 value={form.entry_date}
                 onChange={(e) => setForm({ ...form, entry_date: e.target.value })} />
             </div>
-            <div className="flex items-end gap-2">
+            <div className="sm:col-span-2">
+              <label htmlFor="cash-notes" className="mb-1 block text-xs font-medium text-gray-600">Notes (optionnel)</label>
+              <textarea id="cash-notes" rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                value={form.notes ?? ''}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+            </div>
+            <div className="flex flex-col gap-2 pt-2 sm:col-span-2 sm:flex-row sm:justify-end">
               <button type="submit" disabled={saving}
-                className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
+                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[var(--color-primary)] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60 sm:w-auto">
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </button>
               <button type="button" onClick={() => setShowForm(false)}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600">
+                className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-gray-200 px-5 text-sm font-medium text-gray-600 hover:border-gray-300 hover:text-gray-900 sm:w-auto">
                 Annuler
               </button>
             </div>
@@ -185,7 +191,7 @@ export default function CaissePage() {
         <div className="py-16 text-center">
           <p className="text-gray-500">Aucun mouvement ce mois-ci.</p>
           <button onClick={openCreate} className="mt-3 text-sm text-[var(--color-primary)] underline">
-            Enregistrer votre premier mouvement →
+            Enregistrer votre premier mouvement
           </button>
         </div>
       ) : (
