@@ -19,7 +19,7 @@
                 </button>
 
                 <div class="ms-2 frilo-topbar-context">
-                    <h6 class="mb-0 fw-semibold">Console FRILO</h6>
+                    <h6 class="mb-0 fw-semibold">Espace d'administration FRILO</h6>
                     <small class="text-muted">Pilotage commandes et production</small>
                 </div>
             </div>
@@ -30,14 +30,14 @@
                 </a>
 
                 <div class="dropdown topbar-head-dropdown ms-1 header-item">
-                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle frilo-notification-trigger" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a href="{{ route('admin.notifications.index') }}" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle frilo-notification-trigger" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="button">
                         <i class="bx bx-bell fs-22"></i>
                         @if($adminUnreadCount > 0)
                             <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
                                 {{ $adminUnreadCount > 99 ? '99+' : $adminUnreadCount }}
                             </span>
                         @endif
-                    </button>
+                    </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0">
                         <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border d-flex align-items-center justify-content-between">
                             <h6 class="m-0 fs-16 fw-semibold">Notifications</h6>
