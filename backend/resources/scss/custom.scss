@@ -49,7 +49,7 @@ File: Custom Css File
 
 .frilo-admin-shell .page-content {
   background: var(--frilo-admin-canvas);
-  padding-top: 22px;
+  padding-top: calc(70px + 22px);
 }
 
 .frilo-admin-shell .container-fluid {
@@ -497,7 +497,7 @@ File: Custom Css File
 
 @media (max-width: 767.98px) {
   .frilo-admin-shell .page-content {
-    padding-top: 16px;
+    padding-top: calc(70px + 16px);
   }
 
   .frilo-admin-shell .frilo-op-header {
