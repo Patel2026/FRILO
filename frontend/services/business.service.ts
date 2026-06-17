@@ -26,6 +26,7 @@ export interface Template {
     preview_pages?: Array<{ label?: string; path?: string }> | string | null;
     preview_gallery?: string[] | string | null;
     is_active: boolean;
+    is_system?: boolean;
     sector_id: number;
     sector?: Sector;
 }

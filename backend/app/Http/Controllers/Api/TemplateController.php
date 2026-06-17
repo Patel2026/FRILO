@@ -57,6 +57,7 @@ class TemplateController extends Controller
             'preview_pages' => $template->preview_pages ?? [],
             'preview_gallery' => $template->preview_gallery ?? [],
             'is_active' => (bool) $template->is_active,
+            'is_system' => (bool) ($template->is_system ?? false),
             'sector' => $template->sector,
             'created_at' => $template->created_at,
             'updated_at' => $template->updated_at,
