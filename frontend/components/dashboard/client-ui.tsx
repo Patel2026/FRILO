@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { type ReactNode } from 'react';
+import { type MouseEventHandler, type ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -106,7 +106,7 @@ export function ClientButton({
   children: ReactNode;
   href?: string;
   variant?: ClientButtonVariant;
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
   className?: string;
@@ -238,7 +238,11 @@ export function Timeline({
         const isLast = index === items.length - 1;
 
         return (
-          <li key={`${item.title}-${index}`} className="relative flex gap-3 pb-5 last:pb-0">
+          <li
+            key={`${item.title}-${index}`}
+            className="relative flex gap-3 pb-5 last:pb-0"
+            aria-current={tone === 'current' ? 'step' : undefined}
+          >
             {!isLast && (
               <span className={cn('absolute left-[7px] top-5 h-[calc(100%-1.25rem)] w-px', timelineClasses[tone].line)} aria-hidden="true" />
             )}
@@ -270,33 +274,41 @@ export function CompactRow({
   action?: ReactNode;
   className?: string;
 }) {
-  const content = (
-    <>
-      <span className="min-w-0">
-        <span className="block truncate text-sm font-bold text-black">{title}</span>
-        {description && <span className="mt-1 block text-sm leading-5 text-neutral-600">{description}</span>}
-        {meta && <span className="mt-1 block text-xs font-medium text-neutral-500">{meta}</span>}
-      </span>
-      <span className="flex shrink-0 items-center gap-2">
-        {action}
-        {href && <ArrowRight className="h-4 w-4 text-neutral-400" aria-hidden="true" />}
-      </span>
-    </>
+  const textContent = (
+    <span className="min-w-0">
+      <span className="block truncate text-sm font-bold text-black">{title}</span>
+      {description && <span className="mt-1 block text-sm leading-5 text-neutral-600">{description}</span>}
+      {meta && <span className="mt-1 block text-xs font-medium text-neutral-500">{meta}</span>}
+    </span>
   );
 
-  const classes = cn(
+  const trailingContent = (
+    <span className="flex shrink-0 items-center gap-2">
+      {action}
+      {href && <ArrowRight className="h-4 w-4 text-neutral-400" aria-hidden="true" />}
+    </span>
+  );
+
+  const rowClasses = cn(
     'flex w-full items-center justify-between gap-4 border-b border-neutral-100 px-4 py-3 text-left last:border-b-0 md:px-5',
-    href && 'transition-colors hover:bg-neutral-50',
     className,
   );
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
-        {content}
-      </Link>
+      <div className={rowClasses}>
+        <Link href={href} className="min-w-0 flex-1 transition-colors hover:text-neutral-700">
+          {textContent}
+        </Link>
+        {trailingContent}
+      </div>
     );
   }
 
-  return <div className={classes}>{content}</div>;
+  return (
+    <div className={rowClasses}>
+      {textContent}
+      {trailingContent}
+    </div>
+  );
 }
