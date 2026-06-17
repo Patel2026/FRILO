@@ -15,7 +15,11 @@ export interface Template {
     slug: string;
     description: string;
     price: number;
+    normal_price?: number | string | null;
+    promo_price?: number | string | null;
     features: string[] | string; // API might return JSON string or array
+    target_audience?: string[];
+    included_features?: string[];
     thumbnail: string;
     full_thumbnail_url: string;
     preview_url?: string;

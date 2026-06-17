@@ -18,7 +18,11 @@ class Template extends Model
         'slug',
         'description',
         'price',
+        'normal_price',
+        'promo_price',
         'features',
+        'target_audience',
+        'included_features',
         'thumbnail',
         'preview_url',
         'preview_pages',
@@ -28,13 +32,17 @@ class Template extends Model
 
     protected $casts = [
         'features' => 'array',
+        'target_audience' => 'array',
+        'included_features' => 'array',
         'preview_pages' => 'array',
         'preview_gallery' => 'array',
         'is_active' => 'boolean',
         'price' => 'integer',
+        'normal_price' => 'integer',
+        'promo_price' => 'integer',
     ];
 
-    protected $appends = ['full_thumbnail_url'];
+    protected $appends = ['full_thumbnail_url', 'effective_price'];
 
     public function sector(): BelongsTo
     {
@@ -58,6 +66,11 @@ class Template extends Model
         }
 
         return Storage::url($this->thumbnail);
+    }
+
+    public function getEffectivePriceAttribute(): int
+    {
+        return (int) ($this->promo_price ?? $this->normal_price ?? $this->price);
     }
 
     public function scopeActive($query)

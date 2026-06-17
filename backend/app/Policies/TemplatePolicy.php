@@ -22,4 +22,19 @@ class TemplatePolicy
     {
         return $template->is_active;
     }
+
+    public function create(User $user): bool
+    {
+        return $user->hasAnyAdminRole(['content_admin']);
+    }
+
+    public function update(User $user, Template $template): bool
+    {
+        return $user->hasAnyAdminRole(['content_admin']);
+    }
+
+    public function delete(User $user, Template $template): bool
+    {
+        return $user->hasAnyAdminRole(['content_admin']);
+    }
 }

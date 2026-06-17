@@ -51,18 +51,42 @@
     <textarea name="description" class="form-control" rows="3">{{ old('description', $template?->description) }}</textarea>
 </div>
 
-<div class="mb-3">
-    <label class="form-label">Prix (FCFA) <span class="text-danger">*</span></label>
-    <input type="number" name="price" class="form-control @error('price') is-invalid @enderror"
-           value="{{ old('price', $template?->price) }}" min="0" required>
-    @error('price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Prix normal (FCFA) <span class="text-danger">*</span></label>
+        <input type="number" name="normal_price" class="form-control @error('normal_price') is-invalid @enderror"
+               value="{{ old('normal_price', $template?->normal_price ?? $template?->price) }}" min="0" required>
+        @error('normal_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Prix promo (FCFA)</label>
+        <input type="number" name="promo_price" class="form-control @error('promo_price') is-invalid @enderror"
+               value="{{ old('promo_price', $template?->promo_price) }}" min="0">
+        @error('promo_price')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        <div class="form-text">Le prix commande utilise le prix promo s'il est renseigné, sinon le prix normal.</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Pensé pour</label>
+        <textarea name="target_audience_raw" class="form-control" rows="4"
+                  placeholder="Restaurants&#10;Maquis&#10;Snacks">{{ old('target_audience_raw', implode("\n", $template?->target_audience ?? [])) }}</textarea>
+        <div class="form-text">Chaque ligne apparaît dans la section publique "Pensé pour".</div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Inclus dans l'offre</label>
+        <textarea name="included_features_raw" class="form-control" rows="4"
+                  placeholder="Site 5 pages&#10;Hébergement 1 an&#10;SSL sécurisé">{{ old('included_features_raw', implode("\n", $template?->included_features ?? $template?->features ?? [])) }}</textarea>
+        <div class="form-text">Chaque ligne apparaît dans la section publique "Inclus".</div>
+    </div>
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Fonctionnalités incluses (une par ligne)</label>
-    <textarea name="features_raw" class="form-control" rows="4"
-              placeholder="Menu digital&#10;Réservation en ligne&#10;Galerie photos">{{ old('features_raw', implode("\n", $template?->features ?? [])) }}</textarea>
-    <div class="form-text">Chaque ligne devient un élément de la liste.</div>
+    <label class="form-label">Fonctionnalités legacy / mots-clés internes</label>
+    <textarea name="features_raw" class="form-control" rows="3"
+              placeholder="Mots-clés internes ou compatibilité ancienne fiche">{{ old('features_raw', implode("\n", $template?->features ?? [])) }}</textarea>
+    <div class="form-text">Champ conservé pour compatibilité. Préférer les champs "Pensé pour" et "Inclus".</div>
 </div>
 
 <div class="mb-3">

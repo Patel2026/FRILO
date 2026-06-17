@@ -149,7 +149,7 @@ export default function TemplateDetailPage() {
     );
   }
 
-  const features = parseFeatures(template.features);
+  const legacyFeatures = parseFeatures(template.features);
   const previewPages = parsePreviewPages(template.preview_pages);
   const previewGallery = parsePreviewGallery(template.preview_gallery);
   const livePreviewEnabled = hasLivePreview(template.preview_url);
@@ -160,8 +160,13 @@ export default function TemplateDetailPage() {
   const canBrowseGallery = !livePreviewEnabled && previewGallery.length > 1;
   const galleryImage = previewGallery[activeGalleryIndex] ?? previewGallery[0] ?? null;
   const price = typeof template.price === 'string' ? parseInt(template.price) : template.price;
-  const includedItems = [...features, 'Hébergement inclus', 'Responsive mobile', 'Support 30 jours'];
-  const visibleFeatures = features.slice(0, 4);
+  const targetAudience = Array.isArray(template.target_audience) && template.target_audience.length > 0
+    ? template.target_audience
+    : legacyFeatures.slice(0, 4);
+  const includedItems = Array.isArray(template.included_features) && template.included_features.length > 0
+    ? template.included_features
+    : [...legacyFeatures, 'Hébergement inclus', 'Responsive mobile', 'Support 30 jours'];
+  const visibleFeatures = targetAudience.slice(0, 4);
   const includedPreview = includedItems.slice(0, 6);
   const favoriteActive = isFavorite(template.id);
   const comparedActive = isCompared(template.id);

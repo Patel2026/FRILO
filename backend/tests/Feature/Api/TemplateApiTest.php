@@ -94,4 +94,38 @@ class TemplateApiTest extends TestCase
         $this->getJson('/api/templates/'.$inactiveTemplate->id)
             ->assertNotFound();
     }
+
+    public function test_template_show_returns_pricing_and_separated_public_content_fields(): void
+    {
+        $sector = Sector::create([
+            'name' => 'Restaurants',
+            'slug' => 'restaurants',
+            'description' => 'Secteur test',
+            'icon' => 'Utensils',
+            'gradient' => 'from-orange-400 to-red-500',
+            'is_active' => true,
+        ]);
+
+        $template = Template::create([
+            'sector_id' => $sector->id,
+            'name' => 'Restaurant Pro',
+            'slug' => 'restaurant-pro',
+            'description' => 'Visible',
+            'price' => 50000,
+            'normal_price' => 50000,
+            'promo_price' => 35000,
+            'features' => ['Legacy'],
+            'target_audience' => ['Restaurants', 'Maquis'],
+            'included_features' => ['Site 5 pages', 'Hebergement 1 an'],
+            'is_active' => true,
+        ]);
+
+        $this->getJson('/api/templates/'.$template->id)
+            ->assertOk()
+            ->assertJsonPath('price', 35000)
+            ->assertJsonPath('normal_price', 50000)
+            ->assertJsonPath('promo_price', 35000)
+            ->assertJsonPath('target_audience.0', 'Restaurants')
+            ->assertJsonPath('included_features.1', 'Hebergement 1 an');
+    }
 }

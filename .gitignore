@@ -22,11 +22,8 @@ Icon
 .deploy/
 
 ### Local AI tooling
-.claude/
 .superpowers/
 .agents/
 .impeccable/
 docs/agents/
-PRODUCT.md
-DESIGN.md
 skills-lock.json

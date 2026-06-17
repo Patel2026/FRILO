@@ -51,7 +51,13 @@
                             </div>
                         </td>
                         <td>{{ $template->sector->name ?? '—' }}</td>
-                        <td>{{ number_format($template->price, 0, ',', ' ') }}</td>
+                        <td>
+                            <div class="fw-semibold">{{ number_format($template->effective_price, 0, ',', ' ') }} FCFA</div>
+                            <div class="text-muted small">Normal : {{ number_format($template->normal_price ?? $template->price, 0, ',', ' ') }} FCFA</div>
+                            @if($template->promo_price)
+                                <span class="badge badge-soft-success">Promo : {{ number_format($template->promo_price, 0, ',', ' ') }} FCFA</span>
+                            @endif
+                        </td>
                         <td>
                             <div class="d-flex flex-wrap gap-1">
                                 @if($template->preview_url)
