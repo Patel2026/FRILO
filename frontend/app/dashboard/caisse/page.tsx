@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 import {
   ClientButton,
   ClientPage,
@@ -61,17 +61,26 @@ export default function CaissePage() {
   const [form, setForm]           = useState<CashEntryPayload>(emptyForm());
   const [saving, setSaving]       = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const loadRequestId             = useRef(0);
 
   const load = (m: string) => {
+    const requestId = ++loadRequestId.current;
     setLoading(true);
     setError(null);
     Promise.all([cashService.list(m), cashService.summary(m)])
       .then(([res, sum]) => {
+        if (requestId !== loadRequestId.current) return;
         setEntries(res.data);
         setSummary(sum);
       })
-      .catch(() => setError('Impossible de charger la caisse.'))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (requestId !== loadRequestId.current) return;
+        setError('Impossible de charger la caisse.');
+      })
+      .finally(() => {
+        if (requestId !== loadRequestId.current) return;
+        setLoading(false);
+      });
   };
 
   useEffect(() => { load(month); }, [month]);
@@ -144,35 +153,37 @@ export default function CaissePage() {
         }
       />
 
-      <ClientPanel className="mb-5">
-        {summary ? (
-          <div className="grid divide-y divide-neutral-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            <div className="px-4 py-4 md:px-5">
-              <p className="text-xs font-semibold text-neutral-500">Entrées</p>
-              <p className="mt-1 text-lg font-black text-emerald-700">{fmt(summary.income)}</p>
-            </div>
-            <div className="px-4 py-4 md:px-5">
-              <p className="text-xs font-semibold text-neutral-500">Dépenses</p>
-              <p className="mt-1 text-lg font-black text-red-700">{fmt(summary.expenses)}</p>
-            </div>
-            <div className="px-4 py-4 md:px-5">
-              <p className="text-xs font-semibold text-neutral-500">Solde</p>
-              <p className={`mt-1 text-lg font-black ${summary.balance >= 0 ? 'text-emerald-800' : 'text-red-700'}`}>
-                {fmt(summary.balance)}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid divide-y divide-neutral-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {[0, 1, 2].map((item) => (
-              <div key={item} className="px-4 py-4 md:px-5">
-                <div className="h-3 w-20 animate-pulse rounded bg-neutral-100" />
-                <div className="mt-2 h-5 w-28 animate-pulse rounded bg-neutral-100" />
+      {(summary || loading) && (
+        <ClientPanel className="mb-5">
+          {summary ? (
+            <div className="grid divide-y divide-neutral-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+              <div className="px-4 py-4 md:px-5">
+                <p className="text-xs font-semibold text-neutral-500">Entrées</p>
+                <p className="mt-1 text-lg font-black text-emerald-700">{fmt(summary.income)}</p>
               </div>
-            ))}
-          </div>
-        )}
-      </ClientPanel>
+              <div className="px-4 py-4 md:px-5">
+                <p className="text-xs font-semibold text-neutral-500">Dépenses</p>
+                <p className="mt-1 text-lg font-black text-red-700">{fmt(summary.expenses)}</p>
+              </div>
+              <div className="px-4 py-4 md:px-5">
+                <p className="text-xs font-semibold text-neutral-500">Solde</p>
+                <p className={`mt-1 text-lg font-black ${summary.balance >= 0 ? 'text-emerald-800' : 'text-red-700'}`}>
+                  {fmt(summary.balance)}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid divide-y divide-neutral-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="px-4 py-4 md:px-5">
+                  <div className="h-3 w-20 animate-pulse rounded bg-neutral-100" />
+                  <div className="mt-2 h-5 w-28 animate-pulse rounded bg-neutral-100" />
+                </div>
+              ))}
+            </div>
+          )}
+        </ClientPanel>
+      )}
 
       {showForm && (
         <ClientPanel className="mb-5">
