@@ -205,7 +205,7 @@ export function StatusBand({
   className,
 }: {
   title: string;
-  description?: string;
+  description: string;
   status?: ReactNode;
   tone?: StatusTone;
   action?: ReactNode;
