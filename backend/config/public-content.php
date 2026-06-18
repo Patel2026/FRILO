@@ -260,7 +260,7 @@ return [
             'renderer' => 'home.sectors-intro',
             'defaults' => [
                 'eyebrow' => 'Secteurs',
-                'headline' => 'Choisissez par métier, pas par jargon.',
+                'headline' => 'Trouvez le modèle adapté à votre activité.',
                 'cta' => [
                     'label' => 'Tous les secteurs',
                     'url' => '/secteurs',

@@ -168,7 +168,7 @@ export const HOME_PUBLIC_CONTENT_FALLBACK: PublicContentResponse = {
       renderer: 'home.sectors-intro',
       content: {
         eyebrow: 'Secteurs',
-        headline: 'Choisissez par métier, pas par jargon.',
+        headline: 'Trouvez le modèle adapté à votre activité.',
         cta: {
           label: 'Tous les secteurs',
           url: '/secteurs',
