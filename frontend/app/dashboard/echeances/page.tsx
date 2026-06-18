@@ -1,23 +1,79 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Deadline, DeadlinePayload, deadlinesService } from '@/services/deadlines.service';
+import { type FormEvent, useEffect, useState } from 'react';
+import {
+  ClientButton,
+  ClientPage,
+  ClientPageHeader,
+  ClientPanel,
+  ClientPanelHeader,
+  CompactRow,
+  StatusBand,
+  StatusPill,
+} from '@/components/dashboard/client-ui';
+import { type Deadline, type DeadlinePayload, deadlinesService } from '@/services/deadlines.service';
 
 const emptyForm = (): DeadlinePayload => ({ title: '', description: '', due_date: '' });
 
-function urgencyBorderClass(days: number): string {
-  if (days < 0)   return 'border-gray-200 bg-gray-50';
-  if (days <= 7)  return 'border-red-200 bg-red-50';
-  if (days <= 30) return 'border-orange-200 bg-orange-50';
-  return 'border-gray-200 bg-white';
+const fieldClassName = 'w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-black outline-none transition-colors placeholder:text-neutral-500 focus:border-black focus:ring-2 focus:ring-black/10';
+const labelClassName = 'mb-1 block text-xs font-semibold text-neutral-600';
+const rowActionClassName = 'inline-flex h-9 items-center justify-center rounded-md border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2';
+const destructiveActionClassName = 'inline-flex h-9 items-center justify-center rounded-md border border-red-200 bg-white px-3 text-xs font-semibold text-red-700 transition-colors hover:border-red-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2';
+
+function LoadingRows() {
+  return (
+    <div className="divide-y divide-neutral-100">
+      {[0, 1, 2, 3].map((item) => (
+        <div key={item} className="px-4 py-4 md:px-5">
+          <div className="h-4 w-2/3 animate-pulse rounded bg-neutral-100" />
+          <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-neutral-100" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
-function urgencyBadge(days: number): { label: string; className: string } {
-  if (days < 0)   return { label: 'Passée',        className: 'bg-gray-100 text-gray-500' };
-  if (days === 0) return { label: "Aujourd'hui",   className: 'bg-red-100 text-red-700' };
-  if (days <= 7)  return { label: `Dans ${days}j`, className: 'bg-red-100 text-red-700' };
-  if (days <= 30) return { label: `Dans ${days}j`, className: 'bg-orange-100 text-orange-700' };
-  return             { label: `Dans ${days}j`, className: 'bg-gray-100 text-gray-600' };
+function urgencyBadge(days: number): { label: string; tone: 'neutral' | 'warning' | 'danger' } {
+  if (days < 0) return { label: 'Passée', tone: 'neutral' };
+  if (days === 0) return { label: "Aujourd'hui", tone: 'danger' };
+  if (days <= 7) return { label: `Dans ${days}j`, tone: 'danger' };
+  if (days <= 30) return { label: `Dans ${days}j`, tone: 'warning' };
+  return { label: `Dans ${days}j`, tone: 'neutral' };
+}
+
+function formatDueDate(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return 'Date limite non valide';
+  }
+
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+function getDeadlineDescription(deadline: Deadline): string {
+  if (deadline.description) return deadline.description;
+
+  return deadline.is_system
+    ? 'Rappel FRILO généré automatiquement pour votre suivi.'
+    : 'Rappel personnel sans notes complémentaires.';
+}
+
+function getDeadlineMeta(deadline: Deadline) {
+  return (
+    <span className="flex flex-wrap items-center gap-2">
+      <span>{formatDueDate(deadline.due_date)}</span>
+      {deadline.is_system ? (
+        <StatusPill tone="info">Rappel FRILO</StatusPill>
+      ) : (
+        <StatusPill tone="neutral">Rappel personnel</StatusPill>
+      )}
+    </span>
+  );
 }
 
 export default function EcheancesPage() {
@@ -32,8 +88,12 @@ export default function EcheancesPage() {
 
   const load = () => {
     setLoading(true);
+    setError(null);
     deadlinesService.list()
-      .then(setDeadlines)
+      .then((items) => {
+        setDeadlines(items);
+        setError(null);
+      })
       .catch(() => setError('Impossible de charger les échéances.'))
       .finally(() => setLoading(false));
   };
@@ -55,8 +115,9 @@ export default function EcheancesPage() {
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     setSaving(true);
     setFormError(null);
     try {
@@ -85,117 +146,137 @@ export default function EcheancesPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">Mes Échéances</h1>
-        <button onClick={openCreate}
-          className="rounded-lg bg-[#e11d2e] px-4 py-2 text-sm font-medium text-white hover:opacity-90">
-          + Ajouter
-        </button>
-      </div>
+    <ClientPage>
+      <ClientPageHeader
+        title="Mes échéances"
+        description="Suivez vos rappels FRILO et vos échéances personnelles: renouvellement, paiement, obligations et relances."
+        action={<ClientButton onClick={openCreate}>Ajouter une échéance</ClientButton>}
+      />
 
       {showForm && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-sm font-semibold text-gray-700">
-            {editing ? "Modifier l'échéance" : 'Nouvelle échéance personnelle'}
-          </h2>
-          {formError && <p className="mb-3 rounded bg-red-50 p-3 text-xs text-red-600">{formError}</p>}
-          <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label htmlFor="deadline-title" className="mb-1 block text-xs font-medium text-gray-600">Titre *</label>
-              <input id="deadline-title" required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                placeholder="ex: Déclaration TVA, Renouvellement patente..."
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })} />
-            </div>
-            <div>
-              <label htmlFor="deadline-due_date" className="mb-1 block text-xs font-medium text-gray-600">Date limite *</label>
-              <input id="deadline-due_date" required type="date" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.due_date}
-                onChange={(e) => setForm({ ...form, due_date: e.target.value })} />
-            </div>
-            <div className="flex items-end gap-2">
-              <button type="submit" disabled={saving}
-                className="rounded-lg bg-[#e11d2e] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
-                {saving ? 'Enregistrement...' : 'Enregistrer'}
-              </button>
-              <button type="button" onClick={() => setShowForm(false)}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600">
-                Annuler
-              </button>
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor="deadline-description" className="mb-1 block text-xs font-medium text-gray-600">Notes (optionnel)</label>
-              <textarea id="deadline-description" rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.description ?? ''}
-                onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            </div>
-          </form>
-        </div>
+        <ClientPanel className="mb-5">
+          <ClientPanelHeader
+            title={editing ? "Modifier l'échéance personnelle" : 'Nouvelle échéance personnelle'}
+            description="Les rappels personnels complètent les échéances système FRILO visibles dans votre tableau de bord."
+            action={<StatusPill tone={editing ? 'info' : 'neutral'}>{editing ? 'Modification' : 'Création'}</StatusPill>}
+          />
+          <div className="px-4 py-4 md:px-5">
+            {formError && (
+              <StatusBand
+                title="Impossible d’enregistrer"
+                description={formError}
+                tone="danger"
+                status={<StatusPill tone="danger">Erreur</StatusPill>}
+                className="mb-4"
+              />
+            )}
+            <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label htmlFor="deadline-title" className={labelClassName}>Titre *</label>
+                <input
+                  id="deadline-title"
+                  required
+                  className={fieldClassName}
+                  placeholder="ex: Déclaration TVA, renouvellement patente..."
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <label htmlFor="deadline-due_date" className={labelClassName}>Date limite *</label>
+                <input
+                  id="deadline-due_date"
+                  required
+                  type="date"
+                  className={fieldClassName}
+                  value={form.due_date}
+                  onChange={(e) => setForm({ ...form, due_date: e.target.value })}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="deadline-description" className={labelClassName}>Notes (optionnel)</label>
+                <textarea
+                  id="deadline-description"
+                  rows={3}
+                  className={fieldClassName}
+                  value={form.description ?? ''}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                />
+              </div>
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:col-span-2 sm:flex-row sm:justify-end">
+                <ClientButton type="button" variant="secondary" onClick={() => setShowForm(false)} className="w-full sm:w-auto">
+                  Annuler
+                </ClientButton>
+                <ClientButton type="submit" disabled={saving} className="w-full sm:w-auto">
+                  {saving ? 'Enregistrement...' : 'Enregistrer'}
+                </ClientButton>
+              </div>
+            </form>
+          </div>
+        </ClientPanel>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e11d2e] border-t-transparent" />
-        </div>
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Chargement des échéances"
+            description="Nous récupérons vos rappels FRILO et vos échéances personnelles."
+            action={<StatusPill tone="info">Chargement</StatusPill>}
+          />
+          <LoadingRows />
+        </ClientPanel>
       ) : error ? (
-        <p className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</p>
+        <StatusBand
+          title="Impossible de charger vos échéances"
+          description={error}
+          tone="danger"
+          status={<StatusPill tone="danger">Erreur</StatusPill>}
+          action={<ClientButton onClick={load}>Réessayer</ClientButton>}
+        />
       ) : deadlines.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-gray-500">Aucune échéance pour le moment.</p>
-          <button onClick={openCreate} className="mt-3 text-sm text-[#e11d2e] underline">
-            Ajouter votre première échéance →
-          </button>
-        </div>
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Aucune échéance"
+            description="Vous n’avez pas encore de rappel FRILO ou d’échéance personnelle à suivre."
+            action={<ClientButton onClick={openCreate}>Ajouter une échéance</ClientButton>}
+          />
+        </ClientPanel>
       ) : (
-        <div className="space-y-3">
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Rappels et échéances"
+            description="Les rappels FRILO sont protégés. Vos rappels personnels restent modifiables."
+            action={<StatusPill tone="neutral">{deadlines.length} échéance{deadlines.length > 1 ? 's' : ''}</StatusPill>}
+          />
           {deadlines.map((d) => {
             const badge = urgencyBadge(d.days_remaining);
+
             return (
-              <div key={d.id}
-                className={`rounded-xl border p-4 shadow-sm ${urgencyBorderClass(d.days_remaining)}`}>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-800">{d.title}</p>
-                      {d.is_system && (
-                        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-600">
-                          FRILO
-                        </span>
-                      )}
-                    </div>
-                    {d.description && (
-                      <p className="mt-0.5 text-xs text-gray-500">{d.description}</p>
-                    )}
-                    <p className="mt-1 text-xs text-gray-400">
-                      {new Date(d.due_date).toLocaleDateString('fr-FR', {
-                        day: '2-digit', month: 'long', year: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                  <div className="ml-4 flex flex-col items-end gap-2">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}>
-                      {badge.label}
-                    </span>
+              <CompactRow
+                key={d.id}
+                title={d.title}
+                description={getDeadlineDescription(d)}
+                meta={getDeadlineMeta(d)}
+                action={
+                  <span className="flex flex-wrap items-center justify-end gap-2">
+                    <StatusPill tone={badge.tone}>{badge.label}</StatusPill>
                     {!d.is_system && (
-                      <div className="flex gap-2">
-                        <button onClick={() => openEdit(d)}
-                          className="text-xs text-gray-400 underline hover:text-gray-600">
+                      <>
+                        <button type="button" onClick={() => openEdit(d)} className={rowActionClassName}>
                           Modifier
                         </button>
-                        <button onClick={() => handleDelete(d.id)}
-                          className="text-xs text-red-400 underline hover:text-red-600">
-                          Suppr.
+                        <button type="button" onClick={() => handleDelete(d.id)} className={destructiveActionClassName}>
+                          Supprimer
                         </button>
-                      </div>
+                      </>
                     )}
-                  </div>
-                </div>
-              </div>
+                  </span>
+                }
+              />
             );
           })}
-        </div>
+        </ClientPanel>
       )}
-    </div>
+    </ClientPage>
   );
 }
