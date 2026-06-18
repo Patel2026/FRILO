@@ -297,7 +297,7 @@ function FeaturedSectorCard({ sector, index }: { sector: SectorFeature; index: n
         <p className={cn('text-xs font-black uppercase tracking-[0.18em]', index === 0 ? 'text-white/50' : 'text-black/40')}>
           Métier {index + 1}
         </p>
-        <h3 className="mt-4 max-w-sm font-serif text-4xl font-medium leading-[0.95] tracking-[-0.04em] md:text-5xl">
+        <h3 className="mt-4 max-w-full break-words font-serif text-[2rem] font-medium leading-[1.02] tracking-[-0.03em] hyphens-auto md:text-[2.125rem]">
           {sector.name}
         </h3>
       </div>
