@@ -1,11 +1,49 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ClientContact, ContactsPayload, contactsService } from '@/services/contacts.service';
+import { type FormEvent, useEffect, useState } from 'react';
+import {
+  ClientButton,
+  ClientPage,
+  ClientPageHeader,
+  ClientPanel,
+  ClientPanelHeader,
+  CompactRow,
+  StatusBand,
+  StatusPill,
+} from '@/components/dashboard/client-ui';
+import { type ClientContact, type ContactsPayload, contactsService } from '@/services/contacts.service';
 
 const emptyForm = (): ContactsPayload => ({
   name: '', company: '', phone: '', whatsapp: '', email: '', notes: '', acquired_at: '',
 });
+
+const fieldClassName = 'w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-black outline-none transition-colors placeholder:text-neutral-500 focus:border-black focus:ring-2 focus:ring-black/10';
+const labelClassName = 'mb-1 block text-xs font-semibold text-neutral-600';
+const rowActionClassName = 'inline-flex h-9 items-center justify-center rounded-md border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2';
+const destructiveActionClassName = 'inline-flex h-9 items-center justify-center rounded-md border border-red-200 bg-white px-3 text-xs font-semibold text-red-700 transition-colors hover:border-red-300 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2';
+
+function LoadingRows() {
+  return (
+    <div className="divide-y divide-neutral-100">
+      {[0, 1, 2, 3].map((item) => (
+        <div key={item} className="px-4 py-4 md:px-5">
+          <div className="h-4 w-2/3 animate-pulse rounded bg-neutral-100" />
+          <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-neutral-100" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function getContactDescription(contact: ClientContact): string {
+  return [contact.company, contact.phone, contact.email].filter(Boolean).join(' · ') || 'Aucune coordonnée renseignée';
+}
+
+function getContactMeta(contact: ClientContact): string | undefined {
+  return [contact.whatsapp ? `WhatsApp : ${contact.whatsapp}` : null, contact.acquired_at ? `Client depuis : ${contact.acquired_at}` : null]
+    .filter(Boolean)
+    .join(' · ') || undefined;
+}
 
 export default function ContactsPage() {
   const [contacts, setContacts]   = useState<ClientContact[]>([]);
@@ -53,7 +91,7 @@ export default function ContactsPage() {
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setFormError(null);
@@ -83,122 +121,146 @@ export default function ContactsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-xl font-semibold text-gray-900">
-          Mes Clients <span className="ml-2 text-base font-normal text-gray-400">({total})</span>
-        </h1>
-        <button onClick={openCreate}
-          className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#e11d2e] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto">
-          Ajouter un client
-        </button>
-      </div>
+    <ClientPage>
+      <ClientPageHeader
+        title="Mes clients"
+        description="Votre fichier clients FRILO centralise les contacts utiles pour suivre vos prospects, clients et échanges commerciaux."
+        meta={`${total} client${total > 1 ? 's' : ''} enregistré${total > 1 ? 's' : ''}`}
+        action={<ClientButton onClick={openCreate}>Ajouter un client</ClientButton>}
+      />
 
       {showForm && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-sm font-semibold text-gray-700">
-            {editing ? 'Modifier le contact' : 'Nouveau contact'}
-          </h2>
-          {formError && <p className="mb-3 rounded bg-red-50 p-3 text-xs text-red-600">{formError}</p>}
-          <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label htmlFor="contact-name" className="mb-1 block text-xs font-medium text-gray-600">Nom *</label>
-              <input id="contact-name" required className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            </div>
-            <div>
-              <label htmlFor="contact-company" className="mb-1 block text-xs font-medium text-gray-600">Entreprise</label>
-              <input id="contact-company" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.company ?? ''} onChange={(e) => setForm({ ...form, company: e.target.value })} />
-            </div>
-            <div>
-              <label htmlFor="contact-phone" className="mb-1 block text-xs font-medium text-gray-600">Téléphone</label>
-              <input id="contact-phone" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.phone ?? ''} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-            </div>
-            <div>
-              <label htmlFor="contact-whatsapp" className="mb-1 block text-xs font-medium text-gray-600">WhatsApp</label>
-              <input id="contact-whatsapp" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.whatsapp ?? ''} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
-            </div>
-            <div>
-              <label htmlFor="contact-email" className="mb-1 block text-xs font-medium text-gray-600">Email</label>
-              <input id="contact-email" type="email" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.email ?? ''} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-            </div>
-            <div>
-              <label htmlFor="contact-acquired_at" className="mb-1 block text-xs font-medium text-gray-600">Client depuis</label>
-              <input id="contact-acquired_at" type="date" className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.acquired_at ?? ''} onChange={(e) => setForm({ ...form, acquired_at: e.target.value })} />
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor="contact-notes" className="mb-1 block text-xs font-medium text-gray-600">Notes</label>
-              <textarea id="contact-notes" rows={2} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                value={form.notes ?? ''} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-            </div>
-            <div className="flex flex-col gap-2 pt-2 sm:col-span-2 sm:flex-row sm:justify-end">
-              <button type="submit" disabled={saving}
-                className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-[#e11d2e] px-5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60 sm:w-auto">
-                {saving ? 'Enregistrement...' : 'Enregistrer'}
-              </button>
-              <button type="button" onClick={() => setShowForm(false)}
-                className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-gray-200 px-5 text-sm font-medium text-gray-600 hover:border-gray-300 hover:text-gray-900 sm:w-auto">
-                Annuler
-              </button>
-            </div>
-          </form>
-        </div>
+        <ClientPanel className="mb-5">
+          <ClientPanelHeader
+            title={editing ? 'Modifier le contact' : 'Nouveau contact'}
+            description="Renseignez les informations utiles pour retrouver ce client dans votre fichier."
+            action={<StatusPill tone={editing ? 'info' : 'neutral'}>{editing ? 'Modification' : 'Création'}</StatusPill>}
+          />
+          <div className="px-4 py-4 md:px-5">
+            {formError && (
+              <StatusBand
+                title="Impossible d’enregistrer"
+                description={formError}
+                tone="danger"
+                status={<StatusPill tone="danger">Erreur</StatusPill>}
+                className="mb-4"
+              />
+            )}
+            <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label htmlFor="contact-name" className={labelClassName}>Nom *</label>
+                <input id="contact-name" required className={fieldClassName}
+                  value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div>
+                <label htmlFor="contact-company" className={labelClassName}>Entreprise</label>
+                <input id="contact-company" className={fieldClassName}
+                  value={form.company ?? ''} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+              </div>
+              <div>
+                <label htmlFor="contact-phone" className={labelClassName}>Téléphone</label>
+                <input id="contact-phone" className={fieldClassName}
+                  value={form.phone ?? ''} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+              <div>
+                <label htmlFor="contact-whatsapp" className={labelClassName}>WhatsApp</label>
+                <input id="contact-whatsapp" className={fieldClassName}
+                  value={form.whatsapp ?? ''} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
+              </div>
+              <div>
+                <label htmlFor="contact-email" className={labelClassName}>Email</label>
+                <input id="contact-email" type="email" className={fieldClassName}
+                  value={form.email ?? ''} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              </div>
+              <div>
+                <label htmlFor="contact-acquired_at" className={labelClassName}>Client depuis</label>
+                <input id="contact-acquired_at" type="date" className={fieldClassName}
+                  value={form.acquired_at ?? ''} onChange={(e) => setForm({ ...form, acquired_at: e.target.value })} />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="contact-notes" className={labelClassName}>Notes</label>
+                <textarea id="contact-notes" rows={3} className={fieldClassName}
+                  value={form.notes ?? ''} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              </div>
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:col-span-2 sm:flex-row sm:justify-end">
+                <ClientButton type="button" variant="secondary" onClick={() => setShowForm(false)} className="w-full sm:w-auto">
+                  Annuler
+                </ClientButton>
+                <ClientButton type="submit" disabled={saving} className="w-full sm:w-auto">
+                  {saving ? 'Enregistrement...' : 'Enregistrer'}
+                </ClientButton>
+              </div>
+            </form>
+          </div>
+        </ClientPanel>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#e11d2e] border-t-transparent" />
-        </div>
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Chargement des clients"
+            description="Nous récupérons votre fichier clients."
+            action={<StatusPill tone="info">Chargement</StatusPill>}
+          />
+          <LoadingRows />
+        </ClientPanel>
       ) : error ? (
-        <p className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</p>
+        <StatusBand
+          title="Impossible de charger vos clients"
+          description={error}
+          tone="danger"
+          status={<StatusPill tone="danger">Erreur</StatusPill>}
+          action={<ClientButton onClick={() => load(page)}>Réessayer</ClientButton>}
+        />
       ) : contacts.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-gray-500">Vous n&apos;avez pas encore enregistré de clients.</p>
-          <button onClick={openCreate} className="mt-3 text-sm text-[#e11d2e] underline">
-            Ajouter votre premier client
-          </button>
-        </div>
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Aucun client enregistré"
+            description="Ajoutez votre premier contact pour commencer à structurer votre fichier clients."
+            action={<ClientButton onClick={openCreate}>Ajouter un client</ClientButton>}
+          />
+        </ClientPanel>
       ) : (
-        <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm">
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Fichier clients"
+            description="Contacts enregistrés dans votre espace client FRILO."
+            action={<StatusPill tone="neutral">{total} client{total > 1 ? 's' : ''}</StatusPill>}
+          />
           {contacts.map((c) => (
-            <div key={c.id} className="flex items-center justify-between px-5 py-4">
-              <div>
-                <p className="font-medium text-gray-800">{c.name}</p>
-                <p className="text-xs text-gray-400">
-                  {[c.company, c.phone].filter(Boolean).join(' · ')}
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => openEdit(c)} className="text-xs text-gray-500 underline hover:text-gray-700">
-                  Modifier
-                </button>
-                <button onClick={() => handleDelete(c.id)} className="text-xs text-red-500 underline hover:text-red-700">
-                  Supprimer
-                </button>
-              </div>
-            </div>
+            <CompactRow
+              key={c.id}
+              title={c.name}
+              description={getContactDescription(c)}
+              meta={getContactMeta(c)}
+              action={
+                <span className="flex flex-wrap items-center justify-end gap-2">
+                  <button type="button" onClick={() => openEdit(c)} className={rowActionClassName}>
+                    Modifier
+                  </button>
+                  <button type="button" onClick={() => handleDelete(c.id)} className={destructiveActionClassName}>
+                    Supprimer
+                  </button>
+                </span>
+              }
+            />
           ))}
-        </div>
+        </ClientPanel>
       )}
 
       {lastPage > 1 && (
-        <div className="flex justify-center gap-2">
+        <nav className="mt-5 flex flex-wrap justify-center gap-2" aria-label="Pagination des clients">
           {Array.from({ length: lastPage }, (_, i) => i + 1).map((p) => (
-            <button key={p} onClick={() => load(p)}
-              className={`h-8 w-8 rounded text-sm ${page === p
-                ? 'bg-[#e11d2e] text-white'
-                : 'border border-gray-200 text-gray-600'
+            <button key={p} type="button" onClick={() => load(p)}
+              className={`inline-flex h-10 min-w-10 items-center justify-center rounded-md px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${page === p
+                ? 'bg-black text-white'
+                : 'border border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50 hover:text-black'
               }`}>
               {p}
             </button>
           ))}
-        </div>
+        </nav>
       )}
-    </div>
+    </ClientPage>
   );
 }
