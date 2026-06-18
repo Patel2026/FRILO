@@ -6,7 +6,6 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Check,
-  ChevronRight,
   Plus,
 } from 'lucide-react';
 import { FreeContentBlock } from '@/components/content/FreeContentBlock';
@@ -124,37 +123,6 @@ async function retryCatalogLoad<T>(loader: () => Promise<T>, retries = 20): Prom
   }
 }
 
-function HomeSection({
-  eyebrow,
-  title,
-  children,
-  action,
-  className,
-}: {
-  eyebrow: string;
-  title: string;
-  children: ReactNode;
-  action?: ReactNode;
-  className?: string;
-}) {
-  return (
-    <section className={cn('py-12 md:py-16', className)}>
-      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-slate-500">{eyebrow}</p>
-            <h2 className="text-3xl font-black leading-[1.02] tracking-tight text-slate-950 md:text-4xl lg:text-5xl">
-              {title}
-            </h2>
-          </div>
-          {action}
-        </div>
-        {children}
-      </div>
-    </section>
-  );
-}
-
 function fallbackSectionContent<TContent>(renderer: string): TContent {
   const section = getPublicSection<TContent>(HOME_PUBLIC_CONTENT_FALLBACK, renderer);
 
@@ -167,6 +135,92 @@ function fallbackSectionContent<TContent>(renderer: string): TContent {
 
 function withPricePlaceholder(value: string, priceLabel: string): string {
   return value.replace('{price}', priceLabel);
+}
+
+function PublicShell({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
+  return (
+    <section id={id} className={cn('bg-white px-5 py-16 md:px-8 md:py-24', className)}>
+      <div className="mx-auto max-w-[1360px]">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function SectionIntro({
+  label,
+  title,
+  description,
+  action,
+  invert = false,
+}: {
+  label?: string;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  invert?: boolean;
+}) {
+  return (
+    <div className="mb-10 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.72fr)] lg:items-end">
+      <div>
+        {label && (
+          <p className={cn('mb-4 text-[0.68rem] font-black uppercase tracking-[0.2em]', invert ? 'text-white/50' : 'text-black/45')}>
+            {label}
+          </p>
+        )}
+        <h2 className={cn('max-w-4xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.045em] text-balance md:text-6xl lg:text-7xl', invert ? 'text-white' : 'text-black')}>
+          {title}
+        </h2>
+      </div>
+      <div className="flex flex-col items-start gap-5 lg:items-end">
+        {description && (
+          <p className={cn('max-w-xl text-base leading-7 md:text-lg', invert ? 'text-white/68' : 'text-black/62')}>
+            {description}
+          </p>
+        )}
+        {action}
+      </div>
+    </div>
+  );
+}
+
+function PillLink({
+  href,
+  children,
+  variant = 'black',
+  className,
+}: {
+  href: string;
+  children: ReactNode;
+  variant?: 'black' | 'white' | 'outline-white' | 'outline-black' | 'blue';
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'inline-flex min-h-12 items-center justify-center rounded-full px-6 text-sm font-black transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        variant === 'black' && 'bg-black text-white hover:bg-neutral-800 focus-visible:ring-black',
+        variant === 'white' && 'bg-white text-black hover:bg-neutral-100 focus-visible:ring-white',
+        variant === 'outline-white' && 'border border-white/45 text-white hover:bg-white hover:text-black focus-visible:ring-white',
+        variant === 'outline-black' && 'border border-black text-black hover:bg-black hover:text-white focus-visible:ring-black',
+        variant === 'blue' && 'bg-[#2563eb] text-white hover:bg-[#1d4ed8] focus-visible:ring-[#2563eb]',
+        className
+      )}
+    >
+      {children}
+    </Link>
+  );
+}
+
+function LoadingTiles({ count = 4 }: { count?: number }) {
+  return (
+    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      {Array.from({ length: count }, (_, index) => (
+        <div key={index} className="aspect-[4/5] animate-pulse bg-neutral-100" />
+      ))}
+    </div>
+  );
 }
 
 export default function Home() {
@@ -227,6 +281,9 @@ export default function Home() {
   const pricingContent = pricingSection?.content;
   const priceLabel = `${pricing.standard.price.toLocaleString('fr-FR')} ${pricing.currency_label}`;
   const cmsIncludedItems = pricingContent?.included_items?.length ? pricingContent.included_items : includedItems;
+  const sectorRail = sectors.length > 0
+    ? sectors.slice(0, 9).map((sector) => sector.name)
+    : ['Restaurants', 'Immobilier', 'Coaching', 'Santé', 'Artisanat', 'Services', 'Boutiques', 'Avocats', 'Beauté'];
   const renderBlocksFor = (anchor: string | null | undefined) => (
     getBlocksForAnchor(publicContent, anchor ?? null).map((block) => (
       <FreeContentBlock key={block.id} block={block} />
@@ -236,495 +293,424 @@ export default function Home() {
   const unplacedBlocks = publicContent.blocks.filter((block) => !anchoredBlockIds.has(block.id) && block.anchor_section_key === null);
 
   return (
-    <div className="flex flex-col bg-white text-slate-950">
-      <section className="relative isolate overflow-hidden bg-[oklch(9%_0.006_270)] pt-28 text-[oklch(98%_0.004_270)] md:pt-32">
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,oklch(5%_0.004_270)_0%,oklch(8%_0.005_270)_54%,oklch(13%_0.01_270)_100%)]" />
-        <div className="absolute right-0 top-28 hidden h-24 w-3 bg-[oklch(57%_0.24_29)] lg:block" />
-        <div className="relative mx-auto grid max-w-7xl gap-9 px-5 pb-10 sm:px-6 md:pb-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
-          <div className="max-w-2xl">
-            <p className="mb-5 inline-flex rounded-full border border-[oklch(98%_0.004_270/0.28)] bg-[oklch(98%_0.004_270/0.08)] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-[oklch(86%_0.004_270)]">
-              {hero.eyebrow}
-            </p>
-            <h1 className="max-w-[14ch] text-4xl font-black leading-[0.94] tracking-tight text-[oklch(98%_0.004_270)] md:max-w-[16ch] md:text-5xl lg:max-w-[15ch] lg:text-6xl">
-              {hero.headline}
-            </h1>
-            <p className="mt-6 max-w-[34rem] text-base leading-7 text-[oklch(82%_0.006_270)] md:text-lg">
-              {hero.description}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href={hero.primary_cta.url} className="inline-flex items-center justify-center gap-2 rounded-full bg-[oklch(57%_0.24_29)] px-6 py-3 text-sm font-black text-[oklch(98%_0.004_270)] transition-colors hover:bg-[oklch(51%_0.24_29)]">
-                {hero.primary_cta.label} <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href={hero.secondary_cta.url} className="inline-flex items-center justify-center gap-2 rounded-full border border-[oklch(98%_0.004_270/0.34)] px-6 py-3 text-sm font-black text-[oklch(98%_0.004_270)] transition-colors hover:bg-[oklch(98%_0.004_270/0.09)]">
-                {hero.secondary_cta.label}
-              </Link>
+    <div className="flex flex-col bg-white text-black">
+      <section className="relative isolate min-h-[calc(100svh-4rem)] overflow-hidden bg-black text-white">
+        <img
+          src="/image/client-satisfait-frilo.jpg"
+          alt="Entrepreneur consultant son site FRILO depuis son espace de travail."
+          className="absolute inset-0 h-full w-full scale-[1.02] object-cover object-[58%_42%] opacity-70 saturate-[0.92]"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,0,0,0.12),rgba(0,0,0,0.74)_72%),linear-gradient(180deg,rgba(0,0,0,0.54),rgba(0,0,0,0.18)_36%,rgba(0,0,0,0.78))]" />
+
+        <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-[1440px] flex-col px-5 pb-8 pt-28 md:px-8 md:pt-32">
+          <div className="flex flex-1 items-center justify-center py-16 text-center">
+            <div className="max-w-6xl">
+              <h1 className="mx-auto max-w-[12ch] font-serif text-[clamp(4rem,9.5vw,9.5rem)] font-medium leading-[0.84] tracking-[-0.07em] text-balance">
+                {hero.headline}
+              </h1>
+              <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-white/80 md:text-xl md:leading-8">
+                {hero.description}
+              </p>
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <PillLink href={hero.primary_cta.url} variant="white">
+                  {hero.primary_cta.label}
+                </PillLink>
+                <PillLink href={hero.secondary_cta.url} variant="blue">
+                  {hero.secondary_cta.label}
+                </PillLink>
+              </div>
             </div>
           </div>
 
-          <div className="relative min-h-[500px] text-[oklch(10%_0.006_270)]">
-            <div className="absolute -right-2 top-10 h-32 w-4 bg-[oklch(57%_0.24_29)]" />
-            <div className="relative ml-auto max-w-[620px] overflow-hidden rounded-[2rem] border border-[oklch(98%_0.004_270/0.76)] bg-[oklch(98%_0.004_270)] shadow-[0_35px_100px_rgba(0,0,0,0.42)]">
-              <div className="relative aspect-[0.9] min-h-[450px] md:aspect-[1.05]">
-                <img
-                  src="/image/client-satisfait-frilo.jpg"
-                  alt="Client souriant devant son ordinateur après avoir obtenu une présence en ligne professionnelle."
-                  className="h-full w-full object-cover object-[58%_42%] grayscale contrast-110"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72),rgba(0,0,0,0.12),rgba(0,0,0,0.02))]" />
-                <div className="absolute left-5 top-5 rounded-full bg-[oklch(98%_0.004_270)] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[oklch(10%_0.006_270)]">
-                  Site publié
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                  <div className="max-w-md rounded-[1.25rem] bg-[oklch(98%_0.004_270)] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
-                    <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Après FRILO</p>
-                    <p className="mt-2 text-2xl font-black leading-tight tracking-tight text-[oklch(10%_0.006_270)]">
-                      “Mes clients comprennent mon activité avant même de m&apos;appeler.”
-                    </p>
-                  </div>
-                </div>
-              </div>
+          <div className="overflow-hidden border-t border-white/20 pt-5">
+            <div className="flex min-w-max animate-[frilo-marquee_32s_linear_infinite] items-center gap-10 text-sm font-black text-white/80 [animation-play-state:running] motion-reduce:animate-none">
+              {[...sectorRail, ...sectorRail].map((label, index) => (
+                <span key={`${label}-${index}`} className="whitespace-nowrap">
+                  {label}
+                </span>
+              ))}
             </div>
-
           </div>
         </div>
       </section>
       {renderBlocksFor('home.hero')}
 
       {modelsSection && (
-      <HomeSection
-        eyebrow={modelsSection.content.eyebrow}
-        title={modelsSection.content.headline}
-        action={(
-          <Link href={modelsSection.content.cta.url} className="inline-flex items-center gap-1 text-sm font-black text-slate-950 hover:text-slate-600">
-            {modelsSection.content.cta.label} <ChevronRight className="h-4 w-4" />
-          </Link>
-        )}
-      >
-        <p className="-mt-4 mb-8 max-w-2xl text-base leading-7 text-slate-500">
-          {modelsSection.content.description}
-        </p>
-
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-[24rem] animate-pulse rounded-[1.35rem] bg-slate-100" />
-            ))}
-          </div>
-        ) : catalogError ? (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center">
-            <p className="text-sm text-amber-800">{catalogError}</p>
-          </div>
-        ) : featuredTemplates.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center">
-            <p className="text-sm text-slate-500">Aucun modèle mis en avant pour le moment.</p>
-          </div>
-        ) : (
-          <div className="space-y-5">
-            {sectors.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {sectors.slice(0, 6).map((sector) => (
-                  <Link
-                    key={sector.id}
-                    href={`/secteurs/${sector.slug}`}
-                    className="inline-flex flex-none items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 transition-colors hover:border-slate-950 hover:text-slate-950"
-                  >
-                    {sector.name}
-                  </Link>
-                ))}
-              </div>
+        <PublicShell className="pb-10 md:pb-16">
+          <SectionIntro
+            label={modelsSection.content.eyebrow}
+            title={modelsSection.content.headline}
+            description={modelsSection.content.description}
+            action={(
+              <PillLink href={modelsSection.content.cta.url} variant="outline-black">
+                {modelsSection.content.cta.label}
+              </PillLink>
             )}
+          />
 
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {featuredTemplates.slice(0, 4).map((template, index) => {
-                const templateImage = getTemplateImage(template);
+          {loading ? (
+            <LoadingTiles />
+          ) : catalogError ? (
+            <div className="border-y border-amber-200 bg-amber-50 px-6 py-8 text-center">
+              <p className="text-sm text-amber-900">{catalogError}</p>
+            </div>
+          ) : featuredTemplates.length === 0 ? (
+            <div className="border-y border-neutral-200 px-6 py-12 text-center">
+              <p className="text-sm text-black/60">Aucun modèle mis en avant pour le moment.</p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                {featuredTemplates.slice(0, 4).map((template, index) => {
+                  const templateImage = getTemplateImage(template);
 
-                return (
-                  <Link
-                    key={template.id}
-                    href={`/templates/${template.id}`}
-                    className="group flex min-h-full flex-col overflow-hidden rounded-[1.35rem] border border-slate-100 bg-slate-50 transition-colors hover:border-slate-950"
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                      {templateImage ? (
-                        <img
-                          src={templateImage}
-                          alt={template.name}
-                          className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-slate-200" />
+                  return (
+                    <Link
+                      key={template.id}
+                      href={`/templates/${template.id}`}
+                      className={cn(
+                        'group flex min-h-[30rem] flex-col overflow-hidden bg-neutral-100 text-black transition-transform duration-500 hover:-translate-y-1',
+                        index === 0 && 'md:col-span-2'
                       )}
-                      <div className="absolute left-3 top-3 rounded-full bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-slate-950">
-                        {index === 0 ? 'Exemple de départ' : 'Base métier'}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-1 flex-col p-4">
-                      <div className="flex-1">
-                        {template.sector?.name && (
-                          <p className="mb-2 text-[11px] font-black uppercase tracking-[0.12em] text-[oklch(57%_0.24_29)]">
-                            {template.sector.name}
-                          </p>
+                    >
+                      <div className="relative flex-1 overflow-hidden">
+                        {templateImage ? (
+                          <img
+                            src={templateImage}
+                            alt={template.name}
+                            className="h-full min-h-[22rem] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                          />
+                        ) : (
+                          <div className="h-full min-h-[22rem] w-full bg-neutral-200" />
                         )}
-                        <h3 className="text-xl font-black leading-tight tracking-tight text-slate-950">
-                          {template.name}
-                        </h3>
-                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">
-                          {templateSummary(template)}
-                        </p>
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          {['Mobile', 'Contact', '48h'].map((label) => (
-                            <span key={label} className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-600">
-                              {label}
-                            </span>
-                          ))}
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/10 to-transparent p-5 text-white">
+                          {template.sector?.name && (
+                            <p className="text-xs font-black uppercase tracking-[0.16em] text-white/66">{template.sector.name}</p>
+                          )}
+                          <h3 className="mt-2 max-w-md font-serif text-3xl font-medium leading-none tracking-[-0.04em]">
+                            {template.name}
+                          </h3>
                         </div>
                       </div>
-
-                      <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
-                        <span className="text-base font-black text-slate-950">
-                          {getTemplatePrice(template).toLocaleString('fr-FR')} <span className="text-xs font-semibold text-slate-400">FCFA</span>
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-sm font-black text-slate-950">
-                          Voir cet exemple <ArrowRight className="h-4 w-4" />
+                      <div className="flex items-center justify-between gap-4 bg-white px-5 py-5">
+                        <p className="max-w-sm text-sm leading-6 text-black/58">{templateSummary(template)}</p>
+                        <span className="shrink-0 text-sm font-black">
+                          {getTemplatePrice(template).toLocaleString('fr-FR')} FCFA
                         </span>
                       </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-col gap-3 rounded-[1.35rem] border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-black text-slate-950">Vous ne voyez pas votre activité ?</p>
-                <p className="mt-1 text-sm leading-6 text-slate-500">Choisissez la base la plus proche. FRILO adapte les textes, les photos et les contacts.</p>
+                    </Link>
+                  );
+                })}
               </div>
-              <Link
-                href="/templates"
-                className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-slate-800"
-              >
-                Voir tout le catalogue
-              </Link>
+
+              <div className="flex flex-col gap-4 border-y border-black py-5 md:flex-row md:items-center md:justify-between">
+                <p className="max-w-3xl text-2xl font-black leading-tight tracking-[-0.03em]">
+                  Vous ne voyez pas votre activité ? FRILO adapte la base la plus proche à vos textes, vos photos et vos contacts.
+                </p>
+                <PillLink href="/templates" variant="black" className="shrink-0">
+                  Voir tout le catalogue
+                </PillLink>
+              </div>
             </div>
-          </div>
-        )}
-      </HomeSection>
+          )}
+        </PublicShell>
       )}
       {renderBlocksFor(modelsSection?.key)}
 
       {benefitsSection && (
-      <section className="relative z-10 bg-white py-12 md:py-16">
-        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          <div className="border-y border-slate-200 py-8 md:py-10">
-            <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+        <PublicShell className="pt-10 md:pt-16">
+          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+            <div className="relative min-h-[34rem] overflow-hidden bg-black">
+              <img
+                src="/image/client-satisfait-frilo.jpg"
+                alt="Client FRILO utilisant son site pour présenter son activité."
+                className="h-full w-full object-cover grayscale transition-transform duration-700 hover:scale-[1.03]"
+              />
+              <div className="absolute inset-0 bg-black/20" />
+            </div>
+            <div className="flex flex-col justify-between border-y border-black py-7">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">{benefitsSection.content.eyebrow}</p>
-                <h2 className="mt-3 max-w-xl text-3xl font-black leading-[1.02] tracking-tight text-slate-950 md:text-5xl">
+                <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/45">{benefitsSection.content.eyebrow}</p>
+                <h2 className="max-w-3xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.045em] text-balance md:text-6xl">
                   {benefitsSection.content.headline}
                 </h2>
-                <p className="mt-5 max-w-md text-base leading-7 text-slate-500">
+                <p className="mt-6 max-w-xl text-lg leading-8 text-black/62">
                   {benefitsSection.content.description}
                 </p>
               </div>
-
-              <div className="divide-y divide-slate-200">
-                {benefitsSection.content.items.map((benefit, index) => (
-                  <div key={benefit.title} className="grid gap-3 py-5 first:pt-0 last:pb-0 sm:grid-cols-[3rem_0.72fr_1fr] sm:items-baseline">
-                    <span className="text-sm font-black text-[oklch(57%_0.24_29)]">0{index + 1}</span>
-                    <h3 className="text-xl font-black tracking-tight text-slate-950">{benefit.title}</h3>
-                    <p className="max-w-xl text-base leading-7 text-slate-500">{benefit.description}</p>
+              <div className="mt-10 divide-y divide-neutral-200">
+                {benefitsSection.content.items.map((benefit) => (
+                  <div key={benefit.title} className="grid gap-4 py-5 md:grid-cols-[0.46fr_1fr]">
+                    <h3 className="text-xl font-black leading-tight tracking-[-0.02em]">{benefit.title}</h3>
+                    <p className="text-base leading-7 text-black/58">{benefit.description}</p>
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="mt-8 flex flex-col gap-3 rounded-[1.25rem] bg-slate-950 px-5 py-5 text-white sm:flex-row sm:items-center sm:justify-between md:px-6">
-              <p className="max-w-2xl text-lg font-black leading-snug tracking-tight">
-                {benefitsSection.content.closing_copy}
-              </p>
-              <Link href={benefitsSection.content.cta.url} className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 transition-colors hover:bg-slate-100">
-                {benefitsSection.content.cta.label}
-              </Link>
+              <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <p className="max-w-xl text-lg font-black leading-7 tracking-[-0.02em]">{benefitsSection.content.closing_copy}</p>
+                <PillLink href={benefitsSection.content.cta.url} variant="black">
+                  {benefitsSection.content.cta.label}
+                </PillLink>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </PublicShell>
       )}
       {renderBlocksFor(benefitsSection?.key)}
 
       {processSection && (
-      <section id="how-it-works" className="bg-white px-5 pb-14 pt-2 md:pb-20 md:pt-4">
-        <div className="mx-auto max-w-7xl border-t border-slate-200 pt-8 md:pt-10">
-          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-[oklch(57%_0.24_29)]">{processSection.content.eyebrow}</p>
-              <h2 className="mt-3 max-w-xl text-4xl font-black leading-[0.96] tracking-tight text-slate-950 md:text-5xl">
-                {processSection.content.headline}
-              </h2>
-              <p className="mt-5 max-w-md text-base leading-7 text-slate-500">
-                {processSection.content.description}
-              </p>
-            </div>
-
-            <div>
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <p className="border-b border-slate-200 pb-3 text-xs font-black uppercase tracking-[0.18em] text-slate-400">Vous faites</p>
-                  <div className="divide-y divide-slate-100">
-                    {processSection.content.customer_steps.map((step, index) => (
-                      <div key={step.title} className="grid gap-3 py-5 sm:grid-cols-[3rem_1fr]">
-                        <span className="text-sm font-black text-[oklch(57%_0.24_29)]">0{index + 1}</span>
-                        <div>
-                          <h3 className="text-xl font-black tracking-tight text-slate-950">{step.title}</h3>
-                          <p className="mt-1 text-sm leading-6 text-slate-500">{step.description}</p>
-                        </div>
-                      </div>
-                    ))}
+        <PublicShell id="how-it-works" className="py-16 md:py-24">
+          <SectionIntro
+            label={processSection.content.eyebrow}
+            title={processSection.content.headline}
+            description={processSection.content.description}
+          />
+          <div className="grid border-y border-black lg:grid-cols-2">
+            <div className="border-b border-black p-6 md:p-8 lg:border-b-0 lg:border-r">
+              <p className="mb-5 text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/45">Vous faites</p>
+              <div className="divide-y divide-neutral-200">
+                {processSection.content.customer_steps.map((step, index) => (
+                  <div key={step.title} className="grid gap-4 py-6 md:grid-cols-[4rem_1fr]">
+                    <span className="font-serif text-3xl leading-none tracking-[-0.04em] text-black/36">{index + 1}</span>
+                    <div>
+                      <h3 className="text-2xl font-black tracking-[-0.03em]">{step.title}</h3>
+                      <p className="mt-2 max-w-xl text-base leading-7 text-black/58">{step.description}</p>
+                    </div>
                   </div>
-                </div>
-
-                <div>
-                  <p className="border-b border-slate-200 pb-3 text-xs font-black uppercase tracking-[0.18em] text-slate-400">FRILO fait</p>
-                  <div className="divide-y divide-slate-100">
-                    {processSection.content.frilo_steps.map((step, index) => (
-                      <div key={step.title} className="grid gap-3 py-5 sm:grid-cols-[3rem_1fr]">
-                        <span className="text-sm font-black text-slate-950">0{index + 1}</span>
-                        <div>
-                          <h3 className="text-xl font-black tracking-tight text-slate-950">{step.title}</h3>
-                          <p className="mt-1 text-sm leading-6 text-slate-500">{step.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
-
-              <div className="mt-3 flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <p className="max-w-xl text-base font-black leading-7 text-slate-950">
-                  {processSection.content.result_copy}
-                </p>
-                <Link href={processSection.content.cta.url} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-slate-800">
-                  {processSection.content.cta.label} <ArrowRight className="h-4 w-4" />
-                </Link>
+            </div>
+            <div className="bg-black p-6 text-white md:p-8">
+              <p className="mb-5 text-[0.68rem] font-black uppercase tracking-[0.2em] text-white/45">FRILO fait</p>
+              <div className="divide-y divide-white/18">
+                {processSection.content.frilo_steps.map((step, index) => (
+                  <div key={step.title} className="grid gap-4 py-6 md:grid-cols-[4rem_1fr]">
+                    <span className="font-serif text-3xl leading-none tracking-[-0.04em] text-white/42">{index + 1}</span>
+                    <div>
+                      <h3 className="text-2xl font-black tracking-[-0.03em]">{step.title}</h3>
+                      <p className="mt-2 max-w-xl text-base leading-7 text-white/62">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8 flex flex-col gap-5 border-t border-white/24 pt-6 md:flex-row md:items-center md:justify-between">
+                <p className="max-w-xl text-xl font-black leading-tight tracking-[-0.03em]">{processSection.content.result_copy}</p>
+                <PillLink href={processSection.content.cta.url} variant="white">
+                  {processSection.content.cta.label}
+                </PillLink>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </PublicShell>
       )}
       {renderBlocksFor(processSection?.key)}
 
       {pricingSection && pricingContent && (
-      <section id="pricing" className="bg-white px-5 py-14 md:py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
-            <div>
-              <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">{pricingContent.eyebrow}</p>
-              <h2 className="max-w-2xl text-3xl font-black leading-[1.02] tracking-tight text-slate-950 md:text-5xl">
-                {withPricePlaceholder(pricingContent.headline, priceLabel)}
-              </h2>
-            </div>
-            <p className="max-w-2xl text-base leading-7 text-slate-500 lg:ml-auto">
-              {pricingContent.description}
-            </p>
-          </div>
+        <PublicShell id="pricing">
+          <SectionIntro
+            label={pricingContent.eyebrow}
+            title={withPricePlaceholder(pricingContent.headline, priceLabel)}
+            description={pricingContent.description}
+          />
 
-          <div className="mt-8 grid gap-3 border-y border-slate-200 py-4 sm:grid-cols-2 lg:grid-cols-6">
-            {cmsIncludedItems.map((item) => (
-              <div key={item} className="flex items-center gap-2 text-sm font-black text-slate-700">
-                <Check className="h-4 w-4 shrink-0 text-[oklch(57%_0.24_29)]" />
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 grid border-y border-slate-200 lg:grid-cols-[0.8fr_1.2fr]">
-            <div className="bg-slate-950 p-6 text-white md:p-8">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-white/55">{pricingContent.package_eyebrow}</p>
-              <p className="mt-5 text-5xl font-black tracking-tight">
+          <div className="grid gap-0 border-y border-black lg:grid-cols-[0.82fr_1.18fr]">
+            <div className="bg-black p-7 text-white md:p-10">
+              <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-white/48">{pricingContent.package_eyebrow}</p>
+              <p className="mt-7 font-serif text-6xl font-medium leading-none tracking-[-0.06em] md:text-8xl">
                 {pricing.standard.price.toLocaleString('fr-FR')}
-                <span className="ml-2 text-sm font-semibold text-white/55">{pricing.currency_label}</span>
               </p>
-              <p className="mt-2 text-sm text-white/55">Paiement unique</p>
-              <p className="mt-7 max-w-md text-lg font-black leading-7">
+              <p className="mt-2 text-sm font-black text-white/58">{pricing.currency_label} · Paiement unique</p>
+              <p className="mt-8 max-w-md text-xl font-black leading-8 tracking-[-0.02em]">
                 {pricingContent.package_description}
               </p>
-              <Link href={pricingContent.primary_cta.url} className="mt-7 inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950 transition-colors hover:bg-slate-100">
+              <PillLink href={pricingContent.primary_cta.url} variant="white" className="mt-8">
                 {pricingContent.primary_cta.label}
-              </Link>
+              </PillLink>
             </div>
 
-            <div className="p-6 md:p-8">
-              <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+            <div className="p-7 md:p-10">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-[oklch(57%_0.24_29)]">{pricingContent.options_eyebrow}</p>
-                  <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{pricingContent.options_headline}</h3>
+                  <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/45">{pricingContent.options_eyebrow}</p>
+                  <h3 className="mt-3 max-w-md font-serif text-4xl font-medium leading-none tracking-[-0.05em]">
+                    {pricingContent.options_headline}
+                  </h3>
+                  <p className="mt-5 max-w-md text-base leading-7 text-black/58">
+                    {pricingContent.options_description}
+                  </p>
                 </div>
-                <p className="text-sm text-slate-500">Le total se met à jour avant paiement.</p>
+                <div className="divide-y divide-neutral-200 border-y border-neutral-200">
+                  {popularOptions.map((option) => (
+                    <div key={option.id} className="flex items-center justify-between gap-4 py-4 text-sm">
+                      <span className="font-black text-black/78">{option.name}</span>
+                      <span className="shrink-0 font-black text-black">+{option.price.toLocaleString('fr-FR')} FCFA</span>
+                    </div>
+                  ))}
+                  {popularOptions.length === 0 && (
+                    <p className="py-4 text-sm text-black/55">Les options disponibles apparaissent pendant la commande.</p>
+                  )}
+                </div>
               </div>
-              <div className="mt-6 divide-y divide-slate-100 border-y border-slate-100">
-                {popularOptions.map((option) => (
-                  <div key={option.id} className="flex items-center justify-between gap-4 py-4 text-sm">
-                    <span className="font-black text-slate-700">{option.name}</span>
-                    <span className="shrink-0 font-black text-slate-950">+{option.price.toLocaleString('fr-FR')} FCFA</span>
+
+              <div className="mt-8 grid gap-3 border-t border-neutral-200 pt-6 sm:grid-cols-2 xl:grid-cols-3">
+                {cmsIncludedItems.map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-sm font-black text-black/72">
+                    <Check className="h-4 w-4 shrink-0 text-[#2563eb]" />
+                    <span>{item}</span>
                   </div>
                 ))}
-                {popularOptions.length === 0 && (
-                  <p className="py-4 text-sm text-slate-500">Les options disponibles apparaissent pendant la commande.</p>
-                )}
               </div>
-              <p className="mt-5 text-sm leading-6 text-slate-500">
-                {pricingContent.options_description}
-              </p>
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-slate-200 pt-5 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-6 flex flex-col gap-3 text-sm text-black/58 sm:flex-row sm:items-center sm:justify-between">
             <p>{pricingContent.payment_note}</p>
             <p>
               {pricing.custom_note || 'Projet spécifique ?'}{' '}
-              <Link href={pricingContent.secondary_cta.url} className="font-black text-slate-950 underline underline-offset-4">{pricingContent.secondary_cta.label}.</Link>
+              <Link href={pricingContent.secondary_cta.url} className="font-black text-black underline underline-offset-4">{pricingContent.secondary_cta.label}.</Link>
             </p>
           </div>
-        </div>
-      </section>
+        </PublicShell>
       )}
       {renderBlocksFor(pricingSection?.key)}
 
       {testimonialsSection && (
-      <section className="bg-slate-950 px-5 py-16 text-white md:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end lg:px-8">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">{testimonialsSection.content.eyebrow}</p>
-            <h2 className="mt-5 max-w-2xl text-4xl font-black leading-[0.98] tracking-tight md:text-6xl">
-              {testimonialsSection.content.headline}
-            </h2>
+        <section className="bg-black px-5 py-20 text-white md:px-8 md:py-28">
+          <div className="mx-auto max-w-[1360px]">
+            <SectionIntro
+              label={testimonialsSection.content.eyebrow}
+              title={testimonialsSection.content.headline}
+              invert
+            />
+            {loading ? (
+              <div className="h-52 animate-pulse bg-white/10" />
+            ) : testimonials.length > 0 ? (
+              <figure className="grid gap-8 border-y border-white/20 py-10 lg:grid-cols-[0.62fr_1.38fr] lg:items-center">
+                <div className="relative min-h-[22rem] overflow-hidden">
+                  <img
+                    src="/image/client-satisfait-frilo.jpg"
+                    alt="Client FRILO satisfait après la livraison de son site."
+                    className="h-full w-full object-cover grayscale"
+                  />
+                </div>
+                <div>
+                  <blockquote className="max-w-5xl font-serif text-4xl font-medium leading-[1.02] tracking-[-0.045em] md:text-6xl">
+                    “{testimonials[0].content}”
+                  </blockquote>
+                  <figcaption className="mt-7 text-sm leading-6 text-white/58">
+                    <span className="font-black text-white">{testimonials[0].reviewer_name}</span>
+                    {testimonials[0].reviewer_role ? `, ${testimonials[0].reviewer_role}` : ''}
+                    {testimonials[0].template?.name ? ` · modèle ${testimonials[0].template.name}` : ''}
+                  </figcaption>
+                </div>
+              </figure>
+            ) : (
+              <p className="max-w-xl text-lg leading-8 text-white/65">
+                {testimonialsSection.content.empty_state}
+              </p>
+            )}
           </div>
-          {loading ? (
-            <div className="h-40 animate-pulse rounded-[1.4rem] bg-white/10" />
-          ) : testimonials.length > 0 ? (
-            <figure className="border-l border-white/20 pl-6 md:pl-10">
-              <blockquote className="text-2xl font-black leading-tight tracking-tight text-white md:text-4xl">
-                “{testimonials[0].content}”
-              </blockquote>
-              <figcaption className="mt-6 text-sm leading-6 text-white/55">
-                <span className="font-black text-white">{testimonials[0].reviewer_name}</span>
-                {testimonials[0].reviewer_role ? `, ${testimonials[0].reviewer_role}` : ''}
-                {testimonials[0].template?.name ? ` · modèle ${testimonials[0].template.name}` : ''}
-              </figcaption>
-            </figure>
-          ) : (
-            <p className="max-w-xl text-lg leading-8 text-white/65">
-              {testimonialsSection.content.empty_state}
-            </p>
-          )}
-        </div>
-      </section>
+        </section>
       )}
       {renderBlocksFor(testimonialsSection?.key)}
 
       {sectorsSection && (
-      <section className="overflow-hidden bg-white py-14 md:py-20">
-        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          <div className="grid gap-8 lg:grid-cols-[0.62fr_1.38fr] lg:items-start">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{sectorsSection.content.eyebrow}</p>
-              <h2 className="mt-3 max-w-md text-3xl font-black leading-[1.02] tracking-tight text-slate-950 md:text-5xl">
-                {sectorsSection.content.headline}
-              </h2>
-              <Link href={sectorsSection.content.cta.url} className="mt-6 inline-flex items-center gap-1 text-sm font-black text-slate-950 hover:text-slate-600">
-                {sectorsSection.content.cta.label} <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            {loading ? (
-              <div className="space-y-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-16 animate-pulse border-b border-slate-100 bg-slate-50" />
-                ))}
-              </div>
-            ) : catalogError ? (
-              <div className="border-y border-amber-200 bg-amber-50 px-5 py-6">
-                <p className="text-sm text-amber-800">{catalogError}</p>
-              </div>
-            ) : sectors.length === 0 ? (
-              <div className="border-y border-slate-200 px-5 py-6">
-                <p className="text-sm text-slate-500">Aucun secteur actif disponible pour le moment.</p>
-              </div>
-            ) : (
-              <div className="border-y border-slate-200">
-                {sectors.slice(0, 6).map((sector, index) => (
-                  <Link
-                    key={sector.id}
-                    href={`/secteurs/${sector.slug}`}
-                    className="group grid gap-4 border-b border-slate-200 py-5 last:border-b-0 md:grid-cols-[4rem_1fr_auto] md:items-center"
-                  >
-                    <span className="text-sm font-black text-[oklch(57%_0.24_29)]">0{index + 1}</span>
-                    <div>
-                      <h3 className="text-2xl font-black tracking-tight text-slate-950 transition-colors group-hover:text-[oklch(57%_0.24_29)]">
-                        {sector.name}
-                      </h3>
-                      <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">{sector.description}</p>
-                    </div>
-                    <ArrowRight className="hidden h-5 w-5 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-slate-950 md:block" />
-                  </Link>
-                ))}
-              </div>
+        <PublicShell>
+          <SectionIntro
+            label={sectorsSection.content.eyebrow}
+            title={sectorsSection.content.headline}
+            action={(
+              <PillLink href={sectorsSection.content.cta.url} variant="outline-black">
+                {sectorsSection.content.cta.label}
+              </PillLink>
             )}
-          </div>
-        </div>
-      </section>
+          />
+          {loading ? (
+            <div className="space-y-0 border-y border-neutral-200">
+              {Array.from({ length: 6 }, (_, index) => (
+                <div key={index} className="h-20 animate-pulse border-b border-neutral-100 bg-neutral-50 last:border-b-0" />
+              ))}
+            </div>
+          ) : catalogError ? (
+            <div className="border-y border-amber-200 bg-amber-50 px-5 py-6">
+              <p className="text-sm text-amber-900">{catalogError}</p>
+            </div>
+          ) : sectors.length === 0 ? (
+            <div className="border-y border-neutral-200 px-5 py-6">
+              <p className="text-sm text-black/55">Aucun secteur actif disponible pour le moment.</p>
+            </div>
+          ) : (
+            <div className="border-y border-black">
+              {sectors.slice(0, 7).map((sector, index) => (
+                <Link
+                  key={sector.id}
+                  href={`/secteurs/${sector.slug}`}
+                  className="group grid gap-4 border-b border-neutral-200 py-6 last:border-b-0 md:grid-cols-[5rem_1fr_auto] md:items-center"
+                >
+                  <span className="font-serif text-3xl leading-none tracking-[-0.05em] text-black/32">{index + 1}</span>
+                  <div>
+                    <h3 className="font-serif text-4xl font-medium leading-none tracking-[-0.05em] text-black transition-colors group-hover:text-[#2563eb]">
+                      {sector.name}
+                    </h3>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-black/55">{sector.description}</p>
+                  </div>
+                  <ArrowRight className="hidden h-5 w-5 text-black/30 transition-transform group-hover:translate-x-1 group-hover:text-black md:block" />
+                </Link>
+              ))}
+            </div>
+          )}
+        </PublicShell>
       )}
       {renderBlocksFor(sectorsSection?.key)}
 
       {faqSection && (
-      <section className="bg-white px-5 py-12 md:py-20">
-        <div className="mx-auto grid max-w-7xl gap-8 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:px-8">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">{faqSection.content.eyebrow}</p>
-            <h2 className="mt-4 max-w-md text-3xl font-black leading-[1.02] tracking-tight text-slate-950 md:text-5xl">
-              {faqSection.content.headline}
-            </h2>
-            <p className="mt-5 max-w-sm text-sm leading-6 text-slate-500">
-              {faqSection.content.description}
-            </p>
-            <Link href={faqSection.content.cta.url} className="mt-7 inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-slate-800">
-              {faqSection.content.cta.label}
-            </Link>
-          </div>
+        <PublicShell>
+          <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+            <div>
+              <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/45">{faqSection.content.eyebrow}</p>
+              <h2 className="max-w-xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.045em] md:text-6xl">
+                {faqSection.content.headline}
+              </h2>
+              <p className="mt-6 max-w-sm text-base leading-7 text-black/58">
+                {faqSection.content.description}
+              </p>
+              <PillLink href={faqSection.content.cta.url} variant="black" className="mt-7">
+                {faqSection.content.cta.label}
+              </PillLink>
+            </div>
 
-          <div className="border-y border-slate-200">
-            {loading ? (
-              <div className="space-y-0">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="h-16 animate-pulse border-b border-slate-100 bg-slate-50 last:border-b-0" />
-                ))}
-              </div>
-            ) : homeFaqs.length > 0 ? (
-              <div className="divide-y divide-slate-200">
-                {homeFaqs.map((faq) => (
-                  <div key={faq.id} className="py-5">
-                    <button
-                      className="group flex w-full items-center justify-between gap-4 text-left"
-                      onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                    >
-                      <span className="text-lg font-black text-slate-950 transition-colors group-hover:text-[oklch(57%_0.24_29)]">{faq.question}</span>
-                      <Plus className={cn('h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200', openFaq === faq.id && 'rotate-45 text-[oklch(57%_0.24_29)]')} />
-                    </button>
-                    {openFaq === faq.id && (
-                      <p className="mt-3 max-w-2xl whitespace-pre-line pr-8 text-sm leading-6 text-slate-500">{faq.answer}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="py-8">
-                <p className="text-sm text-slate-500">La FAQ publique sera publiée ici dès qu'elle sera configurée dans le backoffice.</p>
-              </div>
-            )}
+            <div className="border-y border-black">
+              {loading ? (
+                <div className="space-y-0">
+                  {Array.from({ length: 4 }, (_, index) => (
+                    <div key={index} className="h-20 animate-pulse border-b border-neutral-100 bg-neutral-50 last:border-b-0" />
+                  ))}
+                </div>
+              ) : homeFaqs.length > 0 ? (
+                <div className="divide-y divide-neutral-200">
+                  {homeFaqs.map((faq) => (
+                    <div key={faq.id} className="py-6">
+                      <button
+                        className="group flex w-full items-center justify-between gap-4 text-left"
+                        onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                      >
+                        <span className="text-xl font-black leading-tight tracking-[-0.02em] text-black transition-colors group-hover:text-[#2563eb]">{faq.question}</span>
+                        <Plus className={cn('h-5 w-5 shrink-0 text-black/38 transition-transform duration-200', openFaq === faq.id && 'rotate-45 text-black')} />
+                      </button>
+                      {openFaq === faq.id && (
+                        <p className="mt-4 max-w-2xl whitespace-pre-line pr-8 text-sm leading-6 text-black/58">{faq.answer}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-8">
+                  <p className="text-sm text-black/55">La FAQ publique sera publiée ici dès qu&apos;elle sera configurée dans le backoffice.</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </PublicShell>
       )}
       {renderBlocksFor(faqSection?.key)}
 
@@ -733,25 +719,35 @@ export default function Home() {
       ))}
 
       {closingSection && (
-      <section className="bg-slate-950 px-5 py-12 text-white md:py-16">
-        <div className="mx-auto flex max-w-5xl flex-col items-start gap-7 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-2xl">
-            <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-white/45">{closingSection.content.eyebrow}</p>
-            <h2 className="text-3xl font-black leading-tight tracking-tight md:text-5xl">{closingSection.content.headline}</h2>
-            <p className="mt-4 text-sm leading-6 text-white/60 md:text-base">
-              {closingSection.content.description}
-            </p>
+        <section className="relative isolate overflow-hidden bg-black px-5 py-20 text-white md:px-8 md:py-28">
+          <div className="absolute inset-0 opacity-35">
+            <img
+              src="/image/client-satisfait-frilo.jpg"
+              alt=""
+              className="h-full w-full object-cover grayscale"
+            />
+            <div className="absolute inset-0 bg-black/70" />
           </div>
-          <div className="flex shrink-0 flex-col gap-3 sm:flex-row">
-            <Link href={closingSection.content.primary_cta.url} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-slate-950 hover:bg-slate-100">
-              {closingSection.content.primary_cta.label} <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link href={closingSection.content.secondary_cta.url} className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-black text-white hover:bg-white/10">
-              {closingSection.content.secondary_cta.label}
-            </Link>
+          <div className="relative mx-auto grid max-w-[1360px] gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+              <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.2em] text-white/45">{closingSection.content.eyebrow}</p>
+              <h2 className="max-w-4xl font-serif text-5xl font-medium leading-[0.9] tracking-[-0.06em] text-balance md:text-8xl">
+                {closingSection.content.headline}
+              </h2>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/68">
+                {closingSection.content.description}
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 lg:items-end">
+              <PillLink href={closingSection.content.primary_cta.url} variant="white" className="w-full sm:w-auto">
+                {closingSection.content.primary_cta.label} <ArrowRight className="h-4 w-4" />
+              </PillLink>
+              <PillLink href={closingSection.content.secondary_cta.url} variant="outline-white" className="w-full sm:w-auto">
+                {closingSection.content.secondary_cta.label}
+              </PillLink>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
       {renderBlocksFor(closingSection?.key)}
     </div>
