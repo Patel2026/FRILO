@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+declare module 'axios' {
+    interface AxiosRequestConfig {
+        suppressAuthRedirect?: boolean;
+    }
+}
+
 const AUTH_TOKEN_KEY = 'auth_token';
 const AUTH_CHANGED_EVENT = 'frilo-auth-changed';
 const AUTH_FORBIDDEN_EVENT = 'frilo-api-forbidden';
@@ -58,9 +64,10 @@ api.interceptors.response.use(
         }
 
         const status = error.response?.status;
-        const url = error.config?.url;
+        const config = error.config;
+        const url = config?.url;
 
-        if (status === 401 && !isAuthRoute(url)) {
+        if (status === 401 && !isAuthRoute(url) && !config?.suppressAuthRedirect) {
             clearClientSession();
 
             if (typeof window !== 'undefined') {

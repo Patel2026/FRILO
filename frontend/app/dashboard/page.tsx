@@ -216,7 +216,6 @@ export default function DashboardPage() {
   useEffect(() => {
     let isMounted = true;
 
-    setLoading(true);
     Promise.allSettled([
       authService.getUser(),
       businessService.getOrders(1, 3),

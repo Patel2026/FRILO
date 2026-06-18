@@ -33,11 +33,11 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   useEffect(() => {
     let isMounted = true;
 
-    notificationsService.getUnreadCount().then((count) => {
+    notificationsService.getUnreadCount({ suppressAuthRedirect: true }).then((count) => {
       if (isMounted) setUnreadCount(count);
     }).catch(() => {});
 
-    deadlinesService.list()
+    deadlinesService.list({ suppressAuthRedirect: true })
       .then((list) => {
         if (isMounted) setUrgentCount(
           list.filter((d) => d.days_remaining >= 0 && d.days_remaining <= 7).length
@@ -46,7 +46,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
       .catch(() => {});
 
     const handleUpdate = () => {
-      notificationsService.getUnreadCount().then((count) => {
+      notificationsService.getUnreadCount({ suppressAuthRedirect: true }).then((count) => {
         if (isMounted) setUnreadCount(count);
       }).catch(() => {});
     };

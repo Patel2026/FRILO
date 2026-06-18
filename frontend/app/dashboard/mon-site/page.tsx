@@ -77,14 +77,12 @@ export default function MonSitePage() {
   useEffect(() => {
     let isMounted = true;
 
-    setLoading(true);
-    setError(null);
-
     businessService
       .getOrders(1, 50, { status: 'completed' })
       .then((res) => {
         if (!isMounted) return;
         setSites(res.data.filter((order) => order.status === 'completed'));
+        setError(null);
       })
       .catch(() => {
         if (!isMounted) return;
@@ -139,6 +137,8 @@ export default function MonSitePage() {
           action={
             <ClientButton
               onClick={() => {
+                setError(null);
+                setLoading(true);
                 setReloadKey((value) => value + 1);
               }}
             >

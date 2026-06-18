@@ -18,10 +18,18 @@ export default function DashboardLayout({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     authService.getUser().then(user => {
       if (!user) router.replace('/login');
-      else setIsLoading(false);
-    }).catch(() => router.replace('/login'));
+      else if (isMounted) setIsLoading(false);
+    }).catch(() => {
+      if (isMounted) setIsLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   if (isLoading) {

@@ -107,8 +107,6 @@ export default function OrdersPage() {
     const requestId = requestIdRef.current + 1;
     let isActive = true;
     requestIdRef.current = requestId;
-    setLoading(true);
-    setError(null);
 
     businessService.getOrders(page, 10, selectedFilter.filters)
       .then((response) => {
@@ -154,6 +152,8 @@ export default function OrdersPage() {
                 key={option.key}
                 type="button"
                 onClick={() => {
+                  setError(null);
+                  setLoading(true);
                   setPage(1);
                   setActiveFilter(option.key);
                 }}
@@ -197,6 +197,7 @@ export default function OrdersPage() {
                 <ClientButton
                   onClick={() => {
                     setError(null);
+                    setLoading(true);
                     setReloadKey(value => value + 1);
                   }}
                 >
@@ -222,6 +223,8 @@ export default function OrdersPage() {
                 <ClientButton
                   variant="secondary"
                   onClick={() => {
+                    setError(null);
+                    setLoading(true);
                     setPage(1);
                     setActiveFilter('all');
                   }}
@@ -286,7 +289,11 @@ export default function OrdersPage() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setPage(value => Math.max(1, value - 1))}
+                  onClick={() => {
+                    setError(null);
+                    setLoading(true);
+                    setPage(value => Math.max(1, value - 1));
+                  }}
                   disabled={loading || meta.current_page === 1}
                   aria-label="Page précédente"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"
@@ -295,7 +302,11 @@ export default function OrdersPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setPage(value => Math.min(meta.last_page, value + 1))}
+                  onClick={() => {
+                    setError(null);
+                    setLoading(true);
+                    setPage(value => Math.min(meta.last_page, value + 1));
+                  }}
                   disabled={loading || meta.current_page === meta.last_page}
                   aria-label="Page suivante"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"

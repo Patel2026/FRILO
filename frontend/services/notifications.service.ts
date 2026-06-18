@@ -48,20 +48,27 @@ export interface NotificationReadAllResponse {
     unread_count: number;
 }
 
+interface NotificationRequestOptions {
+    suppressAuthRedirect?: boolean;
+}
+
 export const notificationsService = {
-    async getNotifications(page = 1, perPage = 20): Promise<NotificationListResponse> {
+    async getNotifications(page = 1, perPage = 20, options: NotificationRequestOptions = {}): Promise<NotificationListResponse> {
         const response = await api.get('/notifications', {
             params: {
                 page,
                 per_page: perPage,
             },
+            suppressAuthRedirect: options.suppressAuthRedirect,
         });
 
         return response.data as NotificationListResponse;
     },
 
-    async getUnreadCount(): Promise<number> {
-        const response = await api.get('/notifications/unread-count');
+    async getUnreadCount(options: NotificationRequestOptions = {}): Promise<number> {
+        const response = await api.get('/notifications/unread-count', {
+            suppressAuthRedirect: options.suppressAuthRedirect,
+        });
         return Number(response.data?.unread_count ?? 0);
     },
 
@@ -77,4 +84,3 @@ export const notificationsService = {
         return response.data as NotificationReadAllResponse;
     },
 };
-

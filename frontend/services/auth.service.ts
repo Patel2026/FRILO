@@ -1,4 +1,5 @@
 import api from './api';
+import axios from 'axios';
 import { z } from 'zod';
 
 const AUTH_CHANGED_EVENT = 'frilo-auth-changed';
@@ -116,6 +117,18 @@ export const authService = {
         try {
             const response = await api.get('/user');
             return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                return null;
+            }
+
+            throw error;
+        }
+    },
+
+    async getOptionalUser(): Promise<AuthUser | null> {
+        try {
+            return await this.getUser();
         } catch {
             return null;
         }

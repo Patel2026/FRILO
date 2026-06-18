@@ -15,9 +15,15 @@ export interface DeadlinePayload {
   due_date: string;
 }
 
+interface DeadlineRequestOptions {
+  suppressAuthRedirect?: boolean;
+}
+
 export const deadlinesService = {
-  async list(): Promise<Deadline[]> {
-    const { data } = await api.get<Deadline[]>('/deadlines');
+  async list(options: DeadlineRequestOptions = {}): Promise<Deadline[]> {
+    const { data } = await api.get<Deadline[]>('/deadlines', {
+      suppressAuthRedirect: options.suppressAuthRedirect,
+    });
     return data;
   },
 

@@ -39,7 +39,7 @@ export function NotificationsBell() {
 
   const refreshUnreadCount = async () => {
     try {
-      const count = await notificationsService.getUnreadCount();
+      const count = await notificationsService.getUnreadCount({ suppressAuthRedirect: true });
       setUnreadCount(count);
     } catch {
       // silent fail in topbar widget
@@ -51,7 +51,7 @@ export function NotificationsBell() {
     setError(null);
 
     try {
-      const response = await notificationsService.getNotifications(1, 6);
+      const response = await notificationsService.getNotifications(1, 6, { suppressAuthRedirect: true });
       setItems(response.data);
       setUnreadCount(response.unread_count);
     } catch {
