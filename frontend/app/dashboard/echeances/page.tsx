@@ -42,7 +42,22 @@ function urgencyBadge(days: number): { label: string; tone: 'neutral' | 'warning
 }
 
 function formatDueDate(value: string): string {
-  const date = new Date(value);
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  let date: Date;
+
+  if (dateOnlyMatch) {
+    const year = Number(dateOnlyMatch[1]);
+    const month = Number(dateOnlyMatch[2]);
+    const day = Number(dateOnlyMatch[3]);
+
+    date = new Date(year, month - 1, day);
+
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+      return 'Date limite non valide';
+    }
+  } else {
+    date = new Date(value);
+  }
 
   if (Number.isNaN(date.getTime())) {
     return 'Date limite non valide';
@@ -85,6 +100,7 @@ export default function EcheancesPage() {
   const [form, setForm]           = useState<DeadlinePayload>(emptyForm());
   const [saving, setSaving]       = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -93,6 +109,7 @@ export default function EcheancesPage() {
       .then((items) => {
         setDeadlines(items);
         setError(null);
+        setDeleteError(null);
       })
       .catch(() => setError('Impossible de charger les échéances.'))
       .finally(() => setLoading(false));
@@ -104,6 +121,7 @@ export default function EcheancesPage() {
     setEditing(null);
     setForm(emptyForm());
     setFormError(null);
+    setDeleteError(null);
     setShowForm(true);
   };
 
@@ -112,6 +130,7 @@ export default function EcheancesPage() {
     setEditing(d);
     setForm({ title: d.title, description: d.description ?? '', due_date: d.due_date });
     setFormError(null);
+    setDeleteError(null);
     setShowForm(true);
   };
 
@@ -137,11 +156,12 @@ export default function EcheancesPage() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Supprimer cette échéance ?")) return;
+    setDeleteError(null);
     try {
       await deadlinesService.remove(id);
       load();
     } catch {
-      setError("Impossible de supprimer cette échéance.");
+      setDeleteError("Impossible de supprimer cette échéance.");
     }
   };
 
@@ -162,13 +182,15 @@ export default function EcheancesPage() {
           />
           <div className="px-4 py-4 md:px-5">
             {formError && (
-              <StatusBand
-                title="Impossible d’enregistrer"
-                description={formError}
-                tone="danger"
-                status={<StatusPill tone="danger">Erreur</StatusPill>}
-                className="mb-4"
-              />
+              <div role="alert">
+                <StatusBand
+                  title="Impossible d’enregistrer"
+                  description={formError}
+                  tone="danger"
+                  status={<StatusPill tone="danger">Erreur</StatusPill>}
+                  className="mb-4"
+                />
+              </div>
             )}
             <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
@@ -226,13 +248,15 @@ export default function EcheancesPage() {
           <LoadingRows />
         </ClientPanel>
       ) : error ? (
-        <StatusBand
-          title="Impossible de charger vos échéances"
-          description={error}
-          tone="danger"
-          status={<StatusPill tone="danger">Erreur</StatusPill>}
-          action={<ClientButton onClick={load}>Réessayer</ClientButton>}
-        />
+        <div role="alert">
+          <StatusBand
+            title="Impossible de charger vos échéances"
+            description={error}
+            tone="danger"
+            status={<StatusPill tone="danger">Erreur</StatusPill>}
+            action={<ClientButton onClick={load}>Réessayer</ClientButton>}
+          />
+        </div>
       ) : deadlines.length === 0 ? (
         <ClientPanel>
           <ClientPanelHeader
@@ -248,6 +272,16 @@ export default function EcheancesPage() {
             description="Les rappels FRILO sont protégés. Vos rappels personnels restent modifiables."
             action={<StatusPill tone="neutral">{deadlines.length} échéance{deadlines.length > 1 ? 's' : ''}</StatusPill>}
           />
+          {deleteError && (
+            <div role="alert" className="px-4 pb-2 md:px-5">
+              <StatusBand
+                title="Suppression impossible"
+                description={deleteError}
+                tone="danger"
+                status={<StatusPill tone="danger">Erreur</StatusPill>}
+              />
+            </div>
+          )}
           {deadlines.map((d) => {
             const badge = urgencyBadge(d.days_remaining);
 
