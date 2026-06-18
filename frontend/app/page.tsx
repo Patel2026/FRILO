@@ -179,6 +179,16 @@ function withPricePlaceholder(value: string, priceLabel: string): string {
   return value.replace('{price}', priceLabel);
 }
 
+function pricingHeadline(value: string, priceLabel: string): string {
+  const renderedHeadline = withPricePlaceholder(value, priceLabel);
+
+  if (renderedHeadline.includes(priceLabel) || renderedHeadline.includes('50 000') || renderedHeadline.includes('50 000')) {
+    return 'Un site essentiel. Des options selon vos besoins.';
+  }
+
+  return renderedHeadline;
+}
+
 function PublicShell({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
   return (
     <section id={id} className={cn('bg-white px-5 py-12 md:px-8 md:py-16', className)}>
@@ -685,7 +695,7 @@ export default function Home() {
             <div className="lg:sticky lg:top-28">
               <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#2563eb]">{pricingContent.eyebrow}</p>
               <h2 className="max-w-3xl font-serif text-5xl font-medium leading-[0.92] tracking-[-0.04em] text-balance md:text-7xl">
-                {withPricePlaceholder(pricingContent.headline, priceLabel)}
+                {pricingHeadline(pricingContent.headline, priceLabel)}
               </h2>
               <p className="mt-6 max-w-md text-base leading-7 text-black/62">
                 {pricingContent.description}

@@ -188,7 +188,7 @@ return [
             'renderer' => 'home.pricing',
             'defaults' => [
                 'eyebrow' => 'Tarifs',
-                'headline' => 'Commencez avec un site essentiel. Ajoutez seulement ce qui vous sert.',
+                'headline' => 'Un site essentiel. Des options selon vos besoins.',
                 'description' => 'Le site essentiel est compris dans le prix de départ. Pendant la commande, vous choisissez les fonctions utiles à votre activité et voyez le total avant de payer.',
                 'included_items' => [
                     'Domaine 1 an',

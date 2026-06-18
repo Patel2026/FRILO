@@ -131,7 +131,7 @@ export const HOME_PUBLIC_CONTENT_FALLBACK: PublicContentResponse = {
       renderer: 'home.pricing',
       content: {
         eyebrow: 'Tarifs',
-        headline: 'Commencez à {price}. Ajoutez seulement ce qui vous sert.',
+        headline: 'Un site essentiel. Des options selon vos besoins.',
         description: 'Le site essentiel est compris dans le prix de départ. Pendant la commande, vous choisissez les fonctions utiles à votre activité et voyez le total avant de payer.',
         included_items: ['Domaine 1 an', 'Hébergement 1 an', 'SSL', 'Version mobile', 'Mise en ligne', 'Retouches'],
         package_eyebrow: 'Le site essentiel',
