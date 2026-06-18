@@ -206,6 +206,7 @@ function LoadingRows() {
 export default function DashboardPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [completedOrders, setCompletedOrders] = useState<Order[]>([]);
   const [featuredTemplates, setFeaturedTemplates] = useState<Template[]>([]);
   const [summary, setSummary] = useState<OrderSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -219,15 +220,17 @@ export default function DashboardPage() {
     Promise.allSettled([
       authService.getUser(),
       businessService.getOrders(1, 3),
+      businessService.getOrders(1, 1, { status: 'completed' }),
       businessService.getOrderSummary(),
       businessService.getTemplates(),
-    ]).then(([userResult, ordersResult, summaryResult, templatesResult]) => {
+    ]).then(([userResult, ordersResult, completedOrdersResult, summaryResult, templatesResult]) => {
       if (!isMounted) return;
       const hasCriticalFailure = userResult.status === 'rejected' || ordersResult.status === 'rejected';
 
       if (hasCriticalFailure) {
         setError('Impossible de charger votre console client pour le moment.');
         setOrders([]);
+        setCompletedOrders([]);
         setSummary(null);
         setFeaturedTemplates([]);
         return;
@@ -235,12 +238,14 @@ export default function DashboardPage() {
 
       const u = userResult.value;
       const ordersRes = ordersResult.value;
+      const completedOrdersRes = completedOrdersResult.status === 'fulfilled' ? completedOrdersResult.value.data : [];
       const summaryRes = summaryResult.status === 'fulfilled' ? summaryResult.value : null;
       const templatesRes = templatesResult.status === 'fulfilled' ? templatesResult.value : [];
 
       setError(null);
       setUser(u);
       setOrders(ordersRes.data);
+      setCompletedOrders(completedOrdersRes);
       setSummary(summaryRes);
 
       const preferredSectorId = u?.sector_id ?? null;
@@ -262,7 +267,7 @@ export default function DashboardPage() {
 
   const allOrders = orders;
   const latestOrder = allOrders[0] ?? null;
-  const deliveredOrder = allOrders.find((order) => order.status === 'completed') ?? null;
+  const deliveredOrder = completedOrders[0] ?? allOrders.find((order) => order.status === 'completed') ?? null;
   const activeOrder = allOrders.find((order) => order.status === 'processing' || order.status === 'pending') ?? latestOrder;
   const primaryOrder = deliveredOrder ?? activeOrder ?? latestOrder;
   const projectName = primaryOrder?.instruction?.enterprise_name || primaryOrder?.instructions?.[0]?.enterprise_name || primaryOrder?.template?.name || 'Votre projet FRILO';
@@ -387,6 +392,26 @@ export default function DashboardPage() {
           />
           {loading ? (
             <LoadingRows />
+          ) : error ? (
+            <div>
+              <CompactRow
+                title="Outils indisponibles"
+                description="Rechargez le tableau de bord pour retrouver vos modules FRILO."
+                meta={<StatusPill tone="neutral">Contexte non chargé</StatusPill>}
+                action={
+                  <ClientButton
+                    variant="secondary"
+                    onClick={() => {
+                      setError(null);
+                      setLoading(true);
+                      setReloadKey((value) => value + 1);
+                    }}
+                  >
+                    Réessayer
+                  </ClientButton>
+                }
+              />
+            </div>
           ) : (
             <div>
               <CompactRow
