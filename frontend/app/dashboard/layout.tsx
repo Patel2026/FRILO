@@ -75,6 +75,7 @@ export default function DashboardLayout({
               </Link>
               <Link
                 href="/templates"
+                aria-label="Nouvelle demande"
                 className="inline-flex items-center gap-2 rounded-lg bg-[#e11d2e] px-3 py-2 text-sm font-black text-white transition-colors hover:bg-[#be123c]"
               >
                 <Plus className="h-4 w-4" />
