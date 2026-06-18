@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   ClientButton,
@@ -68,15 +69,6 @@ function formatDate(value?: string | null): string {
 
 function formatPrice(value: number): string {
   return `${value.toLocaleString('fr-FR')} FCFA`;
-}
-
-function getOrderDescription(order: Order): string {
-  return [
-    formatDate(order.created_at),
-    formatOrderId(order),
-    order.template?.name,
-    order.template?.sector?.name,
-  ].filter(Boolean).join(' · ');
 }
 
 function LoadingRows() {
@@ -251,20 +243,36 @@ export default function OrdersPage() {
             {orders.map(order => {
               const status = statusConfig[order.status] ?? { label: order.status, tone: 'neutral' as StatusTone };
               const payment = paymentConfig[order.payment_status] ?? { label: order.payment_status, tone: 'neutral' as StatusTone };
+              const orderNumber = formatOrderId(order);
 
               return (
                 <CompactRow
                   key={order.id}
                   title={getOrderName(order)}
-                  description={getOrderDescription(order)}
+                  description={[
+                    formatDate(order.created_at),
+                    orderNumber,
+                    order.template?.name,
+                    order.template?.sector?.name,
+                  ].filter(Boolean).join(' · ')}
                   meta={
                     <span className="flex flex-wrap items-center gap-2">
                       <StatusPill tone={status.tone}>{status.label}</StatusPill>
                       <StatusPill tone={payment.tone}>{payment.label}</StatusPill>
                     </span>
                   }
-                  href={`/dashboard/orders/${order.id}`}
-                  action={<span className="text-sm font-black text-black">{formatPrice(order.price)}</span>}
+                  action={
+                    <span className="flex flex-wrap items-center justify-end gap-2">
+                      <span className="text-sm font-black text-black">{formatPrice(order.price)}</span>
+                      <Link
+                        href={`/dashboard/orders/${order.id}`}
+                        aria-label={`Voir la ${orderNumber.toLowerCase()}`}
+                        className="inline-flex h-8 items-center justify-center rounded-md border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-700 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+                      >
+                        Voir
+                      </Link>
+                    </span>
+                  }
                 />
               );
             })}
