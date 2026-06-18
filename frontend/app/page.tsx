@@ -600,7 +600,7 @@ export default function Home() {
                   ))}
                 </div>
 
-                <p className="mt-8 max-w-5xl border-t border-white/20 pt-6 text-xl font-black leading-tight tracking-[-0.03em]">
+                <p className="mx-auto mt-8 max-w-4xl border-t border-white/20 pt-6 text-center text-xl font-black leading-tight tracking-[-0.03em]">
                   {processSection.content.result_copy}
                 </p>
               </div>
