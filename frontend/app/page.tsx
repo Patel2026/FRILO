@@ -265,23 +265,6 @@ function LoadingTiles({ count = 4 }: { count?: number }) {
   );
 }
 
-function MetricStrip({ items, invert = false }: { items: Array<{ value: string; label: string }>; invert?: boolean }) {
-  return (
-    <div className={cn('grid divide-y border-y md:grid-cols-3 md:divide-x md:divide-y-0', invert ? 'divide-white/18 border-white/24' : 'divide-neutral-200 border-black')}>
-      {items.map((item) => (
-        <div key={item.label} className="px-0 py-5 md:px-5">
-          <p className={cn('font-serif text-4xl font-medium leading-none tracking-[-0.04em] md:text-5xl', invert ? 'text-white' : 'text-black')}>
-            {item.value}
-          </p>
-          <p className={cn('mt-2 max-w-[18rem] text-sm font-black leading-6', invert ? 'text-white/58' : 'text-black/58')}>
-            {item.label}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function FeaturedSectorCard({ sector, index }: { sector: SectorFeature; index: number }) {
   return (
     <Link
@@ -374,11 +357,6 @@ export default function Home() {
   const featuredSectorsForGrid = sectors.length > 0
     ? sectors.slice(0, 4).map(toSectorFeature)
     : FALLBACK_SECTOR_FEATURES;
-  const homeMetrics = [
-    { value: '48h', label: 'pour recevoir une première version claire à partager.' },
-    { value: priceLabel, label: 'pour démarrer avec le site essentiel, sans abonnement caché.' },
-    { value: '1 lieu', label: 'pour suivre commande, paiement, retouches et livraison.' },
-  ];
   const renderBlocksFor = (anchor: string | null | undefined) => (
     getBlocksForAnchor(publicContent, anchor ?? null).map((block) => (
       <FreeContentBlock key={block.id} block={block} />
@@ -566,9 +544,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="mt-8">
-            <MetricStrip items={homeMetrics} />
           </div>
         </PublicShell>
       )}
