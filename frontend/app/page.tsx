@@ -64,6 +64,12 @@ const FALLBACK_SECTOR_FEATURES: SectorFeature[] = [
   },
 ];
 
+const TESTIMONIAL_PLACEHOLDERS = [
+  { label: 'Avis client', status: 'En préparation' },
+  { label: 'Retour vérifié', status: 'Bientôt publié' },
+  { label: 'Preuve sociale', status: 'Après validation' },
+];
+
 function getTemplatePrice(template: Template): number {
   return typeof template.price === 'string' ? parseInt(template.price, 10) : template.price;
 }
@@ -143,11 +149,19 @@ function templateSummary(template: Template): string {
   return template.description || 'Un modèle prêt à adapter à votre activité.';
 }
 
+function sectorDescription(sector: Sector): string {
+  if (sector.description?.toLowerCase().includes('commande sans modèle')) {
+    return 'Un accompagnement pour choisir la base la plus adaptée à votre projet.';
+  }
+
+  return sector.description || 'Une base claire pour présenter vos services, photos et contacts.';
+}
+
 function toSectorFeature(sector: Sector): SectorFeature {
   return {
     id: sector.id,
     name: sector.name,
-    description: sector.description || 'Une base claire pour présenter vos services, photos et contacts.',
+    description: sectorDescription(sector),
     href: `/secteurs/${sector.slug}`,
   };
 }
@@ -187,6 +201,14 @@ function pricingHeadline(value: string, priceLabel: string): string {
   }
 
   return renderedHeadline;
+}
+
+function sectorsHeadline(value: string): string {
+  if (value.toLowerCase().includes('jargon')) {
+    return 'Trouvez le modèle adapté à votre activité.';
+  }
+
+  return value;
 }
 
 function PublicShell({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
@@ -290,7 +312,7 @@ function FeaturedSectorCard({ sector, index }: { sector: SectorFeature; index: n
         <p className={cn('text-xs font-black uppercase tracking-[0.18em]', index === 0 ? 'text-white/50' : 'text-black/40')}>
           Métier {index + 1}
         </p>
-        <h3 className="mt-4 max-w-full break-words font-serif text-[2rem] font-medium leading-[1.02] tracking-[-0.03em] hyphens-auto md:text-[2.125rem]">
+        <h3 className="mt-4 max-w-full font-serif text-[clamp(1.65rem,1.9vw,1.95rem)] font-medium leading-[1.06] tracking-[-0.02em] text-balance">
           {sector.name}
         </h3>
       </div>
@@ -537,22 +559,7 @@ export default function Home() {
                 alt="Client FRILO utilisant son site pour présenter son activité."
                 className="col-start-1 row-start-1 h-full w-full object-cover opacity-70 grayscale transition-transform duration-700 hover:scale-[1.03]"
               />
-              <div className="col-start-1 row-start-1 flex items-end bg-gradient-to-t from-black via-black/24 to-black/12 p-6 md:p-8">
-                <div className="w-full">
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-white/55">Ce que le client voit</p>
-                  <div className="mt-5 divide-y divide-white/18 border-y border-white/20">
-                    {['Services clairs', 'Photos et preuves', 'Contacts visibles'].map((item) => (
-                      <div key={item} className="flex items-center justify-between py-4 text-sm font-black">
-                        <span>{item}</span>
-                        <Check className="h-4 w-4 text-[#60a5fa]" />
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-5 max-w-md text-sm leading-6 text-white/64">
-                    Le site ne vend pas du décor : il rend votre activité compréhensible et joignable.
-                  </p>
-                </div>
-              </div>
+              <div className="col-start-1 row-start-1 bg-gradient-to-t from-black/28 via-transparent to-transparent" />
             </div>
           </div>
         </PublicShell>
@@ -624,7 +631,7 @@ export default function Home() {
         <PublicShell>
           <SectionIntro
             label={sectorsSection.content.eyebrow}
-            title={sectorsSection.content.headline}
+            title={sectorsHeadline(sectorsSection.content.headline)}
             description="Le client doit se reconnaître vite : activité, services, photos, contacts et demandes doivent parler son langage."
             action={(
               <PillLink href={sectorsSection.content.cta.url} variant="outline-black">
@@ -678,10 +685,17 @@ export default function Home() {
                 </figcaption>
               </figure>
             ) : (
-              <div className="border-y border-white/20 py-7">
-                <p className="max-w-2xl text-base leading-7 text-white/62">
-                  {testimonialsSection.content.empty_state}
-                </p>
+              <div className="grid gap-3 border-y border-white/20 py-7 sm:grid-cols-3">
+                {TESTIMONIAL_PLACEHOLDERS.map((item) => (
+                  <div
+                    key={item.label}
+                    className="group border border-white/16 p-4 transition-colors duration-200 hover:border-white/42 hover:bg-white/6"
+                  >
+                    <div className="mb-5 h-1.5 w-12 bg-white/24 transition-colors duration-200 group-hover:bg-[#60a5fa]" />
+                    <p className="text-sm font-black text-white">{item.label}</p>
+                    <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-white/42">{item.status}</p>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -691,19 +705,19 @@ export default function Home() {
 
       {pricingSection && pricingContent && (
         <PublicShell id="pricing" className="pb-8 md:pb-12">
-          <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+          <div className="grid gap-8 lg:grid-cols-[0.68fr_1.32fr] lg:items-start">
             <div className="lg:sticky lg:top-28">
               <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#2563eb]">{pricingContent.eyebrow}</p>
-              <h2 className="max-w-3xl font-serif text-5xl font-medium leading-[0.92] tracking-[-0.04em] text-balance md:text-7xl">
+              <h2 className="max-w-xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.035em] text-balance md:text-5xl lg:text-6xl">
                 {pricingHeadline(pricingContent.headline, priceLabel)}
               </h2>
-              <p className="mt-6 max-w-md text-base leading-7 text-black/62">
+              <p className="mt-6 max-w-lg text-base leading-7 text-black/62">
                 {pricingContent.description}
               </p>
             </div>
 
             <div className="border-y border-black">
-              <div className="grid lg:grid-cols-[0.86fr_1.14fr]">
+              <div className="grid xl:grid-cols-[0.92fr_1.08fr]">
                 <div className="bg-black p-7 text-white md:p-9">
                   <p className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/48">{pricingContent.package_eyebrow}</p>
                   <p className="mt-6 font-serif text-6xl font-medium leading-none tracking-[-0.04em] md:text-8xl">
