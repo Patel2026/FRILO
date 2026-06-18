@@ -763,14 +763,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
-              <div className="flex flex-col gap-3 border-t border-neutral-200 px-7 py-5 text-sm text-black/58 md:px-9 lg:flex-row lg:items-center lg:justify-between">
-                <p>{pricingContent.payment_note}</p>
-                <p>
-                  {pricing.custom_note || 'Projet spécifique ?'}{' '}
-                  <Link href={pricingContent.secondary_cta.url} className="font-black text-black underline underline-offset-4">{pricingContent.secondary_cta.label}.</Link>
-                </p>
-              </div>
             </div>
           </div>
         </PublicShell>
