@@ -4,6 +4,14 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Search, Star, X } from 'lucide-react';
 import { TemplateCard } from '@/components/business/TemplateCard';
+import {
+  PublicBenefitStrip,
+  PublicEmptyState,
+  PublicFinalCta,
+  PublicHero,
+  PublicPageShell,
+} from '@/components/public/PublicPageShell';
+import { PUBLIC_PAGE_TEXT } from '@/components/public/publicPageCopy';
 import { usePublicPricing } from '@/hooks/usePublicPricing';
 import { formatPublicPrice } from '@/lib/publicPricing';
 import { businessService, Sector, Template } from '@/services/business.service';
@@ -233,38 +241,37 @@ export default function TemplatesPage() {
   const compareHref = compareIds.length > 0 ? `/templates/compare?ids=${compareIds.join(',')}` : '/templates/compare';
 
   return (
-    <div className="min-h-screen bg-white pb-28 lg:pb-0">
-      <div className="bg-black px-5 pb-14 pt-32 text-white md:pb-16 md:pt-36">
-        <div className="mx-auto grid max-w-7xl gap-10 sm:px-6 lg:grid-cols-[1fr_0.72fr] lg:items-end lg:px-8">
-          <div>
-            <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Modèles FRILO</p>
-            <h1 className="max-w-4xl text-4xl font-black leading-[0.98] md:text-5xl lg:text-6xl">
-              Choisissez l’image que votre entreprise va donner.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/65 md:text-lg">
-              Parcourez des vitrines prêtes à adapter à votre métier. Le prix est visible, l’aperçu est concret, la commande reste simple.
+    <PublicPageShell className="pb-28 lg:pb-0">
+      <PublicHero
+        eyebrow="Modèles FRILO"
+        title={PUBLIC_PAGE_TEXT.templates.heroTitle}
+        description={PUBLIC_PAGE_TEXT.templates.heroDescription}
+        primaryAction={{ label: 'Voir les modèles', href: '#catalogue' }}
+        secondaryAction={{ label: 'Besoin d’aide ?', href: '/contact?subject=Choix%20du%20mod%C3%A8le' }}
+        aside={(
+          <div className="grid gap-4 bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.16)]">
+            <p className="text-lg font-black leading-tight text-black">
+              Choisissez comme un client regarde votre entreprise.
             </p>
-          </div>
-
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 md:p-6">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">Comment choisir</p>
-            <div className="mt-5 space-y-4">
-              <div>
-                <p className="text-sm font-black text-white">Regardez d’abord l’image perçue.</p>
-                <p className="mt-1 text-sm leading-6 text-white/55">Le bon modèle doit rassurer votre client avant même le premier message.</p>
-              </div>
-              <div className="h-px bg-white/10" />
-              <div>
-                <p className="text-sm font-black text-white">Puis vérifiez le contenu.</p>
-                <p className="mt-1 text-sm leading-6 text-white/55">Services, preuves, contact et présentation doivent pouvoir parler pour vous.</p>
-              </div>
+            <div className="grid gap-3 text-sm leading-6 text-black/62">
+              <p>1. L’image doit rassurer vite.</p>
+              <p>2. Le contenu doit parler de votre activité.</p>
+              <p>3. FRILO remplace les exemples par vos informations.</p>
             </div>
           </div>
-        </div>
-      </div>
+        )}
+      />
 
-      <div className="sticky top-16 z-30 border-b border-slate-100 bg-white/95 backdrop-blur">
-        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <PublicBenefitStrip
+        items={[
+          { title: 'Aperçu concret', description: 'Vous voyez la base visuelle avant de commander.' },
+          { title: 'Prix visible', description: 'Le prix du modèle et les options restent lisibles.' },
+          { title: 'Adaptation FRILO', description: 'Le modèle devient un site à votre nom, avec vos contenus.' },
+        ]}
+      />
+
+      <div className="sticky top-16 z-30 border-b border-black/10 bg-[#f7f4ec]/95 backdrop-blur">
+        <div className="mx-auto max-w-[1360px] px-5 md:px-8">
           <div className="flex items-center gap-2 overflow-x-auto py-3 scrollbar-hide">
             <button
               onClick={() => setActiveSlug(null)}
@@ -272,7 +279,7 @@ export default function TemplatesPage() {
                 'whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition-colors',
                 activeSlug === null
                   ? 'bg-black text-white'
-                  : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-950'
+                  : 'bg-white text-black/62 hover:bg-black hover:text-white'
               )}
             >
               Tous
@@ -285,7 +292,7 @@ export default function TemplatesPage() {
                   'whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition-colors',
                   activeSlug === sector.slug
                     ? 'bg-black text-white'
-                    : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-950'
+                    : 'bg-white text-black/62 hover:bg-black hover:text-white'
                 )}
               >
                 {sector.name}
@@ -295,24 +302,24 @@ export default function TemplatesPage() {
         </div>
       </div>
 
-      <div className="px-5 py-10 md:py-12">
-        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <div id="catalogue" className="px-5 py-10 md:px-8 md:py-12">
+        <div className="mx-auto max-w-[1360px]">
           <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Sélection</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight text-slate-950 md:text-4xl">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">Sélection</p>
+              <h2 className="mt-3 text-3xl font-black leading-tight text-black md:text-4xl">
                 Trouvez une base qui ressemble déjà à une vraie entreprise.
               </h2>
             </div>
             {!loading && !error && (
-              <p className="max-w-sm text-sm leading-6 text-slate-500">
+              <p className="max-w-sm text-sm leading-6 text-black/62">
                 {visibleTemplates.length} modèle{visibleTemplates.length > 1 ? 's' : ''} affiché{visibleTemplates.length > 1 ? 's' : ''}
                 {normalizedSearch ? ` pour “${searchTerm.trim()}”` : ''}.
               </p>
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-3 rounded-[1.35rem] border border-slate-100 bg-slate-50 p-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_220px_220px_auto_auto]">
+          <div className="grid grid-cols-1 gap-3 border-y border-black bg-white p-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_220px_220px_auto_auto]">
           <label htmlFor="templates-search" className="block">
             <span className="sr-only">Rechercher un modèle</span>
             <div className="relative">
@@ -323,7 +330,7 @@ export default function TemplatesPage() {
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder="Rechercher un modèle"
-                className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-black outline-none transition-colors focus:border-black"
+                className="w-full rounded-full border border-black/15 bg-white py-3 pl-10 pr-3 text-sm text-black outline-none transition-colors focus:border-black"
               />
             </div>
           </label>
@@ -334,7 +341,7 @@ export default function TemplatesPage() {
               id="templates-sort"
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value as TemplateSort)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
+              className="w-full rounded-full border border-black/15 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
             >
               <option value="featured">Tri recommandé</option>
               <option value="price_asc">Prix croissant</option>
@@ -350,7 +357,7 @@ export default function TemplatesPage() {
               id="templates-price-filter"
               value={priceFilter}
               onChange={(event) => setPriceFilter(event.target.value as TemplatePriceFilter)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
+              className="w-full rounded-full border border-black/15 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
             >
               <option value="all">Tous les budgets</option>
               <option value="budget">Budget {budgetThresholdLabel}</option>
@@ -362,10 +369,10 @@ export default function TemplatesPage() {
             type="button"
             onClick={() => setShowFavoritesOnly((prev) => !prev)}
             className={cn(
-              'inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-black transition-colors',
+              'inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-black transition-colors',
               showFavoritesOnly
                 ? 'border-black bg-black text-white'
-                : 'border-slate-200 bg-white text-slate-600 hover:border-black hover:text-black'
+                : 'border-black/15 bg-white text-black/62 hover:border-black hover:text-black'
             )}
           >
             <Star className={cn('w-4 h-4', showFavoritesOnly ? 'fill-white' : '')} />
@@ -376,7 +383,7 @@ export default function TemplatesPage() {
             type="button"
             onClick={resetFilters}
             disabled={!hasActiveFilters}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-600 transition-colors enabled:hover:border-black enabled:hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-4 py-3 text-sm font-black text-black/62 transition-colors enabled:hover:border-black enabled:hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
           >
             <X className="w-4 h-4" />
             Réinitialiser
@@ -385,8 +392,8 @@ export default function TemplatesPage() {
         </div>
       </div>
 
-      <div className="px-5 pb-14 md:pb-16">
-        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <div className="px-5 pb-14 md:px-8 md:pb-16">
+        <div className="mx-auto max-w-[1360px]">
           {loading ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {[...Array(8)].map((_, index) => (
@@ -424,37 +431,21 @@ export default function TemplatesPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 px-6 py-12 text-center">
-              <h2 className="text-xl font-black text-black tracking-tight mb-3">Aucun modèle ne correspond à vos filtres.</h2>
-              <p className="text-sm text-gray-500 max-w-lg mx-auto">
-                Essayez un autre secteur, retirez un filtre de budget ou utilisez un mot-clé plus large pour trouver un modèle adapté.
-              </p>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                <button type="button" onClick={resetFilters} className="sq-btn sq-btn-black text-sm py-3 px-6">
-                  Réinitialiser les filtres
-                </button>
-                <Link href="/contact" className="sq-btn sq-btn-outline-black text-sm py-3 px-6">
-                  Demander une recommandation
-                </Link>
-              </div>
-            </div>
+            <PublicEmptyState
+              title="Aucun modèle ne correspond à ces filtres."
+              description="Retirez un filtre ou décrivez votre activité à FRILO pour recevoir une recommandation de modèle."
+              action={{ label: 'Demander une recommandation', href: '/contact?subject=Recommandation%20de%20mod%C3%A8le' }}
+            />
           )}
         </div>
       </div>
 
-      <div className="px-5 pb-20">
-        <div className="mx-auto max-w-7xl rounded-[1.5rem] bg-black p-6 text-white sm:px-8 md:flex md:items-center md:justify-between md:gap-8 lg:px-10">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Besoin d’un avis ?</p>
-            <p className="mt-2 max-w-2xl text-2xl font-black leading-tight">
-              Dites-nous votre activité, on vous oriente vers le modèle le plus crédible.
-            </p>
-          </div>
-          <Link href="/contact" className="mt-6 inline-flex shrink-0 items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-black text-slate-950 md:mt-0">
-            Parler à un expert
-          </Link>
-        </div>
-      </div>
+      <PublicFinalCta
+        title="Vous hésitez entre plusieurs modèles ?"
+        description="Dites-nous votre activité, votre budget et le type de clients que vous voulez rassurer."
+        href="/contact?subject=Choix%20du%20mod%C3%A8le"
+        label="Demander un avis"
+      />
 
       {comparedTemplates.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur">
@@ -487,6 +478,6 @@ export default function TemplatesPage() {
           <p className="text-sm text-amber-800">{compareNotice}</p>
         </div>
       )}
-    </div>
+    </PublicPageShell>
   );
 }

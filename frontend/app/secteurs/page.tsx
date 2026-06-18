@@ -3,7 +3,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, type LucideIcon, Utensils, Hammer, Heart, Scale, Users, Home } from 'lucide-react';
+import {
+  PublicEmptyState,
+  PublicFinalCta,
+  PublicHero,
+  PublicPageShell,
+} from '@/components/public/PublicPageShell';
+import { PUBLIC_CARD_TITLE_CLASS, PUBLIC_PAGE_TEXT } from '@/components/public/publicPageCopy';
 import { businessService, Sector } from '@/services/business.service';
+import { cn } from '@/lib/utils';
 
 const IconMap: Record<string, LucideIcon> = { Utensils, Hammer, Heart, Scale, Users, Home };
 
@@ -26,38 +34,33 @@ export default function SectorsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-
-      <div className="bg-black px-5 pb-14 pt-32 text-white md:pb-16 md:pt-36">
-        <div className="mx-auto grid max-w-7xl gap-10 sm:px-6 lg:grid-cols-[1fr_0.72fr] lg:items-end lg:px-8">
-          <div>
-            <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Secteurs</p>
-            <h1 className="max-w-3xl text-4xl font-black leading-[0.98] tracking-tight md:text-5xl lg:text-6xl">
-              Choisissez le point de départ de votre site.
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/65 md:text-lg">
-              Commencez par le métier le plus proche du vôtre. FRILO adapte ensuite le modèle à votre activité, vos contenus et votre façon de vendre.
+    <PublicPageShell>
+      <PublicHero
+        eyebrow="Secteurs"
+        title="Trouvez le point de départ le plus proche de votre activité."
+        description="Restaurant, cabinet, commerce, service ou accompagnement : choisissez une base métier, puis FRILO adapte le reste à vos contenus."
+        primaryAction={{ label: 'Voir les secteurs', href: '#secteurs' }}
+        secondaryAction={{ label: 'Demander de l’aide', href: '/contact?subject=Choix%20du%20secteur' }}
+        aside={(
+          <div className="border-y border-black bg-white p-5">
+            <p className="text-lg font-black leading-tight">Pas sûr du secteur ?</p>
+            <p className="mt-3 text-sm leading-6 text-black/62">
+              Choisissez le plus proche. L’équipe FRILO ajuste les textes, les pages et les preuves à votre activité réelle.
             </p>
           </div>
-          <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 md:p-6">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">Pas sûr du secteur ?</p>
-            <p className="mt-3 text-xl font-black leading-tight">
-              Choisissez le plus proche, on ajuste le reste pendant la commande.
-            </p>
-          </div>
-        </div>
-      </div>
+        )}
+      />
 
-      <div className="px-5 py-12 md:py-16">
-        <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <div id="secteurs" className="px-5 py-12 md:px-8 md:py-16">
+        <div className="mx-auto max-w-[1360px]">
           <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Métiers disponibles</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 md:text-4xl">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">Métiers disponibles</p>
+              <h2 className="mt-3 text-3xl font-black leading-tight text-black md:text-4xl">
                 Trouvez le modèle qui parle déjà à vos clients.
               </h2>
             </div>
-            <p className="max-w-lg text-sm leading-6 text-slate-500 md:max-w-md">
+            <p className="max-w-lg text-sm leading-6 text-black/62 md:max-w-md">
               Chaque secteur sert de base claire : services, preuves, contact et présentation sont ensuite adaptés à votre entreprise.
             </p>
           </div>
@@ -65,46 +68,46 @@ export default function SectorsPage() {
           {loading ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-64 animate-pulse rounded-[1.35rem] bg-slate-100" />
+                <div key={i} className="h-40 animate-pulse bg-white" />
               ))}
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-10 text-center">
+            <div className="border-y border-amber-300 bg-amber-50 px-6 py-10 text-center">
               <p className="text-sm text-amber-800">{error}</p>
             </div>
           ) : sectors.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-10 text-center">
-              <p className="text-sm text-gray-500">Aucun secteur actif disponible pour le moment.</p>
-            </div>
+            <PublicEmptyState
+              title="Aucun secteur actif disponible pour le moment."
+              description="Vous pouvez quand même nous décrire votre activité pour recevoir une orientation."
+              action={{ label: 'Demander une orientation', href: '/contact?subject=Choix%20du%20secteur' }}
+            />
           ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-0 border-t border-black">
               {sectors.map((sector, index) => {
                 const Icon = IconMap[sector.icon] || Home;
                 return (
                   <Link
                     key={sector.id}
                     href={`/secteurs/${sector.slug}`}
-                    className="group flex min-h-64 flex-col rounded-[1.35rem] border border-slate-100 bg-slate-50 p-6 transition-colors duration-300 hover:border-slate-950 hover:bg-slate-950"
+                    className="group grid min-h-40 gap-5 border-b border-black bg-white p-5 transition-colors hover:bg-black hover:text-white md:grid-cols-[4rem_1fr_auto] md:items-center"
                   >
-                    <div className="mb-8 flex items-center justify-between gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-950 text-white transition-colors group-hover:bg-[oklch(57%_0.24_29)]">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <span className="text-xs font-black text-slate-300 transition-colors group-hover:text-white/35">
-                        0{index + 1}
-                      </span>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white transition-colors group-hover:bg-[#e60000]">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div className="flex flex-1 flex-col">
-                      <h2 className="text-2xl font-black leading-tight tracking-tight text-slate-950 transition-colors group-hover:text-white">
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.16em] text-black/35 group-hover:text-white/35">
+                        Métier {index + 1}
+                      </p>
+                      <h2 className={cn('mt-2 text-2xl font-black text-black transition-colors group-hover:text-white', PUBLIC_CARD_TITLE_CLASS)}>
                         {sector.name}
                       </h2>
-                      <p className="mt-3 text-sm leading-6 text-slate-500 transition-colors group-hover:text-white/62">
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-black/62 transition-colors group-hover:text-white/66">
                         {sector.description}
                       </p>
-                      <div className="mt-auto flex items-center gap-2 pt-8 text-sm font-black text-slate-950 transition-colors group-hover:text-white">
-                        Voir les modèles <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </div>
                     </div>
+                    <span className="inline-flex items-center gap-2 text-sm font-black">
+                      Voir les modèles <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
                   </Link>
                 );
               })}
@@ -112,6 +115,13 @@ export default function SectorsPage() {
           )}
         </div>
       </div>
-    </div>
+
+      <PublicFinalCta
+        title={PUBLIC_PAGE_TEXT.sectors.helperTitle}
+        description={PUBLIC_PAGE_TEXT.sectors.helperDescription}
+        href="/contact?subject=Choix%20du%20secteur"
+        label="Demander une orientation"
+      />
+    </PublicPageShell>
   );
 }

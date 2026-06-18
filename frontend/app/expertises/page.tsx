@@ -1,119 +1,168 @@
 "use client"
 
-import { Section } from '@/components/ui/Section';
-import { ServiceCard } from '@/components/business/ServiceCard';
-import { Button } from '@/components/ui/Button';
-import {
-    Megaphone,
-    Search,
-    BarChart,
-    PenTool,
-    Globe,
-    ShieldCheck,
-    Palette,
-    Share2
-} from 'lucide-react';
-
 import Link from 'next/link';
-// Metadata not supported in client component, moving to layout or separate file if needed.
-// For now, removing to fix build.
+import {
+  BarChart,
+  Globe,
+  Megaphone,
+  Palette,
+  PenTool,
+  Search,
+  Share2,
+  ShieldCheck,
+  type LucideIcon,
+} from 'lucide-react';
+import {
+  PublicBenefitStrip,
+  PublicFinalCta,
+  PublicHero,
+  PublicPageShell,
+  PublicSplitSection,
+} from '@/components/public/PublicPageShell';
+import { PUBLIC_CARD_TITLE_CLASS } from '@/components/public/publicPageCopy';
+import { cn } from '@/lib/utils';
+
+type ExpertiseGroup = {
+  title: string;
+  description: string;
+  services: Array<{
+    title: string;
+    description: string;
+    icon: LucideIcon;
+  }>;
+};
+
+const EXPERTISE_GROUPS: ExpertiseGroup[] = [
+  {
+    title: 'Attirer des visiteurs',
+    description: 'Actions utiles quand votre site est prêt mais que vous voulez plus de demandes.',
+    services: [
+      {
+        title: 'Publicité Google Ads',
+        description: 'Des campagnes ciblées pour apparaître au moment où vos clients recherchent votre service.',
+        icon: Search,
+      },
+      {
+        title: 'Publicité Social Ads',
+        description: 'Des annonces sur les réseaux sociaux pour faire connaître une offre, un service ou une nouveauté.',
+        icon: Share2,
+      },
+      {
+        title: 'Référencement naturel',
+        description: 'Un travail progressif sur les contenus et les pages pour améliorer votre visibilité durablement.',
+        icon: Globe,
+      },
+    ],
+  },
+  {
+    title: 'Clarifier votre image',
+    description: 'Actions utiles quand votre activité est bonne mais que votre présentation doit inspirer plus confiance.',
+    services: [
+      {
+        title: 'Identité visuelle',
+        description: 'Logo, couleurs, supports simples et repères visuels pour rendre votre marque plus professionnelle.',
+        icon: Palette,
+      },
+      {
+        title: 'Rédaction web',
+        description: 'Des textes plus clairs pour expliquer vos services, vos avantages et les prochaines étapes.',
+        icon: PenTool,
+      },
+      {
+        title: 'Stratégie marketing',
+        description: 'Un plan d’action priorisé pour savoir quoi améliorer avant de dépenser davantage.',
+        icon: BarChart,
+      },
+    ],
+  },
+  {
+    title: 'Faire vivre votre site',
+    description: 'Actions utiles après la livraison pour garder un espace fiable, à jour et crédible.',
+    services: [
+      {
+        title: 'Réseaux sociaux',
+        description: 'Animation de vos pages avec des contenus simples, réguliers et alignés à votre activité.',
+        icon: Megaphone,
+      },
+      {
+        title: 'Maintenance et sécurité',
+        description: 'Suivi technique, sauvegardes et corrections pour garder votre site propre après sa mise en ligne.',
+        icon: ShieldCheck,
+      },
+    ],
+  },
+];
 
 export default function ExpertisesPage() {
-    const services = [
-        {
-            title: "Publicité Google Ads (SEA)",
-            description: "Appapparaissez en haut des résultats de recherche dès demain. Nous gérons vos campagnes pour maximiser votre retour sur investissement (ROI) avec un ciblage précis.",
-            icon: Search,
-            color: "blue"
-        },
-        {
-            title: "Publicité Social Ads",
-            description: "Touchez votre audience là où elle passe son temps (Facebook, Instagram, LinkedIn). Création de visuels impactants et gestion de campagnes performantes.",
-            icon: Share2, // Or Share2 / Smartphone
-            color: "purple"
-        },
-        {
-            title: "Référencement Naturel (SEO)",
-            description: "Optimisez votre site pour apparaître durablement dans les premiers résultats de Google. Audit technique, optimisation sémantique et netlinking.",
-            icon: Globe,
-            color: "green"
-        },
-        {
-            title: "Identité Visuelle & Branding",
-            description: "Ne passez pas inaperçu. Création de logo, charte graphique et supports visuels pour donner une image professionnelle et mémorable à votre marque.",
-            icon: Palette,
-            color: "pink"
-        },
-        {
-            title: "Stratégie Marketing",
-            description: "Ne naviguez plus à vue. Nous analysons votre marché et définissons un plan d'action clair pour atteindre vos objectifs de croissance.",
-            icon: BarChart,
-            color: "orange"
-        },
-        {
-            title: "Rédaction Web & Copywriting",
-            description: "Des textes qui convertissent. Articles de blog, fiches produits ou landing pages : nous écrivons pour séduire vos clients et Google.",
-            icon: PenTool,
-            color: "yellow"
-        },
-        {
-            title: "Gestion Réseaux Sociaux",
-            description: "Community Management clé en main. Nous animons vos pages pour engager votre communauté et fidéliser vos clients.",
-            icon: Megaphone,
-            color: "indigo"
-        },
-        {
-            title: "Maintenance & Sécurité",
-            description: "Dormez sur vos deux oreilles. Nous assurons la mise à jour, la sauvegarde et la sécurisation quotidienne de votre site web.",
-            icon: ShieldCheck,
-            color: "teal"
-        }
-    ];
+  return (
+    <PublicPageShell>
+      <PublicHero
+        eyebrow="Expertises"
+        title="Des services pour faire travailler votre site après sa mise en ligne."
+        description="FRILO peut aussi vous aider à attirer, rassurer et convertir vos clients avec des actions digitales ciblées."
+        primaryAction={{ label: 'Parler à un expert', href: '/contact?subject=Expertises%20FRILO' }}
+        secondaryAction={{ label: 'Voir les modèles', href: '/templates' }}
+        aside={(
+          <div className="border-y border-black bg-white p-5">
+            <p className="text-lg font-black leading-tight">On part de votre besoin réel.</p>
+            <p className="mt-3 text-sm leading-6 text-black/62">
+              Pas besoin de tout faire en même temps. On priorise ce qui peut aider votre activité maintenant.
+            </p>
+          </div>
+        )}
+      />
 
-    return (
-        <div className="pt-20">
-            {/* Hero Section */}
-            <Section className="bg-slate-50 border-b border-gray-200 py-24 text-center">
-                <h1 className="text-4xl lg:text-5xl font-extrabold mb-6 text-gray-900">
-                    Plus qu'un site web, <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-frilo">une stratégie digitale complète</span>
-                </h1>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
-                    FRILO vous accompagne bien au-delà de la création. Découvrez nos expertises pour attirer plus de clients, convertir mieux et fidéliser durablement.
-                </p>
-                <div className="flex justify-center gap-4">
-                    <Button size="lg" variant="gradient" asChild>
-                        <Link href="/contact">Parler à un expert</Link>
-                    </Button>
-                </div>
-            </Section>
+      <PublicBenefitStrip
+        items={[
+          { title: 'Attirer', description: 'Faire venir les bons visiteurs vers votre site.' },
+          { title: 'Rassurer', description: 'Rendre votre image claire, crédible et cohérente.' },
+          { title: 'Suivre', description: 'Garder un site utile après sa livraison.' },
+        ]}
+      />
 
-            {/* Services Grid */}
-            <Section title="Nos domaines d'expertise" subtitle="Tout ce dont vous avez besoin pour réussir en ligne">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {services.map((service, index) => (
-                        <ServiceCard
-                            key={index}
-                            title={service.title}
-                            description={service.description}
-                            icon={service.icon}
-                            color={service.color}
-                            href={`/contact?subject=${encodeURIComponent(service.title)}`}
-                        />
-                    ))}
-                </div>
-            </Section>
+      {EXPERTISE_GROUPS.map((group, groupIndex) => (
+        <PublicSplitSection
+          key={group.title}
+          eyebrow={`Besoin ${groupIndex + 1}`}
+          title={group.title}
+          description={group.description}
+          reverse={groupIndex % 2 === 1}
+          className={groupIndex % 2 === 0 ? 'bg-white' : undefined}
+        >
+          <div className="grid border-t border-black bg-white">
+            {group.services.map((service) => {
+              const Icon = service.icon;
 
-            {/* CTA Final */}
-            <Section variant="muted" className="text-center py-20">
-                <h2 className="text-3xl font-bold mb-6">Vous ne savez pas par où commencer ?</h2>
-                <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                    Chaque entreprise est unique. Discutons de vos objectifs et nous vous proposerons la stratégie la plus adaptée à votre budget.
-                </p>
-                <Button size="lg" variant="outline" className="bg-white hover:bg-gray-50" asChild>
-                    <Link href="/contact">Demander un audit gratuit</Link>
-                </Button>
-            </Section>
-        </div>
-    );
+              return (
+                <Link
+                  key={service.title}
+                  href={`/contact?subject=${encodeURIComponent(service.title)}`}
+                  className="group grid gap-4 border-b border-black p-5 transition-colors hover:bg-black hover:text-white md:grid-cols-[3rem_1fr]"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-white transition-colors group-hover:bg-[#e60000]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className={cn('text-xl font-black text-black transition-colors group-hover:text-white', PUBLIC_CARD_TITLE_CLASS)}>
+                      {service.title}
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-black/62 transition-colors group-hover:text-white/66">
+                      {service.description}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </PublicSplitSection>
+      ))}
+
+      <PublicFinalCta
+        title="Vous ne savez pas par où commencer ?"
+        description="Décrivez votre activité et votre objectif. FRILO vous proposera l’action la plus utile avant d’empiler les services."
+        href="/contact?subject=Expertises%20FRILO"
+        label="Demander un conseil"
+      />
+    </PublicPageShell>
+  );
 }

@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { Mail, Phone, Send } from 'lucide-react';
 import axios from 'axios';
 import {
+  PublicHero,
+  PublicPageShell,
+} from '@/components/public/PublicPageShell';
+import {
   contactService,
   ContactRequestPayload,
   ContactRequestValidationErrors,
@@ -114,59 +118,56 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-[oklch(7%_0.006_29)] px-5 pb-12 pt-32 text-white md:pb-14 md:pt-36">
-        <div className="mx-auto grid max-w-7xl gap-8 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-end lg:px-8">
-          <div>
-            <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Contact</p>
-            <h1 className="max-w-3xl text-4xl font-black leading-[0.98] md:text-5xl lg:text-6xl">
-              Dites-nous ce dont vous avez besoin.
-            </h1>
+    <PublicPageShell>
+      <PublicHero
+        eyebrow="Contact"
+        title="Dites-nous ce dont vous avez besoin."
+        description="Une question sur un modèle, une commande ou votre futur site ? Envoyez un message court, on vous répond avec la prochaine étape."
+        primaryAction={{ label: 'Écrire un message', href: '#message' }}
+        secondaryAction={{ label: 'Voir les modèles', href: '/templates' }}
+        aside={(
+          <div className="grid gap-3 border-y border-black bg-white p-5">
+            {CONTACT_CHANNELS.map(({ icon: Icon, value, href }) => (
+              <a
+                key={value}
+                href={href}
+                className="inline-flex items-center gap-3 border-b border-black/10 py-3 text-sm font-black text-black transition-colors last:border-b-0 hover:text-[#e60000]"
+              >
+                <Icon className="h-4 w-4" />
+                {value}
+              </a>
+            ))}
           </div>
-          <div>
-            <p className="max-w-xl text-base leading-7 text-white/65 md:text-lg">
-              Une question sur un modèle, une commande ou votre futur site ? Envoyez un message court, on vous répond avec la prochaine étape.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              {CONTACT_CHANNELS.map(({ icon: Icon, value, href }) => (
-                <a
-                  key={value}
-                  href={href}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-black text-white transition-colors hover:bg-white/10"
-                >
-                  <Icon className="h-4 w-4" />
-                  {value}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+        )}
+      />
 
-      <div className="px-5 py-12 md:py-16">
-        <div className="mx-auto max-w-5xl sm:px-6 lg:px-8">
-            <div className="rounded-[1.5rem] border border-slate-100 bg-slate-50 p-5 md:p-8">
+      <div id="message" className="px-5 py-12 md:px-8 md:py-16">
+        <div className="mx-auto max-w-5xl">
+            <div className="border-y border-black bg-white p-5 md:p-8">
               <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Message</p>
-                <h2 className="mt-3 text-3xl font-black leading-tight text-slate-950 md:text-4xl">Écrivez simplement.</h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">Message</p>
+                <h2 className="mt-3 text-3xl font-black leading-tight text-black md:text-4xl">Écrivez simplement.</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-black/62">
                   Votre nom, votre contact et le sujet suffisent pour démarrer. Ajoutez une référence seulement si vous parlez d’une commande.
                 </p>
               </div>
 
               {sent ? (
-                <div className="rounded-[1.25rem] border border-slate-100 bg-white p-10 text-center">
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-950">
+                <div className="border-y border-black/10 bg-[#f7f4ec] p-10 text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-black">
                     <Send className="h-5 w-5 text-white" />
                   </div>
-                  <h2 className="mb-2 text-xl font-black text-slate-950">Message envoyé.</h2>
-                  <p className="text-sm text-slate-500">Nous vous répondrons dans les 24 heures.</p>
+                  <h2 className="mb-2 text-xl font-black text-black">Message envoyé.</h2>
+                  <p className="text-sm text-black/62">Nous vous répondrons dans les 24 heures.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="border-b border-black/10 pb-2 text-xs font-black uppercase tracking-[0.14em] text-black/40">
+                    Vos informations
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
                         Nom <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -175,12 +176,12 @@ export default function ContactPage() {
                         value={form.name}
                         onChange={(e) => handleChange('name', e.target.value)}
                         required
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
                       />
                       {fieldErrors.name?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.name[0]}</p>}
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
                         E-mail <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -189,38 +190,41 @@ export default function ContactPage() {
                         value={form.email}
                         onChange={(e) => handleChange('email', e.target.value)}
                         required
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
                       />
                       {fieldErrors.email?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.email[0]}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">Téléphone</label>
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">Téléphone</label>
                       <input
                         type="text"
                         placeholder="+229 00 00 00 00"
                         value={form.phone}
                         onChange={(e) => handleChange('phone', e.target.value)}
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
                       />
                       {fieldErrors.phone?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.phone[0]}</p>}
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">Entreprise</label>
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">Entreprise</label>
                       <input
                         type="text"
                         placeholder="Mon entreprise"
                         value={form.company}
                         onChange={(e) => handleChange('company', e.target.value)}
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
                       />
                       {fieldErrors.company?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.company[0]}</p>}
                     </div>
                   </div>
+                  <div className="border-b border-black/10 pb-2 pt-3 text-xs font-black uppercase tracking-[0.14em] text-black/40">
+                    Contexte
+                  </div>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_0.62fr]">
                     <div>
-                    <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
+                    <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
                       Sujet <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -229,24 +233,27 @@ export default function ContactPage() {
                       value={form.subject}
                       onChange={(e) => handleChange('subject', e.target.value)}
                       required
-                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                      className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
                     />
                     {fieldErrors.subject?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.subject[0]}</p>}
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">Référence</label>
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">Référence</label>
                       <input
                         type="text"
                         placeholder="#ORD-00042"
                         value={form.order_reference}
                         onChange={(e) => handleChange('order_reference', e.target.value)}
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
                       />
                       {fieldErrors.order_reference?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.order_reference[0]}</p>}
                     </div>
                   </div>
+                  <div className="border-b border-black/10 pb-2 pt-3 text-xs font-black uppercase tracking-[0.14em] text-black/40">
+                    Message
+                  </div>
                   <div>
-                    <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-950">
+                    <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
                       Message <span className="text-red-500">*</span>
                     </label>
                     <textarea
@@ -255,11 +262,11 @@ export default function ContactPage() {
                       value={form.message}
                       onChange={(e) => handleChange('message', e.target.value)}
                       required
-                      className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-black"
+                      className="w-full resize-none rounded-2xl border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
                     />
                     {fieldErrors.message?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.message[0]}</p>}
                   </div>
-                  <div className="rounded-2xl border border-slate-100 bg-white px-4 py-4">
+                  <div className="border-y border-black/10 bg-[#f7f4ec] px-4 py-4">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -271,13 +278,13 @@ export default function ContactPage() {
                         required
                         className="mt-1 h-4 w-4 rounded border-slate-300 text-black focus:ring-black"
                       />
-                      <span className="text-sm leading-relaxed text-slate-600">
+                      <span className="text-sm leading-relaxed text-black/62">
                         J’accepte que mes informations soient utilisées pour traiter ma demande, conformément aux{' '}
-                        <Link href="/mentions-legales" className="font-black text-slate-950 underline underline-offset-2">
+                        <Link href="/mentions-legales" className="font-black text-black underline underline-offset-2">
                           mentions légales
                         </Link>{' '}
                         et aux{' '}
-                        <Link href="/cgu" className="font-black text-slate-950 underline underline-offset-2">
+                        <Link href="/cgu" className="font-black text-black underline underline-offset-2">
                           CGU / CGV
                         </Link>
                         <span className="text-red-500"> *</span>
@@ -296,7 +303,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={submitting || !acceptedTerms}
-                      className="inline-flex justify-center rounded-full bg-slate-950 px-7 py-3.5 text-sm font-black text-white transition-colors hover:bg-black disabled:opacity-50 md:min-w-[220px]"
+                      className="inline-flex justify-center rounded-full bg-black px-7 py-3.5 text-sm font-black text-white transition-colors hover:bg-[#e60000] disabled:opacity-50 md:min-w-[220px]"
                     >
                       {submitting ? 'Envoi en cours…' : 'Envoyer'}
                     </button>
@@ -306,6 +313,6 @@ export default function ContactPage() {
             </div>
         </div>
       </div>
-    </div>
+    </PublicPageShell>
   );
 }

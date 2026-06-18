@@ -6,6 +6,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Check, Heart, MessageSquare, Monitor, Scale, Smartphone, Star, Tablet } from 'lucide-react';
 import { TestimonialCard } from '@/components/business/TestimonialCard';
+import {
+  PublicBenefitStrip,
+  PublicFinalCta,
+  PublicPageShell,
+  PublicSplitSection,
+} from '@/components/public/PublicPageShell';
+import { PUBLIC_PAGE_TEXT } from '@/components/public/publicPageCopy';
 import { useAuthState } from '@/hooks/useAuthState';
 import { businessService, Template, TemplateReview, TemplateReviewEligibility, TemplateReviewSummary } from '@/services/business.service';
 import { cn } from '@/lib/utils';
@@ -221,31 +228,31 @@ export default function TemplateDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[oklch(98%_0.004_29)] pb-24 text-slate-950 lg:pb-0">
-      <div className="fixed left-0 right-0 top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur">
+    <PublicPageShell className="pb-24 lg:pb-0">
+      <div className="fixed left-0 right-0 top-0 z-50 border-b border-black/10 bg-[#f7f4ec]/95 backdrop-blur">
         <div className="flex h-16 items-center gap-4 px-4 md:px-6">
           <Link
             href={template.sector ? `/secteurs/${template.sector.slug}` : '/templates'}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 transition-colors hover:text-slate-950"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-black/62 transition-colors hover:text-black"
           >
             <ArrowLeft className="h-4 w-4" /> Retour
           </Link>
 
           <div className="hidden min-w-0 flex-1 text-center md:block">
-            <span className="truncate text-sm font-black text-slate-950">{template.name}</span>
+            <span className="truncate text-sm font-black text-black">{template.name}</span>
             {template.sector && (
-              <span className="ml-2 text-xs font-semibold text-slate-400">{template.sector.name}</span>
+              <span className="ml-2 text-xs font-semibold text-black/40">{template.sector.name}</span>
             )}
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1">
+            <div className="flex items-center gap-1 rounded-full border border-black/10 bg-white p-1">
               <button
                 type="button"
                 onClick={() => setViewMode('desktop')}
                 className={cn(
                   'inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors',
-                  viewMode === 'desktop' ? 'bg-slate-950 text-white' : 'text-slate-400 hover:text-slate-950'
+                  viewMode === 'desktop' ? 'bg-black text-white' : 'text-black/40 hover:text-black'
                 )}
                 aria-label="Affichage desktop"
                 aria-pressed={viewMode === 'desktop'}
@@ -257,7 +264,7 @@ export default function TemplateDetailPage() {
                 onClick={() => setViewMode('tablet')}
                 className={cn(
                   'inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors',
-                  viewMode === 'tablet' ? 'bg-slate-950 text-white' : 'text-slate-400 hover:text-slate-950'
+                  viewMode === 'tablet' ? 'bg-black text-white' : 'text-black/40 hover:text-black'
                 )}
                 aria-label="Affichage tablette"
                 aria-pressed={viewMode === 'tablet'}
@@ -269,7 +276,7 @@ export default function TemplateDetailPage() {
                 onClick={() => setViewMode('mobile')}
                 className={cn(
                   'inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors',
-                  viewMode === 'mobile' ? 'bg-slate-950 text-white' : 'text-slate-400 hover:text-slate-950'
+                  viewMode === 'mobile' ? 'bg-black text-white' : 'text-black/40 hover:text-black'
                 )}
                 aria-label="Affichage mobile"
                 aria-pressed={viewMode === 'mobile'}
@@ -280,7 +287,7 @@ export default function TemplateDetailPage() {
 
             <Link
               href={`/commande?templateId=${template.id}`}
-              className="hidden rounded-full bg-slate-950 px-5 py-2.5 text-sm font-black text-white transition-colors hover:bg-black lg:inline-flex"
+              className="hidden rounded-full bg-black px-5 py-2.5 text-sm font-black text-white transition-colors hover:bg-[#e60000] lg:inline-flex"
               onClick={() =>
                 trackFunnelEvent('start_order', {
                   template_id: template.id,
@@ -297,13 +304,13 @@ export default function TemplateDetailPage() {
 
       <main className="pt-16">
         <section className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="relative order-2 flex items-center justify-center border-b border-slate-100 bg-[oklch(96%_0.005_29)] px-4 py-6 md:px-8 lg:order-1 lg:border-b-0 lg:border-r lg:py-8">
+          <div className="relative order-2 flex items-center justify-center border-b border-black/10 bg-white px-4 py-6 md:px-8 lg:order-1 lg:border-b-0 lg:border-r lg:py-8">
             <div
               className={cn(
                 'relative overflow-hidden bg-white shadow-[0_24px_70px_rgba(15,23,42,0.12)] transition-all duration-300',
-                viewMode === 'desktop' && 'h-[320px] w-full max-w-5xl rounded-2xl border border-slate-200 md:h-[560px] lg:h-[calc(100vh-8rem)]',
-                viewMode === 'tablet' && 'h-[560px] w-full max-w-[760px] rounded-[1.8rem] border-[10px] border-slate-900 md:h-[720px] md:w-[560px] lg:h-[calc(100vh-8rem)] lg:w-[min(760px,80%)]',
-                viewMode === 'mobile' && 'h-[520px] w-[290px] rounded-[2.2rem] border-[10px] border-slate-950 md:h-[680px] md:w-[360px]'
+                viewMode === 'desktop' && 'h-[320px] w-full max-w-5xl border border-black/15 md:h-[560px] lg:h-[min(70vh,760px)]',
+                viewMode === 'tablet' && 'h-[560px] w-full max-w-[760px] rounded-[1.8rem] border-[10px] border-black md:h-[720px] md:w-[560px] lg:h-[min(70vh,760px)] lg:w-[min(760px,80%)]',
+                viewMode === 'mobile' && 'h-[520px] w-[290px] rounded-[2.2rem] border-[10px] border-black md:h-[680px] md:w-[360px]'
               )}
             >
               {iframeSrc ? (
@@ -351,37 +358,37 @@ export default function TemplateDetailPage() {
             )}
           </div>
 
-          <aside className="order-1 bg-white px-6 py-7 md:px-8 lg:order-2 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
+          <aside className="order-1 bg-[#f7f4ec] px-6 py-7 md:px-8 lg:order-2 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
             <div className="space-y-6 lg:space-y-7">
               <div>
                 {template.sector && (
-                  <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">
+                  <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">
                     {template.sector.name}
                   </p>
                 )}
-                <h1 className="text-4xl font-black leading-none tracking-tight text-slate-950 md:text-5xl">
+                <h1 className="text-balance break-words text-4xl font-black leading-none text-black md:text-5xl">
                   {template.name}
                 </h1>
-                <p className="mt-4 text-base leading-7 text-slate-500">
+                <p className="mt-4 text-base leading-7 text-black/62">
                   {template.description}
                 </p>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-[oklch(98%_0.004_29)] p-5">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Prix du modèle</p>
+              <div className="border-y border-black bg-white p-5">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-black/40">Prix du modèle</p>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-4xl font-black tracking-tight text-slate-950">
+                  <span className="text-4xl font-black tracking-tight text-black">
                     {price.toLocaleString('fr-FR')}
                   </span>
-                  <span className="text-sm font-semibold text-slate-400">FCFA</span>
+                  <span className="text-sm font-semibold text-black/40">FCFA</span>
                 </div>
-                <p className="mt-2 text-sm text-slate-500">Paiement unique, livraison sous 48h après réception des contenus.</p>
+                <p className="mt-2 text-sm text-black/62">Paiement unique, livraison sous 48h après réception des contenus.</p>
               </div>
 
               <div className="grid gap-3">
                 <Link
                   href={`/commande?templateId=${template.id}`}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-7 py-4 text-sm font-black text-white transition-colors hover:bg-black"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-black px-7 py-4 text-sm font-black text-white transition-colors hover:bg-[#e60000]"
                   onClick={() =>
                     trackFunnelEvent('start_order', {
                       template_id: template.id,
@@ -396,7 +403,7 @@ export default function TemplateDetailPage() {
                   {livePreviewEnabled && (
                     <Link
                       href={`/templates/${template.id}/preview`}
-                      className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-3 text-sm font-black text-slate-950 transition-colors hover:border-slate-950"
+                      className="inline-flex items-center justify-center rounded-full border border-black/15 px-4 py-3 text-sm font-black text-black transition-colors hover:border-black"
                       onClick={() =>
                         trackFunnelEvent('open_preview', {
                           template_id: template.id,
@@ -411,7 +418,7 @@ export default function TemplateDetailPage() {
                   <Link
                     href="/contact"
                     className={cn(
-                      'inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-3 text-sm font-black text-slate-950 transition-colors hover:border-slate-950',
+                      'inline-flex items-center justify-center rounded-full border border-black/15 px-4 py-3 text-sm font-black text-black transition-colors hover:border-black',
                       !livePreviewEnabled && 'col-span-2'
                     )}
                   >
@@ -427,7 +434,7 @@ export default function TemplateDetailPage() {
                   aria-pressed={favoriteActive}
                   className={cn(
                     'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black transition-colors',
-                    favoriteActive ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 text-slate-500 hover:border-slate-950 hover:text-slate-950'
+                    favoriteActive ? 'border-black bg-black text-white' : 'border-black/15 text-black/62 hover:border-black hover:text-black'
                   )}
                 >
                   <Heart className={cn('h-3.5 w-3.5', favoriteActive ? 'fill-white' : '')} />
@@ -439,24 +446,24 @@ export default function TemplateDetailPage() {
                   aria-pressed={comparedActive}
                   className={cn(
                     'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black transition-colors',
-                    comparedActive ? 'border-slate-950 bg-slate-950 text-white' : 'border-slate-200 text-slate-500 hover:border-slate-950 hover:text-slate-950'
+                    comparedActive ? 'border-black bg-black text-white' : 'border-black/15 text-black/62 hover:border-black hover:text-black'
                   )}
                 >
                   <Scale className="h-3.5 w-3.5" />
                   {comparedActive ? 'Comparé' : `Comparer ${compareIds.length}/${maxCompareItems}`}
                 </button>
-                <Link href="/templates/compare" className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-xs font-black text-slate-500 transition-colors hover:border-slate-950 hover:text-slate-950">
+                <Link href="/templates/compare" className="inline-flex items-center rounded-full border border-black/15 px-4 py-2 text-xs font-black text-black/62 transition-colors hover:border-black hover:text-black">
                   Comparaison
                 </Link>
               </div>
 
               {visibleFeatures.length > 0 && (
                 <div>
-                  <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-slate-400">Pensé pour</p>
+                  <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-black/40">Pensé pour</p>
                   <div className="grid gap-2">
                     {visibleFeatures.map((feature) => (
-                      <div key={feature} className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
-                        <Check className="h-4 w-4 rounded-full bg-slate-950 p-0.5 text-white" />
+                      <div key={feature} className="flex items-center gap-3 bg-white px-4 py-3 text-sm font-semibold text-black/70">
+                        <Check className="h-4 w-4 rounded-full bg-black p-0.5 text-white" />
                         <span>{feature}</span>
                       </div>
                     ))}
@@ -466,11 +473,11 @@ export default function TemplateDetailPage() {
 
               {includedPreview.length > 0 && (
               <div className="hidden sm:block">
-                <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-slate-400">Inclus</p>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-500">
+                <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-black/40">Inclus</p>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-black/62">
                   {includedPreview.map((item) => (
                     <div key={item} className="flex items-start gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-950" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-black" />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -478,7 +485,7 @@ export default function TemplateDetailPage() {
               </div>
               )}
 
-              <div className="rounded-3xl bg-slate-950 p-5 text-white">
+              <div className="bg-black p-5 text-white">
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-white/50">Après commande</p>
                 <p className="mt-3 text-lg font-black leading-snug">FRILO vous demande seulement les contenus utiles, puis adapte le modèle à votre activité.</p>
               </div>
@@ -486,14 +493,45 @@ export default function TemplateDetailPage() {
           </aside>
         </section>
 
-        <section id="template-reviews" className="border-t border-slate-100 bg-white px-6 py-12 md:px-8 md:py-16">
-          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <PublicBenefitStrip
+          className="py-10"
+          items={[
+            {
+              title: 'Pensé pour',
+              description: visibleFeatures.length > 0 ? visibleFeatures.join(' · ') : 'Les profils clients adaptés apparaîtront ici.',
+            },
+            {
+              title: 'Inclus',
+              description: includedPreview.length > 0 ? includedPreview.join(' · ') : 'Les éléments inclus apparaîtront ici.',
+            },
+            {
+              title: 'Adapté par FRILO',
+              description: 'Vos textes, photos, contacts et liens remplacent les exemples du modèle.',
+            },
+          ]}
+        />
+
+        <PublicSplitSection
+          title={PUBLIC_PAGE_TEXT.templateDetail.reassuranceTitle}
+          description={PUBLIC_PAGE_TEXT.templateDetail.reassuranceDescription}
+        >
+          <div className="grid gap-0 border-y border-black bg-white">
+            {['Pages adaptées', 'Version mobile vérifiée', 'Contacts visibles', 'Lien livré'].map((item) => (
+              <div key={item} className="border-b border-black/10 px-5 py-4 text-sm font-black last:border-b-0">
+                {item}
+              </div>
+            ))}
+          </div>
+        </PublicSplitSection>
+
+        <section id="template-reviews" className="border-t border-black/10 bg-white px-6 py-12 md:px-8 md:py-16">
+          <div className="mx-auto grid max-w-[1360px] gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
             <div>
-              <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Avis vérifiés</p>
-              <h2 className="text-3xl font-black leading-tight tracking-tight text-slate-950 md:text-4xl">
+              <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">Avis vérifiés</p>
+              <h2 className="text-3xl font-black leading-tight text-black md:text-4xl">
                 Retours clients sur ce modèle.
               </h2>
-              <div className="mt-6 rounded-3xl border border-slate-200 p-5">
+              <div className="mt-6 border-y border-black p-5">
                 <div className="flex items-end gap-4">
                   <div className="text-4xl font-black tracking-tight text-slate-950">
                     {reviewsSummary.average_rating ? reviewsSummary.average_rating.toFixed(1) : 'N/A'}
@@ -611,15 +649,22 @@ export default function TemplateDetailPage() {
         </section>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden">
+      <PublicFinalCta
+        title={`Prêt à partir de ${template.name} ?`}
+        description="Passez commande, ajoutez vos informations, puis FRILO prépare votre site."
+        href={`/commande?templateId=${template.id}`}
+        label="Commander ce modèle"
+      />
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white/95 backdrop-blur lg:hidden">
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="min-w-0">
-            <p className="text-xs text-slate-500">Prix</p>
-            <p className="truncate text-sm font-black text-slate-950">{price.toLocaleString('fr-FR')} FCFA</p>
+            <p className="text-xs text-black/50">Prix</p>
+            <p className="truncate text-sm font-black text-black">{price.toLocaleString('fr-FR')} FCFA</p>
           </div>
           <Link
             href={`/commande?templateId=${template.id}`}
-            className="inline-flex flex-1 items-center justify-center rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white"
+            className="inline-flex flex-1 items-center justify-center rounded-full bg-black px-4 py-3 text-sm font-black text-white"
             onClick={() =>
               trackFunnelEvent('start_order', {
                 template_id: template.id,
@@ -638,6 +683,6 @@ export default function TemplateDetailPage() {
           <p className="text-sm text-amber-800">{compareNotice}</p>
         </div>
       )}
-    </div>
+    </PublicPageShell>
   );
 }
