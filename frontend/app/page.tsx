@@ -388,19 +388,19 @@ export default function Home() {
   const unplacedBlocks = publicContent.blocks.filter((block) => !anchoredBlockIds.has(block.id) && block.anchor_section_key === null);
 
   return (
-    <div className="flex flex-col bg-white text-black">
+    <div className="flex flex-col overflow-x-hidden bg-white text-black">
       <section className="relative isolate min-h-[calc(100svh-4rem)] overflow-hidden bg-black text-white">
         <img
           src="/image/client-satisfait-frilo.jpg"
           alt="Entrepreneur consultant son site FRILO depuis son espace de travail."
-          className="absolute inset-0 h-full w-full scale-[1.02] object-cover object-[58%_42%] opacity-70 saturate-[0.92]"
+          className="absolute inset-0 h-full w-full object-cover object-[58%_42%] opacity-78 saturate-[0.92]"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(0,0,0,0.12),rgba(0,0,0,0.74)_72%),linear-gradient(180deg,rgba(0,0,0,0.54),rgba(0,0,0,0.18)_36%,rgba(0,0,0,0.78))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.78),rgba(15,23,42,0.18)_32%,rgba(15,23,42,0.62)_100%),radial-gradient(circle_at_50%_44%,rgba(15,23,42,0.04),rgba(15,23,42,0.74)_70%),linear-gradient(180deg,rgba(15,23,42,0.58),rgba(15,23,42,0.18)_34%,rgba(15,23,42,0.94)_100%)]" />
 
-        <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-[1440px] flex-col px-5 pb-8 pt-28 md:px-8 md:pt-32">
-          <div className="flex flex-1 items-center justify-center py-16 text-center">
+        <div className="relative mx-auto flex min-h-[calc(100svh-4rem)] max-w-[1440px] flex-col px-5 pb-8 pt-24 md:px-8 md:pt-28">
+          <div className="flex flex-1 items-center justify-center py-12 text-center md:py-14">
             <div className="max-w-6xl">
-              <h1 className="mx-auto max-w-[12ch] font-serif text-[clamp(4rem,9.5vw,9.5rem)] font-medium leading-[0.84] tracking-[-0.07em] text-balance">
+              <h1 className="mx-auto max-w-[12ch] font-serif text-[clamp(3.75rem,8vw,7.5rem)] font-medium leading-[0.88] tracking-[-0.04em] text-balance">
                 {hero.headline}
               </h1>
               <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-white/80 md:text-xl md:leading-8">
@@ -417,8 +417,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="overflow-hidden border-t border-white/20 pt-5">
-            <div className="flex min-w-max animate-[frilo-marquee_32s_linear_infinite] items-center gap-10 text-sm font-black text-white/80 [animation-play-state:running] motion-reduce:animate-none">
+          <div className="w-full overflow-hidden border-t border-white/20 pt-5">
+            <div className="flex w-max animate-[frilo-marquee_32s_linear_infinite] items-center gap-10 text-sm font-black text-white/80 [animation-play-state:running] motion-reduce:animate-none">
               {[...sectorRail, ...sectorRail].map((label, index) => (
                 <span key={`${label}-${index}`} className="whitespace-nowrap">
                   {label}
