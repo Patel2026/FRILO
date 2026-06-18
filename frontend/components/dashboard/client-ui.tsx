@@ -150,7 +150,7 @@ export function ClientPanel({
   className?: string;
 }) {
   return (
-    <section className={cn('rounded-lg border border-neutral-200 bg-white', className)}>
+    <section className={cn('overflow-hidden rounded-lg border border-neutral-200 bg-white', className)}>
       {children}
     </section>
   );
@@ -198,23 +198,33 @@ export function StatusPill({
 export function StatusBand({
   title,
   description,
+  status,
   tone = 'neutral',
   action,
+  secondaryAction,
   className,
 }: {
   title: string;
   description?: string;
+  status?: ReactNode;
   tone?: StatusTone;
   action?: ReactNode;
+  secondaryAction?: ReactNode;
   className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col gap-3 rounded-lg border px-4 py-3 md:flex-row md:items-center md:justify-between', statusClasses[tone].band, className)}>
+    <div className={cn('rounded-lg border px-4 py-3', statusClasses[tone].band, className)}>
       <div className="min-w-0">
+        {status && <div className="mb-2 flex flex-wrap items-center gap-2">{status}</div>}
         <p className="text-sm font-bold">{title}</p>
         {description && <p className="mt-1 text-sm leading-5 opacity-80">{description}</p>}
+        {(action || secondaryAction) && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {action}
+            {secondaryAction}
+          </div>
+        )}
       </div>
-      {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}
     </div>
   );
 }
