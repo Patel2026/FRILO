@@ -1,27 +1,19 @@
 "use client"
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight, AlertTriangle, Clock3, CreditCard, PackageCheck } from 'lucide-react';
-import { businessService, Order, OrderSummary, Template } from '@/services/business.service';
+import {
+  ClientButton,
+  ClientPage,
+  ClientPageHeader,
+  ClientPanel,
+  ClientPanelHeader,
+  CompactRow,
+  StatusBand,
+  StatusPill,
+  Timeline,
+} from '@/components/dashboard/client-ui';
 import { authService, AuthUser } from '@/services/auth.service';
-import { cn } from '@/lib/utils';
-
-const statusConfig = {
-  pending: { label: 'En attente', dot: 'bg-amber-400', classes: 'bg-amber-50 text-amber-700' },
-  processing: { label: 'En cours', dot: 'bg-blue-400', classes: 'bg-blue-50 text-blue-700' },
-  completed: { label: 'Livré', dot: 'bg-emerald-400', classes: 'bg-emerald-50 text-emerald-700' },
-  cancelled: { label: 'Annulé', dot: 'bg-red-400', classes: 'bg-red-50 text-red-700' },
-};
-
-const paymentConfig = {
-  awaiting_payment: { label: 'Paiement en attente', classes: 'bg-amber-50 text-amber-700' },
-  paid: { label: 'Payée', classes: 'bg-emerald-50 text-emerald-700' },
-  failed: { label: 'Paiement échoué', classes: 'bg-red-50 text-red-700' },
-  cancelled: { label: 'Paiement annulé', classes: 'bg-gray-100 text-gray-700' },
-  refunded: { label: 'Remboursée', classes: 'bg-sky-50 text-sky-700' },
-  expired: { label: 'Paiement expiré', classes: 'bg-slate-100 text-slate-700' },
-};
+import { businessService, Order, OrderSummary, Template } from '@/services/business.service';
 
 type NextStep = {
   title: string;
@@ -30,20 +22,90 @@ type NextStep = {
   ctaHref: string;
 };
 
+type TimelineItem = Parameters<typeof Timeline>[0]['items'][number];
+
+const statusLabels: Record<Order['status'], string> = {
+  pending: 'En attente',
+  processing: 'En production',
+  completed: 'Livré',
+  cancelled: 'Annulé',
+};
+
+const paymentLabels: Record<Order['payment_status'], string> = {
+  awaiting_payment: 'Paiement en attente',
+  paid: 'Payée',
+  failed: 'Paiement échoué',
+  cancelled: 'Paiement annulé',
+  refunded: 'Remboursée',
+  expired: 'Paiement expiré',
+};
+
+function getOrderName(order: Order | null): string {
+  return order?.instruction?.enterprise_name
+    || order?.instructions?.[0]?.enterprise_name
+    || order?.template?.name
+    || 'Projet sans nom';
+}
+
+function formatOrderId(order: Order): string {
+  return `Commande #${String(order.id).padStart(4, '0')}`;
+}
+
+function formatDate(value?: string | null): string | null {
+  if (!value) return null;
+
+  return new Date(value).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function formatPrice(value: number): string {
+  return `${value.toLocaleString('fr-FR')} FCFA`;
+}
+
+function getStatusTone(order: Order | null): Parameters<typeof StatusPill>[0]['tone'] {
+  if (!order) return 'neutral';
+  if (order.status === 'completed') return 'success';
+  if (order.status === 'cancelled' || order.payment_status === 'failed') return 'danger';
+  if (order.payment_status !== 'paid') return 'warning';
+  if (order.status === 'processing') return 'info';
+  return 'warning';
+}
+
 function getNextStep(order: Order | null): NextStep {
   if (!order) {
     return {
-      title: 'Démarrer votre première commande',
-      description: 'Choisissez un modèle adapté à votre activité pour lancer votre présence en ligne.',
-      ctaLabel: 'Comparer les modèles',
-      ctaHref: '/templates/compare',
+      title: 'Lancer votre premier projet FRILO',
+      description: 'Choisissez un modèle, transmettez les informations de votre activité et suivez la livraison depuis cet espace.',
+      ctaLabel: 'Voir les modèles',
+      ctaHref: '/templates',
+    };
+  }
+
+  if (order.status === 'completed') {
+    return {
+      title: 'Site livré',
+      description: 'Votre site est livré. Retrouvez son lien, son domaine et les informations utiles dans Mon Site.',
+      ctaLabel: 'Ouvrir Mon Site',
+      ctaHref: '/dashboard/mon-site',
+    };
+  }
+
+  if (order.status === 'cancelled') {
+    return {
+      title: 'Dossier annulé',
+      description: 'Cette commande est annulée. Vous pouvez consulter le dossier ou relancer un nouveau projet depuis les modèles.',
+      ctaLabel: 'Voir le dossier',
+      ctaHref: `/dashboard/orders/${order.id}`,
     };
   }
 
   if (order.payment_status !== 'paid') {
     return {
       title: 'Finaliser le paiement',
-      description: 'Votre commande est prête. Confirmez le paiement pour que l’équipe démarre la production.',
+      description: 'Votre demande est enregistrée. Le paiement déclenche la prise en charge par l’équipe FRILO.',
       ctaLabel: 'Payer maintenant',
       ctaHref: `/dashboard/orders/${order.id}`,
     };
@@ -51,28 +113,94 @@ function getNextStep(order: Order | null): NextStep {
 
   if (order.status === 'pending') {
     return {
-      title: 'Commande en attente de traitement',
-      description: 'Votre paiement est validé. Notre équipe confirme la prise en charge sous 2h ouvrées.',
-      ctaLabel: 'Suivre la commande',
-      ctaHref: `/dashboard/orders/${order.id}`,
-    };
-  }
-
-  if (order.status === 'processing') {
-    return {
-      title: 'Commande en production',
-      description: 'Votre site est en cours de finalisation. Vous pouvez suivre l’évolution en temps réel.',
-      ctaLabel: 'Voir l’avancement',
+      title: 'Validation du dossier',
+      description: 'Votre paiement est validé. L’équipe FRILO vérifie les informations avant le démarrage de la production.',
+      ctaLabel: 'Suivre le dossier',
       ctaHref: `/dashboard/orders/${order.id}`,
     };
   }
 
   return {
-    title: 'Commande livrée',
-    description: 'Votre dernière commande est terminée. Vous pouvez en lancer une nouvelle quand vous voulez.',
-    ctaLabel: 'Nouvelle commande',
-    ctaHref: '/templates',
+    title: 'Production en cours',
+    description: 'Votre site est en construction. Vous pouvez suivre l’avancement et relire les informations transmises.',
+    ctaLabel: 'Voir l’avancement',
+    ctaHref: `/dashboard/orders/${order.id}`,
   };
+}
+
+function getTimelineItems(order: Order | null): TimelineItem[] {
+  if (!order) {
+    return [
+      {
+        title: 'Espace client prêt',
+        description: 'Votre compte FRILO est disponible pour lancer et suivre un projet.',
+        tone: 'done',
+      },
+      {
+        title: 'Choisir un modèle',
+        description: 'Sélectionnez la base la plus proche de votre activité.',
+        tone: 'current',
+      },
+      {
+        title: 'Transmettre les informations',
+        description: 'Nom de l’entreprise, activité, couleurs et consignes de personnalisation.',
+        tone: 'waiting',
+      },
+      {
+        title: 'Livraison du site',
+        description: 'FRILO publie les informations du site une fois la production terminée.',
+        tone: 'waiting',
+      },
+    ];
+  }
+
+  const paymentDone = order.payment_status === 'paid' || order.status === 'completed';
+  const dossierDone = paymentDone && (order.status === 'pending' || order.status === 'processing' || order.status === 'completed');
+  const productionDone = order.status === 'completed';
+
+  return [
+    {
+      title: 'Commande créée',
+      description: order.template?.name ? `Modèle sélectionné : ${order.template.name}.` : 'Dossier créé dans votre espace client.',
+      meta: formatDate(order.created_at) ?? undefined,
+      tone: 'done',
+    },
+    {
+      title: 'Paiement',
+      description: paymentDone ? 'Paiement validé pour lancer le traitement.' : 'Paiement requis avant le démarrage de la production.',
+      meta: paymentLabels[order.payment_status],
+      tone: paymentDone ? 'done' : 'current',
+    },
+    {
+      title: 'Préparation du dossier',
+      description: dossierDone ? 'Les informations client sont en cours de contrôle.' : 'Cette étape démarre après paiement.',
+      tone: !paymentDone ? 'waiting' : order.status === 'pending' ? 'current' : 'done',
+    },
+    {
+      title: 'Production FRILO',
+      description: order.status === 'processing' ? 'Le site est en cours de finalisation.' : 'Personnalisation, vérification et mise en ligne.',
+      tone: order.status === 'processing' ? 'current' : productionDone ? 'done' : 'waiting',
+    },
+    {
+      title: 'Site livré',
+      description: productionDone ? 'Les accès et informations du site sont disponibles.' : 'La livraison apparaîtra ici dès validation finale.',
+      meta: order.site_url || order.domain || undefined,
+      tone: productionDone ? 'done' : 'waiting',
+    },
+  ];
+}
+
+function LoadingRows() {
+  return (
+    <div className="divide-y divide-neutral-100">
+      {[0, 1, 2].map((item) => (
+        <div key={item} className="px-4 py-4 md:px-5">
+          <div className="h-4 w-2/3 animate-pulse rounded bg-neutral-100" />
+          <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-neutral-100" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function DashboardPage() {
@@ -87,6 +215,7 @@ export default function DashboardPage() {
   useEffect(() => {
     let isMounted = true;
 
+    setLoading(true);
     Promise.allSettled([
       authService.getUser(),
       businessService.getOrders(1, 3),
@@ -97,7 +226,10 @@ export default function DashboardPage() {
       const hasCriticalFailure = userResult.status === 'rejected' || ordersResult.status === 'rejected';
 
       if (hasCriticalFailure) {
-        setError('Impossible de charger votre tableau de bord pour le moment.');
+        setError('Impossible de charger votre console client pour le moment.');
+        setOrders([]);
+        setSummary(null);
+        setFeaturedTemplates([]);
         return;
       }
 
@@ -106,6 +238,7 @@ export default function DashboardPage() {
       const summaryRes = summaryResult.status === 'fulfilled' ? summaryResult.value : null;
       const templatesRes = templatesResult.status === 'fulfilled' ? templatesResult.value : [];
 
+      setError(null);
       setUser(u);
       setOrders(ordersRes.data);
       setSummary(summaryRes);
@@ -127,234 +260,235 @@ export default function DashboardPage() {
     };
   }, [reloadKey]);
 
-  const total = summary?.total ?? 0;
-  const pending = summary?.pending ?? 0;
-  const inProgress = summary?.processing ?? 0;
-  const delivered = summary?.completed ?? 0;
-  const completionRate = total > 0 ? Math.round((delivered / total) * 100) : 0;
+  const allOrders = orders;
+  const latestOrder = allOrders[0] ?? null;
+  const deliveredOrder = allOrders.find((order) => order.status === 'completed') ?? null;
+  const activeOrder = allOrders.find((order) => order.status === 'processing' || order.status === 'pending') ?? latestOrder;
+  const primaryOrder = deliveredOrder ?? activeOrder ?? latestOrder;
+  const projectName = primaryOrder?.instruction?.enterprise_name || primaryOrder?.instructions?.[0]?.enterprise_name || primaryOrder?.template?.name || 'Votre projet FRILO';
+  const hasSite = Boolean(deliveredOrder?.site_url || deliveredOrder?.domain || deliveredOrder);
+
+  const totalOrders = summary?.total ?? allOrders.length;
   const firstName = user?.name.split(' ')[0] ?? 'Client';
-  const latestOrder = orders[0] ?? null;
-  const nextStep = useMemo(() => getNextStep(latestOrder), [latestOrder]);
-  const backlogHint = pending > 0
-    ? `${pending} commande${pending > 1 ? 's' : ''} en attente de traitement`
-    : 'Aucune commande en attente actuellement';
-  const quickLinks = total > 0
-    ? [
-        { label: 'Nouvelle commande', href: '/templates' },
-        { label: 'Toutes mes commandes', href: '/dashboard/orders' },
-        { label: 'Profil', href: '/dashboard/profile' },
-        { label: 'Support', href: '/contact' },
-      ]
-    : [
-        { label: 'Comparer les modèles', href: '/templates/compare' },
-        { label: 'Voir les modèles', href: '/templates' },
-        { label: 'Profil', href: '/dashboard/profile' },
-        { label: 'Support', href: '/contact' },
-      ];
+  const nextStep = useMemo(() => getNextStep(primaryOrder), [primaryOrder]);
+  const timelineItems = useMemo(() => getTimelineItems(primaryOrder), [primaryOrder]);
+  const deliveredSiteLabel = deliveredOrder?.site_url || deliveredOrder?.domain || (hasSite ? 'Informations disponibles dans Mon Site' : null);
+
+  const mainBand = (() => {
+    if (loading) {
+      return (
+        <StatusBand
+          title="Chargement de votre console FRILO"
+          description="Nous récupérons vos commandes, votre dossier actif et les outils disponibles."
+          tone="neutral"
+          status={<StatusPill>Synchronisation</StatusPill>}
+          className="mb-5"
+        />
+      );
+    }
+
+    if (error) {
+      return (
+        <StatusBand
+          title="Console momentanément indisponible"
+          description={error}
+          tone="danger"
+          status={<StatusPill tone="danger">Erreur de chargement</StatusPill>}
+          action={
+            <ClientButton
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                setReloadKey((value) => value + 1);
+              }}
+            >
+              Réessayer
+            </ClientButton>
+          }
+          secondaryAction={<ClientButton href="/templates" variant="secondary">Voir les modèles</ClientButton>}
+          className="mb-5"
+        />
+      );
+    }
+
+    if (!primaryOrder) {
+      return (
+        <StatusBand
+          title="Lancer votre premier projet FRILO"
+          description="Aucun dossier n’est encore ouvert. Comparez les modèles, choisissez celui qui correspond à votre activité, puis transmettez vos informations."
+          tone="neutral"
+          status={<StatusPill>Aucun dossier actif</StatusPill>}
+          action={<ClientButton href="/templates">Voir les modèles</ClientButton>}
+          secondaryAction={<ClientButton href="/templates/compare" variant="secondary">Comparer</ClientButton>}
+          className="mb-5"
+        />
+      );
+    }
+
+    if (hasSite && deliveredOrder) {
+      return (
+        <StatusBand
+          title={projectName}
+          description={deliveredSiteLabel ? `Votre site est livré : ${deliveredSiteLabel}.` : 'Votre site est livré et les informations sont disponibles dans Mon Site.'}
+          tone="success"
+          status={<StatusPill tone="success">Site livré</StatusPill>}
+          action={<ClientButton href="/dashboard/mon-site">Ouvrir Mon Site</ClientButton>}
+          secondaryAction={<ClientButton href={`/dashboard/orders/${deliveredOrder.id}`} variant="secondary">Voir le dossier</ClientButton>}
+          className="mb-5"
+        />
+      );
+    }
+
+    return (
+      <StatusBand
+        title={projectName}
+        description={nextStep.description}
+        tone={getStatusTone(primaryOrder)}
+        status={
+          <>
+            <StatusPill tone={getStatusTone(primaryOrder)}>{statusLabels[primaryOrder.status]}</StatusPill>
+            <StatusPill tone={primaryOrder.payment_status === 'paid' ? 'success' : 'warning'}>{paymentLabels[primaryOrder.payment_status]}</StatusPill>
+          </>
+        }
+        action={<ClientButton href={nextStep.ctaHref}>{nextStep.ctaLabel}</ClientButton>}
+        secondaryAction={<ClientButton href="/dashboard/orders" variant="secondary">Toutes les commandes</ClientButton>}
+        className="mb-5"
+      />
+    );
+  })();
 
   return (
-    <div className="w-full max-w-[1180px] px-4 py-5 md:px-7 md:py-7">
-      <section className="border-b border-neutral-200 pb-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-neutral-400">Espace client</p>
-            <h1 className="mt-2 text-3xl font-black leading-tight tracking-tight text-neutral-950 md:text-4xl">
-              {loading ? 'Bonjour.' : `Bonjour, ${firstName}.`}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-500">
-              {nextStep.description}
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href={nextStep.ctaHref}
-              className="inline-flex items-center justify-center rounded-full bg-[oklch(55%_0.23_29)] px-5 py-3 text-sm font-black text-[oklch(99%_0.004_95)] transition-colors hover:bg-[oklch(48%_0.22_29)]"
-            >
-              {nextStep.ctaLabel}
-            </Link>
-            <Link
-              href="/dashboard/orders"
-              className="inline-flex items-center gap-2 rounded-full border border-neutral-200 px-5 py-3 text-sm font-black text-neutral-700 transition-colors hover:border-neutral-950 hover:text-neutral-950"
-            >
-              Voir les commandes
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
+    <ClientPage>
+      <ClientPageHeader
+        title={loading ? 'Bonjour.' : `Bonjour, ${firstName}.`}
+        description={primaryOrder ? nextStep.description : 'Votre console rassemble le dossier de site, les outils commerciaux et les prochaines actions FRILO.'}
+        meta={totalOrders > 0 ? `${totalOrders} commande${totalOrders > 1 ? 's' : ''} dans votre espace` : 'Espace client FRILO'}
+        action={<ClientButton href={primaryOrder ? '/dashboard/orders' : '/templates'} variant="secondary">{primaryOrder ? 'Mes commandes' : 'Démarrer'}</ClientButton>}
+      />
 
-      <section className="grid gap-4 border-b border-neutral-200 py-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)]">
-        <div className="rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] p-5">
-          <div className="flex items-start gap-4">
-            <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-neutral-950 text-[oklch(99%_0.004_95)]">
-              {latestOrder?.payment_status !== 'paid' ? <CreditCard className="h-5 w-5" /> : <PackageCheck className="h-5 w-5" />}
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-neutral-400">Prochaine étape</p>
-              <h2 className="mt-2 text-xl font-black tracking-tight text-neutral-950">{nextStep.title}</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">{nextStep.description}</p>
-              {latestOrder && (
-                <p className="mt-3 text-xs font-semibold text-neutral-400">
-                  Commande #{String(latestOrder.id).padStart(4, '0')}
-                  {latestOrder.template?.name && ` · ${latestOrder.template.name}`}
-                </p>
-              )}
-            </div>
+      {mainBand}
+
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Suivi du dossier"
+            description={primaryOrder ? `${formatOrderId(primaryOrder)} · ${getOrderName(primaryOrder)}` : 'Les étapes de votre premier projet apparaîtront ici.'}
+            action={primaryOrder ? <StatusPill tone={getStatusTone(primaryOrder)}>{statusLabels[primaryOrder.status]}</StatusPill> : undefined}
+          />
+          <div className="px-4 py-5 md:px-5">
+            {loading ? <LoadingRows /> : <Timeline items={timelineItems} />}
           </div>
-        </div>
+        </ClientPanel>
 
-        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)]">
-          {[
-            { label: 'Commandes', value: total },
-            { label: 'À traiter', value: pending },
-            { label: 'En production', value: inProgress },
-            { label: 'Livrées', value: delivered },
-          ].map(({ label, value }, index) => (
-            <div
-              key={label}
-              className={cn(
-                "p-4",
-                index % 2 === 0 && "border-r border-neutral-100",
-                index < 2 && "border-b border-neutral-100"
-              )}
-            >
-              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-neutral-400">{label}</p>
-              <p className="mt-2 text-2xl font-black tracking-tight text-neutral-950">{loading ? '...' : value}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="flex flex-col gap-3 border-b border-neutral-200 py-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          {quickLinks.map(link => (
-            <Link key={link.href} href={link.href} className="text-sm font-semibold text-neutral-500 transition-colors hover:text-neutral-950">
-              {link.label}
-            </Link>
-          ))}
-        </div>
-        <div className="flex items-center gap-3">
-          <Clock3 className="h-4 w-4 text-neutral-400" />
-          <p className="text-xs font-semibold text-neutral-500">{backlogHint}</p>
-          <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-neutral-200 sm:block">
-            <div
-              className="h-full rounded-full bg-neutral-950"
-              style={{ width: `${completionRate}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <section className="mt-5">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-neutral-400">Commandes récentes</p>
-            <p className="mt-1 text-sm text-neutral-500">Les derniers dossiers visibles côté client.</p>
-          </div>
-          <Link href="/dashboard/orders" className="inline-flex items-center gap-1 text-sm font-black text-neutral-950">
-            Tout voir <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)]">
+        <ClientPanel>
+          <ClientPanelHeader
+            title="Outils disponibles"
+            description="Accès rapides liés à votre site, vos clients et votre suivi d’activité."
+          />
           {loading ? (
-            <div className="divide-y divide-gray-50">
-              {[...Array(2)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between px-5 py-4">
-                  <div className="space-y-2">
-                    <div className="h-4 w-40 bg-neutral-100 rounded animate-pulse" />
-                    <div className="h-3 w-24 bg-neutral-100 rounded animate-pulse" />
-                  </div>
-                  <div className="h-6 w-20 bg-neutral-100 rounded-full animate-pulse" />
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="px-6 py-8 text-center">
-              <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
-              <p className="text-sm text-neutral-500 mb-5">{error}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setError(null);
-                  setLoading(true);
-                  setReloadKey(v => v + 1);
-                }}
-                className="inline-flex items-center justify-center rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)]"
-              >
-                Réessayer
-              </button>
-            </div>
-          ) : orders.length === 0 ? (
-            <div className="px-5 py-6">
-              <div className="border-b border-neutral-100 pb-6">
-                <p className="text-lg font-black text-neutral-950">Aucune commande pour le moment.</p>
-                <p className="mt-2 max-w-xl text-sm text-neutral-500">Choisissez un modèle, FRILO l’adapte ensuite à votre activité.</p>
-                <Link href="/templates" className="mt-4 inline-flex items-center justify-center rounded-full bg-neutral-950 px-6 py-3 text-sm font-black text-[oklch(99%_0.004_95)]">
-                  Voir les modèles
-                </Link>
-              </div>
-
-              {featuredTemplates.length > 0 && (
-                <div className="pt-5">
-                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-neutral-400">
-                    {user?.sector?.name ? `Suggestions pour ${user.sector.name}` : 'Suggestions de modèles'}
-                  </p>
-                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                    {featuredTemplates.map(template => (
-                      <Link
-                        key={template.id}
-                        href={`/templates/${template.id}`}
-                        className="rounded-xl border border-neutral-100 p-4 hover:border-neutral-950/20 hover:bg-neutral-50 transition-colors"
-                      >
-                        <p className="text-sm font-semibold text-neutral-950">{template.name}</p>
-                        <p className="text-xs text-neutral-500 mt-1">
-                          {template.sector?.name || 'Secteur'} · {template.price.toLocaleString('fr-FR')} FCFA
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            <LoadingRows />
           ) : (
-            <div className="divide-y divide-neutral-100">
-              {orders.map(order => {
-                const cfg = statusConfig[order.status] || { label: order.status, dot: 'bg-gray-400', classes: 'bg-gray-50 text-gray-600' };
-                const payment = paymentConfig[order.payment_status] || { label: order.payment_status, classes: 'bg-gray-50 text-gray-600' };
-                const name = order.instruction?.enterprise_name || order.instructions?.[0]?.enterprise_name || 'Projet sans nom';
-
-                return (
-                  <Link
-                    key={order.id}
-                    href={`/dashboard/orders/${order.id}`}
-                    className="grid gap-3 px-5 py-4 transition-colors hover:bg-neutral-50 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-neutral-950">{name}</p>
-                      <p className="text-xs text-neutral-400 mt-0.5">
-                        #{String(order.id).padStart(4, '0')}
-                        {order.template?.name && ` · ${order.template.name}`}
-                        {order.created_at && ` · ${new Date(order.created_at).toLocaleDateString('fr-FR')}`}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 mt-2">
-                        <span className={cn("inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full", cfg.classes)}>
-                          <span className={cn("w-1.5 h-1.5 rounded-full", cfg.dot)} />
-                          {cfg.label}
-                        </span>
-                        <span className={cn("inline-flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-full", payment.classes)}>
-                          {payment.label}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-sm font-black text-neutral-950">{order.price.toLocaleString('fr-FR')} FCFA</span>
-                  </Link>
-                );
-              })}
+            <div>
+              <CompactRow
+                title="Mon Site"
+                description={hasSite ? 'Lien, domaine, hébergement et informations de livraison.' : 'Disponible dès que FRILO marque votre site comme livré.'}
+                meta={<StatusPill tone={hasSite ? 'success' : 'neutral'}>{hasSite ? 'Actif' : 'En attente'}</StatusPill>}
+                href="/dashboard/mon-site"
+              />
+              <CompactRow
+                title="Mes Clients"
+                description={hasSite ? 'Enregistrez les prospects et clients générés par votre nouveau site.' : 'Préparez votre fichier client avant la mise en ligne.'}
+                meta={<StatusPill tone={hasSite ? 'success' : 'info'}>{hasSite ? 'Disponible' : 'Prêt à remplir'}</StatusPill>}
+                href="/dashboard/contacts"
+              />
+              <CompactRow
+                title="Ma Caisse"
+                description={totalOrders > 0 ? 'Suivez les entrées et dépenses liées à votre activité.' : 'Votre suivi financier client reste accessible à tout moment.'}
+                meta={<StatusPill tone="neutral">Module client</StatusPill>}
+                href="/dashboard/caisse"
+              />
+              <CompactRow
+                title="Mes Échéances"
+                description={deliveredOrder?.hosting_expires_at ? 'La prochaine date d’hébergement est visible dans votre espace.' : 'Ajoutez vos rappels et retrouvez les échéances FRILO.'}
+                meta={deliveredOrder?.hosting_expires_at ? `Hébergement : ${formatDate(deliveredOrder.hosting_expires_at)}` : <StatusPill tone="neutral">À organiser</StatusPill>}
+                href="/dashboard/echeances"
+              />
             </div>
           )}
-        </div>
-      </section>
-    </div>
+        </ClientPanel>
+      </div>
+
+      <ClientPanel className="mt-5">
+        <ClientPanelHeader
+          title="Activité récente"
+          description={allOrders.length > 0 ? 'Les derniers dossiers suivis dans votre espace client.' : 'Suggestions pour lancer votre premier dossier.'}
+          action={!loading && allOrders.length > 0 ? <ClientButton href="/dashboard/orders" variant="ghost">Tout voir</ClientButton> : undefined}
+        />
+        {loading ? (
+          <LoadingRows />
+        ) : error ? (
+          <div className="px-4 py-5 md:px-5">
+            <StatusBand
+              title="Impossible d’afficher l’activité"
+              description="Réessayez le chargement pour récupérer vos dernières commandes."
+              tone="danger"
+              action={
+                <ClientButton
+                  onClick={() => {
+                    setError(null);
+                    setLoading(true);
+                    setReloadKey((value) => value + 1);
+                  }}
+                >
+                  Réessayer
+                </ClientButton>
+              }
+            />
+          </div>
+        ) : allOrders.length > 0 ? (
+          <div>
+            {allOrders.map((order) => (
+              <CompactRow
+                key={order.id}
+                title={getOrderName(order)}
+                description={[
+                  order.template?.name,
+                  formatDate(order.created_at),
+                  formatPrice(order.price),
+                ].filter(Boolean).join(' · ')}
+                meta={
+                  <span className="flex flex-wrap items-center gap-2">
+                    <StatusPill tone={getStatusTone(order)}>{statusLabels[order.status]}</StatusPill>
+                    <span>{formatOrderId(order)}</span>
+                  </span>
+                }
+                href={`/dashboard/orders/${order.id}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div>
+            {featuredTemplates.length > 0 ? (
+              featuredTemplates.map((template) => (
+                <CompactRow
+                  key={template.id}
+                  title={template.name}
+                  description={template.sector?.name ? `Modèle ${template.sector.name}` : 'Modèle prêt à personnaliser'}
+                  meta={formatPrice(template.price)}
+                  href={`/templates/${template.id}`}
+                />
+              ))
+            ) : (
+              <CompactRow
+                title="Explorer le catalogue FRILO"
+                description="Choisissez un modèle adapté à votre activité pour ouvrir votre premier dossier."
+                meta={<StatusPill>Premier projet</StatusPill>}
+                href="/templates"
+              />
+            )}
+          </div>
+        )}
+      </ClientPanel>
+    </ClientPage>
   );
 }
