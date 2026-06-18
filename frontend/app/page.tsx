@@ -578,7 +578,7 @@ export default function Home() {
         <section id="how-it-works" className="bg-neutral-100 px-5 py-12 md:px-8 md:py-16">
           <div className="mx-auto max-w-[1360px]">
             <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
-              <div className="lg:sticky lg:top-28">
+              <div className="lg:sticky lg:top-28 lg:self-center">
                 <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.18em] text-black/45">{processSection.content.eyebrow}</p>
                 <h2 className="max-w-xl font-serif text-5xl font-medium leading-[0.92] tracking-[-0.04em] text-balance md:text-7xl">
                   {processSection.content.headline}
