@@ -651,7 +651,7 @@ export default function Home() {
                 {testimonialsSection.content.headline}
               </h2>
               <p className="mt-5 max-w-md text-base leading-7 text-white/58">
-                Les retours clients donnent du poids à votre décision. Ils restent affichés seulement quand ils sont validés.
+                Un site inspire confiance quand les services, les preuves et les contacts sont clairs dès les premières secondes.
               </p>
             </div>
             {loading ? (
