@@ -600,34 +600,34 @@ export default function Home() {
                     <ArrowRight className="hidden h-5 w-5 text-black/26 md:block" />
                   </div>
                 ))}
+              </div>
 
-                <div className="bg-black p-6 text-white md:p-8">
-                  <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-                    <div>
-                      <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">FRILO prend la main</p>
-                      <h3 className="mt-4 max-w-2xl font-serif text-4xl font-medium leading-[0.95] tracking-[-0.04em] md:text-5xl">
-                        Une équipe transforme vos infos en site prêt à montrer.
-                      </h3>
-                    </div>
-                    <PillLink href={processSection.content.cta.url} variant="white" className="shrink-0">
-                      {processSection.content.cta.label}
-                    </PillLink>
+              <div className="bg-black p-6 text-white md:p-8 lg:col-span-2 lg:p-10">
+                <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-white/45">FRILO prend la main</p>
+                    <h3 className="mt-4 max-w-5xl font-serif text-4xl font-medium leading-[0.95] tracking-[-0.04em] md:text-6xl">
+                      Une équipe transforme vos infos en site prêt à montrer.
+                    </h3>
                   </div>
-
-                  <div className="mt-8 grid gap-4 md:grid-cols-3">
-                    {processSection.content.frilo_steps.map((step, index) => (
-                      <div key={step.title} className="border-t border-white/20 pt-5">
-                        <span className="font-serif text-4xl leading-none tracking-[-0.04em] text-white/34">{index + 1}</span>
-                        <h4 className="mt-4 text-xl font-black tracking-[-0.03em]">{step.title}</h4>
-                        <p className="mt-2 text-sm leading-6 text-white/62">{step.description}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <p className="mt-8 max-w-3xl border-t border-white/20 pt-6 text-xl font-black leading-tight tracking-[-0.03em]">
-                    {processSection.content.result_copy}
-                  </p>
+                  <PillLink href={processSection.content.cta.url} variant="white" className="shrink-0">
+                    {processSection.content.cta.label}
+                  </PillLink>
                 </div>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-3">
+                  {processSection.content.frilo_steps.map((step, index) => (
+                    <div key={step.title} className="border-t border-white/20 pt-5">
+                      <span className="font-serif text-4xl leading-none tracking-[-0.04em] text-white/34">{index + 1}</span>
+                      <h4 className="mt-4 text-xl font-black tracking-[-0.03em]">{step.title}</h4>
+                      <p className="mt-2 text-sm leading-6 text-white/62">{step.description}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-8 max-w-5xl border-t border-white/20 pt-6 text-xl font-black leading-tight tracking-[-0.03em]">
+                  {processSection.content.result_copy}
+                </p>
               </div>
             </div>
           </div>
