@@ -60,12 +60,14 @@ export default function ContactsPage() {
 
   const load = (p = 1) => {
     setLoading(true);
+    setError(null);
     contactsService.list(p)
       .then((res) => {
         setContacts(res.data);
         setTotal(res.meta.total);
         setLastPage(res.meta.last_page);
         setPage(p);
+        setError(null);
       })
       .catch(() => setError('Impossible de charger les contacts.'))
       .finally(() => setLoading(false));
@@ -93,6 +95,7 @@ export default function ContactsPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     setSaving(true);
     setFormError(null);
     try {
@@ -114,7 +117,7 @@ export default function ContactsPage() {
     if (!confirm('Supprimer ce contact ?')) return;
     try {
       await contactsService.remove(id);
-      load(page);
+      load(contacts.length === 1 && page > 1 ? page - 1 : page);
     } catch {
       setError('Impossible de supprimer ce contact.');
     }
@@ -252,6 +255,8 @@ export default function ContactsPage() {
         <nav className="mt-5 flex flex-wrap justify-center gap-2" aria-label="Pagination des clients">
           {Array.from({ length: lastPage }, (_, i) => i + 1).map((p) => (
             <button key={p} type="button" onClick={() => load(p)}
+              aria-current={page === p ? 'page' : undefined}
+              aria-label={page === p ? `Page ${p}, page actuelle` : `Aller à la page ${p}`}
               className={`inline-flex h-10 min-w-10 items-center justify-center rounded-md px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 ${page === p
                 ? 'bg-black text-white'
                 : 'border border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50 hover:text-black'
