@@ -14,7 +14,6 @@ import { usePublicContent } from '@/hooks/usePublicContent';
 import { usePublicPricing } from '@/hooks/usePublicPricing';
 import {
   HomeBenefitsContent,
-  HomeClosingCtaContent,
   HomeFaqIntroContent,
   HomeHeroContent,
   HomeModelsIntroContent,
@@ -139,7 +138,7 @@ function withPricePlaceholder(value: string, priceLabel: string): string {
 
 function PublicShell({ children, className, id }: { children: ReactNode; className?: string; id?: string }) {
   return (
-    <section id={id} className={cn('bg-white px-5 py-16 md:px-8 md:py-24', className)}>
+    <section id={id} className={cn('bg-white px-5 py-12 md:px-8 md:py-16', className)}>
       <div className="mx-auto max-w-[1360px]">
         {children}
       </div>
@@ -161,14 +160,14 @@ function SectionIntro({
   invert?: boolean;
 }) {
   return (
-    <div className="mb-10 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.72fr)] lg:items-end">
+    <div className="mb-8 grid gap-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(20rem,0.72fr)] lg:items-end">
       <div>
         {label && (
           <p className={cn('mb-4 text-[0.68rem] font-black uppercase tracking-[0.2em]', invert ? 'text-white/50' : 'text-black/45')}>
             {label}
           </p>
         )}
-        <h2 className={cn('max-w-4xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.045em] text-balance md:text-6xl lg:text-7xl', invert ? 'text-white' : 'text-black')}>
+        <h2 className={cn('max-w-4xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.04em] text-balance md:text-5xl lg:text-6xl', invert ? 'text-white' : 'text-black')}>
           {title}
         </h2>
       </div>
@@ -277,7 +276,6 @@ export default function Home() {
   const testimonialsSection = getPublicSection<HomeTestimonialsIntroContent>(publicContent, 'home.testimonials-intro');
   const sectorsSection = getPublicSection<HomeSectorsIntroContent>(publicContent, 'home.sectors-intro');
   const faqSection = getPublicSection<HomeFaqIntroContent>(publicContent, 'home.faq-intro');
-  const closingSection = getPublicSection<HomeClosingCtaContent>(publicContent, 'home.closing-cta');
   const pricingContent = pricingSection?.content;
   const priceLabel = `${pricing.standard.price.toLocaleString('fr-FR')} ${pricing.currency_label}`;
   const cmsIncludedItems = pricingContent?.included_items?.length ? pricingContent.included_items : includedItems;
@@ -336,7 +334,7 @@ export default function Home() {
       {renderBlocksFor('home.hero')}
 
       {modelsSection && (
-        <PublicShell className="pb-10 md:pb-16">
+        <PublicShell className="pb-8 md:pb-12">
           <SectionIntro
             label={modelsSection.content.eyebrow}
             title={modelsSection.content.headline}
@@ -369,7 +367,7 @@ export default function Home() {
                       key={template.id}
                       href={`/templates/${template.id}`}
                       className={cn(
-                        'group flex min-h-[30rem] flex-col overflow-hidden bg-neutral-100 text-black transition-transform duration-500 hover:-translate-y-1',
+                        'group flex min-h-[26rem] flex-col overflow-hidden bg-neutral-100 text-black transition-transform duration-500 hover:-translate-y-1',
                         index === 0 && 'md:col-span-2'
                       )}
                     >
@@ -378,10 +376,10 @@ export default function Home() {
                           <img
                             src={templateImage}
                             alt={template.name}
-                            className="h-full min-h-[22rem] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                            className="h-full min-h-[18rem] w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
                           />
                         ) : (
-                          <div className="h-full min-h-[22rem] w-full bg-neutral-200" />
+                          <div className="h-full min-h-[18rem] w-full bg-neutral-200" />
                         )}
                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/72 via-black/10 to-transparent p-5 text-white">
                           {template.sector?.name && (
@@ -418,9 +416,9 @@ export default function Home() {
       {renderBlocksFor(modelsSection?.key)}
 
       {benefitsSection && (
-        <PublicShell className="pt-10 md:pt-16">
-          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
-            <div className="relative min-h-[34rem] overflow-hidden bg-black">
+        <PublicShell className="pt-8 md:pt-12">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+            <div className="relative min-h-[28rem] overflow-hidden bg-black">
               <img
                 src="/image/client-satisfait-frilo.jpg"
                 alt="Client FRILO utilisant son site pour présenter son activité."
@@ -438,7 +436,7 @@ export default function Home() {
                   {benefitsSection.content.description}
                 </p>
               </div>
-              <div className="mt-10 divide-y divide-neutral-200">
+              <div className="mt-8 divide-y divide-neutral-200">
                 {benefitsSection.content.items.map((benefit) => (
                   <div key={benefit.title} className="grid gap-4 py-5 md:grid-cols-[0.46fr_1fr]">
                     <h3 className="text-xl font-black leading-tight tracking-[-0.02em]">{benefit.title}</h3>
@@ -459,7 +457,7 @@ export default function Home() {
       {renderBlocksFor(benefitsSection?.key)}
 
       {processSection && (
-        <PublicShell id="how-it-works" className="py-16 md:py-24">
+        <PublicShell id="how-it-works" className="py-12 md:py-16">
           <SectionIntro
             label={processSection.content.eyebrow}
             title={processSection.content.headline}
@@ -470,7 +468,7 @@ export default function Home() {
               <p className="mb-5 text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/45">Vous faites</p>
               <div className="divide-y divide-neutral-200">
                 {processSection.content.customer_steps.map((step, index) => (
-                  <div key={step.title} className="grid gap-4 py-6 md:grid-cols-[4rem_1fr]">
+                  <div key={step.title} className="grid gap-4 py-5 md:grid-cols-[4rem_1fr]">
                     <span className="font-serif text-3xl leading-none tracking-[-0.04em] text-black/36">{index + 1}</span>
                     <div>
                       <h3 className="text-2xl font-black tracking-[-0.03em]">{step.title}</h3>
@@ -484,7 +482,7 @@ export default function Home() {
               <p className="mb-5 text-[0.68rem] font-black uppercase tracking-[0.2em] text-white/45">FRILO fait</p>
               <div className="divide-y divide-white/18">
                 {processSection.content.frilo_steps.map((step, index) => (
-                  <div key={step.title} className="grid gap-4 py-6 md:grid-cols-[4rem_1fr]">
+                  <div key={step.title} className="grid gap-4 py-5 md:grid-cols-[4rem_1fr]">
                     <span className="font-serif text-3xl leading-none tracking-[-0.04em] text-white/42">{index + 1}</span>
                     <div>
                       <h3 className="text-2xl font-black tracking-[-0.03em]">{step.title}</h3>
@@ -575,7 +573,7 @@ export default function Home() {
       {renderBlocksFor(pricingSection?.key)}
 
       {testimonialsSection && (
-        <section className="bg-black px-5 py-20 text-white md:px-8 md:py-28">
+        <section className="bg-black px-5 py-14 text-white md:px-8 md:py-20">
           <div className="mx-auto max-w-[1360px]">
             <SectionIntro
               label={testimonialsSection.content.eyebrow}
@@ -585,8 +583,8 @@ export default function Home() {
             {loading ? (
               <div className="h-52 animate-pulse bg-white/10" />
             ) : testimonials.length > 0 ? (
-              <figure className="grid gap-8 border-y border-white/20 py-10 lg:grid-cols-[0.62fr_1.38fr] lg:items-center">
-                <div className="relative min-h-[22rem] overflow-hidden">
+              <figure className="grid gap-8 border-y border-white/20 py-8 lg:grid-cols-[0.62fr_1.38fr] lg:items-center">
+                <div className="relative min-h-[18rem] overflow-hidden">
                   <img
                     src="/image/client-satisfait-frilo.jpg"
                     alt="Client FRILO satisfait après la livraison de son site."
@@ -717,39 +715,6 @@ export default function Home() {
       {unplacedBlocks.map((block) => (
         <FreeContentBlock key={block.id} block={block} />
       ))}
-
-      {closingSection && (
-        <section className="relative isolate overflow-hidden bg-black px-5 py-20 text-white md:px-8 md:py-28">
-          <div className="absolute inset-0 opacity-35">
-            <img
-              src="/image/client-satisfait-frilo.jpg"
-              alt=""
-              className="h-full w-full object-cover grayscale"
-            />
-            <div className="absolute inset-0 bg-black/70" />
-          </div>
-          <div className="relative mx-auto grid max-w-[1360px] gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-            <div>
-              <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.2em] text-white/45">{closingSection.content.eyebrow}</p>
-              <h2 className="max-w-4xl font-serif text-5xl font-medium leading-[0.9] tracking-[-0.06em] text-balance md:text-8xl">
-                {closingSection.content.headline}
-              </h2>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/68">
-                {closingSection.content.description}
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 lg:items-end">
-              <PillLink href={closingSection.content.primary_cta.url} variant="white" className="w-full sm:w-auto">
-                {closingSection.content.primary_cta.label} <ArrowRight className="h-4 w-4" />
-              </PillLink>
-              <PillLink href={closingSection.content.secondary_cta.url} variant="outline-white" className="w-full sm:w-auto">
-                {closingSection.content.secondary_cta.label}
-              </PillLink>
-            </div>
-          </div>
-        </section>
-      )}
-      {renderBlocksFor(closingSection?.key)}
     </div>
   );
 }

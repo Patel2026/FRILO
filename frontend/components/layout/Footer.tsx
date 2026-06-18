@@ -47,26 +47,7 @@ export function Footer() {
   return (
     <footer className="bg-black text-white">
       <div className="mx-auto max-w-[1320px] px-6 lg:px-8">
-        <div className="border-b border-white/10 py-10 md:py-12">
-          <div className="flex flex-col gap-6 rounded-3xl bg-white px-5 py-6 text-black md:flex-row md:items-center md:justify-between md:px-7">
-            <div className="max-w-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">
-                Prêt quand vous l&apos;êtes
-              </p>
-              <h2 className="mt-3 text-2xl font-black leading-tight tracking-tight md:text-4xl">
-                Choisissez le modèle qui peut porter votre entreprise.
-              </h2>
-            </div>
-            <Link
-              href="/templates"
-              className="inline-flex shrink-0 items-center justify-center rounded-full bg-[oklch(57%_0.24_29)] px-6 py-3 text-sm font-black text-white transition-colors hover:bg-[oklch(51%_0.24_29)]"
-            >
-              Choisir un modèle
-            </Link>
-          </div>
-        </div>
-
-        <div className="py-10 md:hidden">
+        <div className="py-8 md:hidden">
           <div className="border-b border-white/10 pb-8">
             <div className="max-w-sm space-y-4">
               <Link href="/" className="text-xl font-black tracking-tight text-white">
@@ -131,8 +112,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="hidden py-10 md:block">
-          <div className="grid grid-cols-1 gap-12 border-b border-white/10 pb-12 md:grid-cols-4">
+        <div className="hidden py-8 md:block">
+          <div className="grid grid-cols-1 gap-12 border-b border-white/10 pb-10 md:grid-cols-4">
             <div className="space-y-5">
               <Link href="/" className="text-xl font-black tracking-tight text-white">
                 FRILO
