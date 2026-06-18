@@ -669,18 +669,21 @@ export default function Home() {
 
       {testimonialsSection && (
         <section className="bg-black px-5 py-12 text-white md:px-8 md:py-16">
-          <div className="mx-auto grid max-w-[1360px] gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
+          <div className="mx-auto grid max-w-[1360px] gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
             <div>
               <p className="mb-4 text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/45">{testimonialsSection.content.eyebrow}</p>
-              <h2 className="max-w-3xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.04em] text-balance md:text-6xl">
+              <h2 className="max-w-2xl font-serif text-4xl font-medium leading-[0.98] tracking-[-0.035em] text-balance md:text-5xl">
                 {testimonialsSection.content.headline}
               </h2>
+              <p className="mt-5 max-w-md text-base leading-7 text-white/58">
+                Les retours clients donnent du poids à votre décision. Ils restent affichés seulement quand ils sont validés.
+              </p>
             </div>
             {loading ? (
-              <div className="h-40 animate-pulse bg-white/10" />
+              <div className="h-40 animate-pulse border-y border-white/20 bg-white/10" />
             ) : testimonials.length > 0 ? (
               <figure className="border-y border-white/20 py-7">
-                <blockquote className="max-w-4xl text-2xl font-black leading-tight tracking-[-0.03em] md:text-4xl">
+                <blockquote className="max-w-4xl text-xl font-black leading-tight tracking-[-0.02em] md:text-3xl">
                   “{testimonials[0].content}”
                 </blockquote>
                 <figcaption className="mt-5 text-sm leading-6 text-white/58">
@@ -691,7 +694,7 @@ export default function Home() {
               </figure>
             ) : (
               <div className="border-y border-white/20 py-7">
-                <p className="max-w-xl text-lg leading-8 text-white/65">
+                <p className="max-w-2xl text-base leading-7 text-white/62">
                   {testimonialsSection.content.empty_state}
                 </p>
               </div>
