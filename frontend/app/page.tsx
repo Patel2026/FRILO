@@ -401,8 +401,8 @@ export default function Home() {
     <div className="flex flex-col overflow-x-hidden bg-white text-black">
       <section className="relative isolate min-h-[calc(100svh-4rem)] overflow-hidden bg-black text-white">
         <img
-          src="/image/client-satisfait-frilo.jpg"
-          alt="Entrepreneur consultant son site FRILO depuis son espace de travail."
+          src={hero.image.url}
+          alt={hero.image.alt}
           className="absolute inset-0 h-full w-full object-cover object-[58%_42%] opacity-78 saturate-[0.92]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.78),rgba(15,23,42,0.18)_32%,rgba(15,23,42,0.62)_100%),radial-gradient(circle_at_50%_44%,rgba(15,23,42,0.04),rgba(15,23,42,0.74)_70%),linear-gradient(180deg,rgba(15,23,42,0.58),rgba(15,23,42,0.18)_34%,rgba(15,23,42,0.94)_100%)]" />
@@ -555,8 +555,8 @@ export default function Home() {
 
             <div className="grid min-h-[32rem] overflow-hidden bg-black text-white">
               <img
-                src="/image/client-satisfait-frilo.jpg"
-                alt="Client FRILO utilisant son site pour présenter son activité."
+                src={benefitsSection.content.image.url}
+                alt={benefitsSection.content.image.alt}
                 className="col-start-1 row-start-1 h-full w-full object-cover opacity-70 grayscale transition-transform duration-700 hover:scale-[1.03]"
               />
               <div className="col-start-1 row-start-1 bg-gradient-to-t from-black/28 via-transparent to-transparent" />

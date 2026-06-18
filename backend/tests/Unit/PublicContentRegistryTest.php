@@ -64,6 +64,35 @@ class PublicContentRegistryTest extends TestCase
         }
     }
 
+    public function test_home_visual_sections_accept_only_safe_image_urls(): void
+    {
+        $registry = app(PublicContentRegistry::class);
+
+        foreach (['home.hero', 'home.benefits'] as $sectionKey) {
+            $content = $registry->section($sectionKey)['defaults'];
+            $content['image'] = [
+                'url' => '/image/client-satisfait-frilo.jpg',
+                'alt' => 'Client FRILO consultant son site.',
+            ];
+
+            $validated = $registry->validateSectionContent($sectionKey, $content);
+
+            $this->assertSame('/image/client-satisfait-frilo.jpg', $validated['image']['url']);
+            $this->assertSame('Client FRILO consultant son site.', $validated['image']['alt']);
+
+            foreach (['javascript:alert(1)', 'data:text/html,unsafe', '//evil.example'] as $unsafeUrl) {
+                $content['image']['url'] = $unsafeUrl;
+
+                try {
+                    $registry->validateSectionContent($sectionKey, $content);
+                    $this->fail("Unsafe image URL [{$unsafeUrl}] was accepted for [{$sectionKey}].");
+                } catch (ValidationException) {
+                    $this->addToAssertionCount(1);
+                }
+            }
+        }
+    }
+
     public function test_it_rejects_an_unknown_section_key(): void
     {
         $this->expectException(InvalidArgumentException::class);

@@ -21,6 +21,10 @@ return [
                 'eyebrow' => 'Pas besoin de savoir créer un site',
                 'headline' => 'Envoyez vos infos. FRILO prépare votre site.',
                 'description' => 'Vous choisissez un modèle, vous ajoutez votre activité, vos photos et vos contacts. Vous payez simplement, puis vous recevez votre site prêt à partager.',
+                'image' => [
+                    'url' => '/image/client-satisfait-frilo.jpg',
+                    'alt' => 'Entrepreneur consultant son site FRILO depuis son espace de travail.',
+                ],
                 'primary_cta' => [
                     'label' => 'Commencer avec un modèle',
                     'url' => '/templates',
@@ -34,6 +38,9 @@ return [
                 'eyebrow' => ['required', 'string', 'max:120'],
                 'headline' => ['required', 'string', 'max:180'],
                 'description' => ['required', 'string', 'max:500'],
+                'image' => ['required', 'array:url,alt'],
+                'image.url' => ['required', SafePublicUrl::class],
+                'image.alt' => ['required', 'string', 'max:180'],
                 'primary_cta' => ['required', 'array:label,url'],
                 'primary_cta.label' => ['required', 'string', 'max:80'],
                 'primary_cta.url' => ['required', SafePublicUrl::class],
@@ -78,6 +85,10 @@ return [
                 'eyebrow' => 'Avantages',
                 'headline' => 'Ce que FRILO vous fait gagner.',
                 'description' => 'Choisissez un modèle. FRILO ajoute vos informations et prépare un site prêt à partager.',
+                'image' => [
+                    'url' => '/image/client-satisfait-frilo.jpg',
+                    'alt' => 'Client FRILO utilisant son site pour présenter son activité.',
+                ],
                 'items' => [
                     [
                         'title' => 'Moins de temps perdu',
@@ -106,6 +117,9 @@ return [
                 'eyebrow' => ['required', 'string', 'max:120'],
                 'headline' => ['required', 'string', 'max:180'],
                 'description' => ['required', 'string', 'max:500'],
+                'image' => ['required', 'array:url,alt'],
+                'image.url' => ['required', SafePublicUrl::class],
+                'image.alt' => ['required', 'string', 'max:180'],
                 'items' => ['required', 'array', 'min:1', 'max:8'],
                 'items.*' => ['required', 'array:title,description'],
                 'items.*.title' => ['required', 'string', 'max:120'],

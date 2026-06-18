@@ -60,10 +60,16 @@ export interface CtaContent {
   url: string;
 }
 
+export interface ImageContent {
+  url: string;
+  alt: string;
+}
+
 export interface HomeHeroContent {
   eyebrow: string;
   headline: string;
   description: string;
+  image: ImageContent;
   primary_cta: CtaContent;
   secondary_cta: CtaContent;
 }
@@ -84,6 +90,7 @@ export interface HomeBenefitsContent {
   eyebrow: string;
   headline: string;
   description: string;
+  image: ImageContent;
   items: HomeBenefitItem[];
   closing_copy: string;
   cta: CtaContent;
