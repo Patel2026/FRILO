@@ -28,7 +28,11 @@ function safeHref(url: string | null | undefined): string | null {
 function formatDate(value: string | null | undefined): string | null {
   if (!value) return null;
 
-  return new Date(value).toLocaleDateString('fr-FR', {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -171,98 +175,108 @@ export default function MonSitePage() {
         action={<ClientButton href="/dashboard/orders" variant="secondary">Mes commandes</ClientButton>}
       />
 
-      {sites.map((site) => (
-        <ClientPanel key={site.id} className="mb-5 last:mb-0">
-          <ClientPanelHeader
-            title={getSiteName(site)}
-            description={getTemplateContext(site)}
-            action={
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusPill tone="success">Livré</StatusPill>
-                {safeHref(site.site_url) && (
+      {sites.map((site) => {
+        const siteName = getSiteName(site);
+        const siteHref = safeHref(site.site_url);
+        const previewHref = safeHref(site.preview_url);
+        const hostingExpiryLabel = formatDate(site.hosting_expires_at);
+
+        return (
+          <ClientPanel key={site.id} className="mb-5 last:mb-0">
+            <ClientPanelHeader
+              title={siteName}
+              description={getTemplateContext(site)}
+              action={
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusPill tone="success">Livré</StatusPill>
+                  {siteHref && (
+                    <a
+                      href={siteHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Ouvrir le site ${siteName} dans un nouvel onglet`}
+                      className={externalActionClasses}
+                    >
+                      Ouvrir le site
+                    </a>
+                  )}
+                  <ClientButton href={`/dashboard/orders/${site.id}`} variant="secondary">Voir la commande</ClientButton>
+                </div>
+              }
+            />
+
+            <div>
+              <CompactRow
+                title="Modèle"
+                description={site.template?.name ?? 'Modèle FRILO'}
+                meta={site.template?.sector?.name ? `Secteur : ${site.template.sector.name}` : 'Secteur non renseigné'}
+              />
+              <CompactRow
+                title="URL du site"
+                description={siteHref ?? 'L’URL publique sera ajoutée après la mise en ligne.'}
+                meta={siteHref ? <StatusPill tone="success">Active</StatusPill> : <StatusPill tone="neutral">Non renseignée</StatusPill>}
+                action={siteHref ? (
                   <a
-                    href={safeHref(site.site_url)!}
+                    href={siteHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={externalActionClasses}
+                    aria-label={`Ouvrir le site ${siteName} dans un nouvel onglet`}
+                    className="text-sm font-semibold text-black underline underline-offset-4"
                   >
-                    Ouvrir le site
+                    Ouvrir
                   </a>
-                )}
-                <ClientButton href={`/dashboard/orders/${site.id}`} variant="secondary">Voir la commande</ClientButton>
-              </div>
-            }
-          />
-
-          <div>
-            <CompactRow
-              title="Modèle"
-              description={site.template?.name ?? 'Modèle FRILO'}
-              meta={site.template?.sector?.name ? `Secteur : ${site.template.sector.name}` : 'Secteur non renseigné'}
-            />
-            <CompactRow
-              title="URL du site"
-              description={safeHref(site.site_url) ?? 'L’URL publique sera ajoutée après la mise en ligne.'}
-              meta={safeHref(site.site_url) ? <StatusPill tone="success">Active</StatusPill> : <StatusPill tone="neutral">Non renseignée</StatusPill>}
-              action={safeHref(site.site_url) ? (
-                <a
-                  href={safeHref(site.site_url)!}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-semibold text-black underline underline-offset-4"
-                >
-                  Ouvrir
-                </a>
-              ) : undefined}
-            />
-            <CompactRow
-              title="Domaine"
-              description={site.domain || 'Domaine non renseigné pour ce site.'}
-              meta={site.domain ? <StatusPill tone="success">Configuré</StatusPill> : <StatusPill tone="neutral">En attente</StatusPill>}
-            />
-            <CompactRow
-              title="Prévisualisation"
-              description={safeHref(site.preview_url) ?? 'Aucune URL de prévisualisation disponible.'}
-              meta={safeHref(site.preview_url) ? <StatusPill tone="info">Disponible</StatusPill> : <StatusPill tone="neutral">Non publiée</StatusPill>}
-              action={safeHref(site.preview_url) ? (
-                <a
-                  href={safeHref(site.preview_url)!}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-semibold text-black underline underline-offset-4"
-                >
-                  Voir
-                </a>
-              ) : undefined}
-            />
-            <CompactRow
-              title="Échéance hébergement"
-              description={formatDate(site.hosting_expires_at) ?? 'Aucune date d’échéance renseignée.'}
-              meta={site.hosting_expires_at ? <StatusPill tone="warning">À surveiller</StatusPill> : <StatusPill tone="neutral">Non renseignée</StatusPill>}
-            />
-          </div>
-
-          {site.selected_options && site.selected_options.length > 0 && (
-            <div className="border-t border-neutral-100">
-              <div className="px-4 py-3 md:px-5">
-                <p className="text-sm font-bold text-black">Options sélectionnées</p>
-                <p className="mt-1 text-sm text-neutral-600">
-                  {site.selected_options.length} option{site.selected_options.length > 1 ? 's' : ''} associée{site.selected_options.length > 1 ? 's' : ''} à cette commande.
-                </p>
-              </div>
-              <div>
-                {site.selected_options.map((option) => (
-                  <CompactRow
-                    key={`${site.id}-${option.id ?? option.name}`}
-                    title={option.name}
-                    description={`${option.price.toLocaleString('fr-FR')} FCFA`}
-                  />
-                ))}
-              </div>
+                ) : undefined}
+              />
+              <CompactRow
+                title="Domaine"
+                description={site.domain || 'Domaine non renseigné pour ce site.'}
+                meta={site.domain ? <StatusPill tone="success">Configuré</StatusPill> : <StatusPill tone="neutral">En attente</StatusPill>}
+              />
+              <CompactRow
+                title="Prévisualisation"
+                description={previewHref ?? 'Aucune URL de prévisualisation disponible.'}
+                meta={previewHref ? <StatusPill tone="info">Disponible</StatusPill> : <StatusPill tone="neutral">Non publiée</StatusPill>}
+                action={previewHref ? (
+                  <a
+                    href={previewHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Voir la prévisualisation ${siteName} dans un nouvel onglet`}
+                    className="text-sm font-semibold text-black underline underline-offset-4"
+                  >
+                    Voir
+                  </a>
+                ) : undefined}
+              />
+              <CompactRow
+                title="Échéance hébergement"
+                description={hostingExpiryLabel ?? 'Aucune date d’échéance renseignée.'}
+                meta={hostingExpiryLabel ? <StatusPill tone="warning">À surveiller</StatusPill> : <StatusPill tone="neutral">Non renseignée</StatusPill>}
+              />
             </div>
-          )}
-        </ClientPanel>
-      ))}
+
+            {site.selected_options && site.selected_options.length > 0 && (
+              <div className="border-t border-neutral-100">
+                <div className="px-4 py-3 md:px-5">
+                  <p className="text-sm font-bold text-black">Options sélectionnées</p>
+                  <p className="mt-1 text-sm text-neutral-600">
+                    {site.selected_options.length} option{site.selected_options.length > 1 ? 's' : ''} associée{site.selected_options.length > 1 ? 's' : ''} à cette commande.
+                  </p>
+                </div>
+                <div>
+                  {site.selected_options.map((option) => (
+                    <CompactRow
+                      key={`${site.id}-${option.id ?? option.name}`}
+                      title={option.name}
+                      description={`${option.price.toLocaleString('fr-FR')} FCFA`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </ClientPanel>
+        );
+      })}
     </ClientPage>
   );
 }
