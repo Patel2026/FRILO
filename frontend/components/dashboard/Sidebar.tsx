@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, User, LogOut, Globe, X, ArrowRight, Bell, MonitorSmartphone, Users, Wallet, Calendar } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, User, LogOut, Globe, X, Bell, MonitorSmartphone, Users, Wallet, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { authService } from '@/services/auth.service';
 import { notificationsService, NOTIFICATIONS_UPDATED_EVENT } from '@/services/notifications.service';
@@ -71,13 +71,13 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
 
   return (
     <aside className={cn(
-      "fixed inset-y-0 left-0 z-50 flex min-h-screen w-72 flex-shrink-0 flex-col overflow-y-auto border-r border-neutral-200 bg-[oklch(96.8%_0.004_95)] transition-transform duration-200",
+      "fixed inset-y-0 left-0 z-50 flex min-h-screen w-72 flex-shrink-0 flex-col overflow-y-auto border-r border-neutral-200 bg-[#f0f0f1] transition-transform duration-200",
       mobileOpen ? "translate-x-0" : "-translate-x-full",
       "md:static md:w-[232px] md:translate-x-0"
     )}>
 
       {/* Logo */}
-      <div className="relative border-b border-neutral-200 px-6 py-6">
+      <div className="relative border-b border-neutral-200 px-4 py-4">
         <Link href="/" className="text-xl font-black tracking-tight text-neutral-950">
           FRILO
         </Link>
@@ -92,9 +92,15 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         </button>
       </div>
 
+      <div className="border-y border-neutral-200 px-3 py-4">
+        <p className="text-xs font-bold text-neutral-500">Espace actif</p>
+        <p className="mt-1 truncate text-sm font-black text-neutral-950">Suivi FRILO</p>
+        <p className="mt-1 text-xs font-semibold text-[#e11d2e]">Site, commandes et outils</p>
+      </div>
+
       {/* Nav */}
-      <nav className="px-3 py-5">
-        <p className="mb-3 px-3 text-[10px] font-black uppercase tracking-[0.18em] text-neutral-400">Navigation</p>
+      <nav className="px-2 py-3">
+        <p className="mb-2 px-3 text-[10px] font-black uppercase tracking-[0.16em] text-neutral-500">Navigation</p>
         <div className="space-y-0.5">
         {navItems.map(({ href, label, icon: Icon, match }) => {
           const active = match === 'exact' ? pathname === href : pathname.startsWith(href);
@@ -104,10 +110,10 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               href={href}
               onClick={handleClose}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
                 active
-                  ? "bg-neutral-950 text-[oklch(99%_0.004_95)]"
-                  : "text-neutral-500 hover:bg-[oklch(99%_0.004_95)] hover:text-neutral-950"
+                  ? "bg-neutral-950 text-white"
+                  : "text-neutral-600 hover:bg-white hover:text-neutral-950"
               )}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
@@ -122,10 +128,10 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               href="/dashboard/notifications"
               onClick={handleClose}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
                 active
-                  ? "bg-neutral-950 text-[oklch(99%_0.004_95)]"
-                  : "text-neutral-500 hover:bg-[oklch(99%_0.004_95)] hover:text-neutral-950"
+                  ? "bg-neutral-950 text-white"
+                  : "text-neutral-600 hover:bg-white hover:text-neutral-950"
               )}
             >
               <Bell className="w-4 h-4 flex-shrink-0" />
@@ -133,7 +139,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               {unreadCount > 0 && (
                 <span className={cn(
                   "ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-black",
-                  active ? "bg-[oklch(99%_0.004_95)] text-neutral-950" : "bg-[oklch(55%_0.23_29)] text-[oklch(99%_0.004_95)]"
+                  active ? "bg-white text-neutral-950" : "bg-[#e11d2e] text-white"
                 )}>
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
@@ -148,10 +154,10 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               href="/dashboard/echeances"
               onClick={handleClose}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
                 active
-                  ? "bg-neutral-950 text-[oklch(99%_0.004_95)]"
-                  : "text-neutral-500 hover:bg-[oklch(99%_0.004_95)] hover:text-neutral-950"
+                  ? "bg-neutral-950 text-white"
+                  : "text-neutral-600 hover:bg-white hover:text-neutral-950"
               )}
             >
               <Calendar className="w-4 h-4 flex-shrink-0" />
@@ -159,7 +165,7 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               {urgentCount > 0 && (
                 <span className={cn(
                   "ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-black",
-                  active ? "bg-[oklch(99%_0.004_95)] text-neutral-950" : "bg-[oklch(55%_0.23_29)] text-[oklch(99%_0.004_95)]"
+                  active ? "bg-white text-neutral-950" : "bg-[#e11d2e] text-white"
                 )}>
                   {urgentCount > 99 ? '99+' : urgentCount}
                 </span>
@@ -170,26 +176,11 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
         </div>
       </nav>
 
-      <div className="px-3">
-        <Link
-          href="/templates"
-          onClick={handleClose}
-          className="block rounded-2xl border border-neutral-200 bg-[oklch(99%_0.004_95)] p-4 text-neutral-950 transition-colors hover:border-neutral-300"
-        >
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[oklch(55%_0.23_29)]">Action utile</p>
-          <p className="mt-2 text-sm font-black leading-5">Lancer un nouveau site</p>
-          <p className="mt-2 text-xs leading-5 text-neutral-500">Choisissez un modèle, FRILO prépare la suite.</p>
-          <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-neutral-950">
-            Voir les modèles <ArrowRight className="h-3.5 w-3.5" />
-          </span>
-        </Link>
-      </div>
-
       {/* Bottom actions */}
       <div className="mt-auto border-t border-neutral-200 px-3 py-4">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-neutral-500 transition-colors hover:bg-[oklch(99%_0.004_95)] hover:text-neutral-950"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-neutral-600 transition-colors hover:bg-white hover:text-neutral-950"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
           Déconnexion
