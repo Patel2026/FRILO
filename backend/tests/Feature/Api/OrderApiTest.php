@@ -69,6 +69,41 @@ class OrderApiTest extends TestCase
         ])->assertStatus(422);
     }
 
+    public function test_order_creation_snapshots_selected_template_personalization(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $template = $this->createTemplate(price: 50000, isActive: true);
+        $template->update([
+            'color_palettes' => [
+                ['id' => 'clair', 'name' => 'Clair', 'colors' => ['#ffffff', '#111111', '#e60000']],
+                ['id' => 'bleu', 'name' => 'Bleu profond', 'colors' => ['#071a2f', '#f4f8ff', '#9cc9ff']],
+            ],
+            'font_pairings' => [
+                ['id' => 'default', 'name' => 'Police par defaut', 'heading' => 'Inter', 'body' => 'Inter'],
+                ['id' => 'editorial', 'name' => 'Editorial', 'heading' => 'Instrument Serif', 'body' => 'Inter'],
+            ],
+            'default_color_palette' => 'clair',
+            'default_font_pairing' => 'default',
+        ]);
+
+        $response = $this->postJson('/api/orders', [
+            'template_id' => $template->id,
+            'color_palette_id' => 'bleu',
+            'font_pairing_id' => 'editorial',
+        ]);
+
+        $response->assertCreated();
+        $response->assertJsonPath('selected_color_palette.id', 'bleu');
+        $response->assertJsonPath('selected_font_pairing.id', 'editorial');
+
+        $order = Order::findOrFail($response->json('id'));
+
+        $this->assertSame('Bleu profond', $order->selected_color_palette['name']);
+        $this->assertSame('Editorial', $order->selected_font_pairing['name']);
+    }
+
     public function test_orders_index_is_paginated_and_scoped_to_authenticated_user(): void
     {
         $userA = User::factory()->create();

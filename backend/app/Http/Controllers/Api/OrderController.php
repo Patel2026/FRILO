@@ -151,6 +151,8 @@ class OrderController extends Controller
             'paid_at' => optional($order->paid_at)?->toISOString(),
             'price' => (int) $order->price,
             'selected_options' => $selectedOptions,
+            'selected_color_palette' => $order->selected_color_palette,
+            'selected_font_pairing' => $order->selected_font_pairing,
             'created_at' => optional($order->created_at)?->toISOString(),
             'template' => $order->template ? [
                 'id' => $order->template->id,

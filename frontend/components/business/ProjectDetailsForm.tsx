@@ -20,6 +20,7 @@ interface ProjectDetailsFormProps {
   formId?: string;
   showSubmit?: boolean;
   submitLabel?: string;
+  selectedStyleLabel?: string;
 }
 
 const inputClass = "w-full rounded-lg border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-950 outline-none transition-colors placeholder:text-slate-300 focus:border-slate-950";
@@ -32,6 +33,7 @@ export function ProjectDetailsForm({
   formId,
   showSubmit = true,
   submitLabel = 'Valider et continuer',
+  selectedStyleLabel,
 }: ProjectDetailsFormProps) {
   const { register, handleSubmit, formState: { errors } } = useForm<ProjectDetails>({
     resolver: zodResolver(projectSchema),
@@ -64,15 +66,10 @@ export function ProjectDetailsForm({
           {errors.domainName && <p className="text-red-500 text-xs mt-1.5">{errors.domainName.message}</p>}
         </div>
         <div>
-          <label className={labelClass}>Style ou couleurs <span className="font-normal normal-case tracking-normal text-slate-400">(optionnel)</span></label>
-          <input
-            {...register('colors', {
-              onChange: syncFieldChange('colors'),
-            })}
-            type="text"
-            placeholder="Sobre, noir et rouge, doré..."
-            className={inputClass}
-          />
+          <p className={labelClass}>Style sélectionné</p>
+          <div className="min-h-[49px] rounded-lg border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold text-slate-700">
+            {selectedStyleLabel || 'Style par défaut FRILO'}
+          </div>
         </div>
       </div>
 
@@ -99,11 +96,6 @@ export function ProjectDetailsForm({
           placeholder="Nom de domaine existant, page importante, préférence de langue, contact à afficher..."
           className={`${inputClass} resize-none`}
         />
-      </div>
-
-      <div className="border-l-2 border-slate-950 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-        <p className="font-black text-slate-950">Vous pouvez commencer avec l’essentiel.</p>
-        <p className="mt-1">Après paiement, FRILO récupère les images, le logo et les derniers contenus avec vous.</p>
       </div>
 
       {showSubmit && <div className="flex justify-end pt-2">

@@ -3,23 +3,33 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowLeft, Check, Heart, MessageSquare, Monitor, Scale, Smartphone, Star, Tablet } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ExternalLink, MessageSquare, Monitor, Paintbrush, Smartphone, Star, Tablet, Type } from 'lucide-react';
 import { TestimonialCard } from '@/components/business/TestimonialCard';
-import {
-  PublicBenefitStrip,
-  PublicFinalCta,
-  PublicPageShell,
-  PublicSplitSection,
-} from '@/components/public/PublicPageShell';
-import { PUBLIC_PAGE_TEXT } from '@/components/public/publicPageCopy';
+import { PublicPageShell } from '@/components/public/PublicPageShell';
 import { useAuthState } from '@/hooks/useAuthState';
 import { businessService, Template, TemplateReview, TemplateReviewEligibility, TemplateReviewSummary } from '@/services/business.service';
 import { cn } from '@/lib/utils';
 import { buildPreviewUrl, hasLivePreview, parsePreviewGallery, parsePreviewPages } from '@/lib/templatePreview';
+import {
+  buildOrderUrl,
+  buildTemplatePreviewUrl,
+  resolveDefaultFontPairingId,
+  resolveDefaultPaletteId,
+  resolveTemplateFontPairings,
+  resolveTemplatePalettes,
+} from '@/lib/templatePersonalization';
 import { trackFunnelEvent } from '@/lib/analytics';
-import { useTemplateCollections } from '@/hooks/useTemplateCollections';
 import axios from 'axios';
+
+const SECTOR_FALLBACK_IMAGES: Record<string, string> = {
+  restaurants: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80',
+  btp: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80',
+  sante: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1600&q=80',
+  avocats: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1600&q=80',
+  coaching: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1600&q=80',
+  immobilier: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=80',
+  accompagnement: '/image/client-satisfait-frilo.jpg',
+};
 
 export default function TemplateDetailPage() {
   const params = useParams();
@@ -39,16 +49,9 @@ export default function TemplateDetailPage() {
   const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [activePreviewPath, setActivePreviewPath] = useState('/');
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
-  const [compareNotice, setCompareNotice] = useState<string | null>(null);
-
-  const {
-    isFavorite,
-    isCompared,
-    toggleFavorite,
-    toggleCompare,
-    maxCompareItems,
-    compareIds,
-  } = useTemplateCollections();
+  const [selectedPaletteId, setSelectedPaletteId] = useState('');
+  const [selectedFontPairingId, setSelectedFontPairingId] = useState('');
+  const [recommendedTemplates, setRecommendedTemplates] = useState<Template[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -64,8 +67,30 @@ export default function TemplateDetailPage() {
         setTemplateReviews(reviewsResponse.data);
         setReviewsSummary(reviewsResponse.summary);
         const pages = parsePreviewPages(templateData.preview_pages);
+        const palettes = resolveTemplatePalettes(templateData);
+        const fontPairings = resolveTemplateFontPairings(templateData);
         setActivePreviewPath(pages[0]?.path ?? '/');
         setActiveGalleryIndex(0);
+        setSelectedPaletteId(resolveDefaultPaletteId(templateData, palettes));
+        setSelectedFontPairingId(resolveDefaultFontPairingId(templateData, fontPairings));
+
+        const sectorSlug = templateData.sector?.slug;
+        businessService.getTemplates(sectorSlug)
+          .then(async (sectorTemplates) => {
+            const related = sectorTemplates.filter((item) => item.id !== templateData.id);
+
+            if (related.length >= 3 || !sectorSlug) {
+              setRecommendedTemplates(related.slice(0, 3));
+              return;
+            }
+
+            const allTemplates = await businessService.getTemplates();
+            const fallback = allTemplates
+              .filter((item) => item.id !== templateData.id && !related.some((relatedItem) => relatedItem.id === item.id))
+              .slice(0, 3 - related.length);
+            setRecommendedTemplates([...related, ...fallback].slice(0, 3));
+          })
+          .catch(() => setRecommendedTemplates([]));
       })
       .catch(() => {
         setTemplate(null);
@@ -120,15 +145,6 @@ export default function TemplateDetailPage() {
   }, [template]);
 
   useEffect(() => {
-    if (!compareNotice) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => setCompareNotice(null), 3000);
-    return () => window.clearTimeout(timeoutId);
-  }, [compareNotice]);
-
-  useEffect(() => {
     if (!reviewNotice) {
       return;
     }
@@ -158,27 +174,25 @@ export default function TemplateDetailPage() {
 
   const previewPages = parsePreviewPages(template.preview_pages);
   const previewGallery = parsePreviewGallery(template.preview_gallery);
+  const colorPalettes = resolveTemplatePalettes(template);
+  const fontPairings = resolveTemplateFontPairings(template);
+  const selectedPalette = colorPalettes.find((palette) => palette.id === selectedPaletteId) ?? colorPalettes[0];
+  const selectedFontPairing = fontPairings.find((pairing) => pairing.id === selectedFontPairingId) ?? fontPairings[0];
+  const selectedColors = selectedPalette?.colors?.slice(0, 4) ?? [];
+  const orderUrl = buildOrderUrl(template.id, selectedPalette?.id, selectedFontPairing?.id);
+  const previewUrl = buildTemplatePreviewUrl(template.id, selectedPalette?.id, selectedFontPairing?.id);
   const livePreviewEnabled = hasLivePreview(template.preview_url);
   const selectedPreviewPath = previewPages.length > 0 ? activePreviewPath || previewPages[0].path : '/';
   const iframeSrc = livePreviewEnabled && template.preview_url
-    ? buildPreviewUrl(template.preview_url, selectedPreviewPath)
+    ? buildPreviewUrl(template.preview_url, selectedPreviewPath, {
+      palette: selectedPalette?.id,
+      font: selectedFontPairing?.id,
+    })
     : null;
   const canBrowseGallery = !livePreviewEnabled && previewGallery.length > 1;
   const galleryImage = previewGallery[activeGalleryIndex] ?? previewGallery[0] ?? null;
+  const primaryPreviewImage = galleryImage ?? template.full_thumbnail_url ?? getSectorFallbackImage(template.sector?.slug);
   const price = typeof template.price === 'string' ? parseInt(template.price) : template.price;
-  const targetAudience = Array.isArray(template.target_audience) ? template.target_audience : [];
-  const includedItems = Array.isArray(template.included_features) ? template.included_features : [];
-  const visibleFeatures = targetAudience.slice(0, 4);
-  const includedPreview = includedItems.slice(0, 6);
-  const favoriteActive = isFavorite(template.id);
-  const comparedActive = isCompared(template.id);
-
-  const handleToggleCompare = () => {
-    const result = toggleCompare(template.id);
-    if (result === 'max_reached') {
-      setCompareNotice(`Vous pouvez comparer jusqu'à ${maxCompareItems} modèles.`);
-    }
-  };
 
   const refreshReviewData = async () => {
     if (!id) {
@@ -228,8 +242,8 @@ export default function TemplateDetailPage() {
   };
 
   return (
-    <PublicPageShell className="pb-24 lg:pb-0">
-      <div className="fixed left-0 right-0 top-0 z-50 border-b border-black/10 bg-[#f7f4ec]/95 backdrop-blur">
+    <PublicPageShell className="bg-white pb-24 lg:pb-0">
+      <div className="fixed left-0 right-0 top-0 z-50 border-b border-black/10 bg-white">
         <div className="flex h-16 items-center gap-4 px-4 md:px-6">
           <Link
             href={template.sector ? `/secteurs/${template.sector.slug}` : '/templates'}
@@ -286,7 +300,7 @@ export default function TemplateDetailPage() {
             </div>
 
             <Link
-              href={`/commande?templateId=${template.id}`}
+              href={orderUrl}
               className="hidden rounded-full bg-black px-5 py-2.5 text-sm font-black text-white transition-colors hover:bg-[#e60000] lg:inline-flex"
               onClick={() =>
                 trackFunnelEvent('start_order', {
@@ -303,36 +317,30 @@ export default function TemplateDetailPage() {
       </div>
 
       <main className="pt-16">
-        <section className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-[minmax(0,1fr)_420px]">
+        <section className="grid min-h-[calc(100vh-4rem)] bg-white lg:grid-cols-[minmax(0,1fr)_410px]" style={{ backgroundColor: '#fff' }}>
           <div className="relative order-2 flex items-center justify-center border-b border-black/10 bg-white px-4 py-6 md:px-8 lg:order-1 lg:border-b-0 lg:border-r lg:py-8">
             <div
               className={cn(
-                'relative overflow-hidden bg-white shadow-[0_24px_70px_rgba(15,23,42,0.12)] transition-all duration-300',
-                viewMode === 'desktop' && 'h-[320px] w-full max-w-5xl border border-black/15 md:h-[560px] lg:h-[min(70vh,760px)]',
-                viewMode === 'tablet' && 'h-[560px] w-full max-w-[760px] rounded-[1.8rem] border-[10px] border-black md:h-[720px] md:w-[560px] lg:h-[min(70vh,760px)] lg:w-[min(760px,80%)]',
-                viewMode === 'mobile' && 'h-[520px] w-[290px] rounded-[2.2rem] border-[10px] border-black md:h-[680px] md:w-[360px]'
+                'relative overflow-hidden bg-white transition-all duration-300',
+                viewMode === 'desktop' && 'h-[360px] w-full max-w-5xl border border-black/15 md:h-[600px] lg:h-[min(76vh,780px)]',
+                viewMode === 'tablet' && 'h-[560px] w-full max-w-[760px] rounded-2xl border-[10px] border-black md:h-[720px] md:w-[560px] lg:h-[min(76vh,780px)] lg:w-[min(760px,82%)]',
+                viewMode === 'mobile' && 'h-[520px] w-[290px] rounded-[1.75rem] border-[10px] border-black md:h-[680px] md:w-[360px]'
               )}
+              style={{ outlineColor: selectedColors[2] ?? undefined }}
             >
               {iframeSrc ? (
                 <iframe src={iframeSrc} className="h-full w-full" title={`Aperçu interactif ${template.name}`} />
-              ) : galleryImage ? (
+              ) : primaryPreviewImage ? (
                 <div
                   className="h-full w-full bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${galleryImage})` }}
-                />
-              ) : template.full_thumbnail_url ? (
-                <Image
-                  src={template.full_thumbnail_url}
-                  alt={template.name}
-                  fill
-                  sizes={viewMode === 'desktop' ? '70vw' : '360px'}
-                  className="object-cover object-top"
+                  style={{ backgroundImage: `url(${primaryPreviewImage})` }}
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-slate-100">
-                  <div className="text-center">
-                    <Monitor className="mx-auto mb-3 h-12 w-12 text-slate-300" />
-                    <p className="text-sm text-slate-400">Aperçu non disponible</p>
+                <div className="flex h-full w-full items-center justify-center bg-white">
+                  <div className="max-w-xs text-center">
+                    <Monitor className="mx-auto mb-4 h-12 w-12 text-black/25" />
+                    <p className="text-lg font-black text-black">Aperçu en préparation</p>
+                    <p className="mt-2 text-sm leading-6 text-black/55">Le visuel principal sera visible dès qu’une image ou une démo sera associée à ce modèle.</p>
                   </div>
                 </div>
               )}
@@ -358,37 +366,30 @@ export default function TemplateDetailPage() {
             )}
           </div>
 
-          <aside className="order-1 bg-[#f7f4ec] px-6 py-7 md:px-8 lg:order-2 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
-            <div className="space-y-6 lg:space-y-7">
-              <div>
+          <aside className="order-1 bg-white px-6 py-5 md:px-8 lg:order-2 lg:sticky lg:top-16 lg:self-start" style={{ backgroundColor: '#fff' }}>
+            <div className="space-y-5">
+              <div className="border-b border-black/10 pb-5">
+                <Link href="/templates" className="mb-5 inline-flex items-center gap-2 text-sm font-black text-black/55 transition-colors hover:text-black lg:hidden">
+                  <ArrowLeft className="h-4 w-4" />
+                  Tous les modèles
+                </Link>
                 {template.sector && (
-                  <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">
+                  <p className="mb-3 text-sm font-black text-[#2563eb]">
                     {template.sector.name}
                   </p>
                 )}
-                <h1 className="text-balance break-words text-4xl font-black leading-none text-black md:text-5xl">
+                <h1 className="text-balance break-words text-4xl font-black leading-[0.95] tracking-[-0.03em] text-black md:text-[3.05rem]">
                   {template.name}
                 </h1>
-                <p className="mt-4 text-base leading-7 text-black/62">
+                <p className="mt-4 text-base leading-7 text-black/65">
                   {template.description}
                 </p>
               </div>
 
-              <div className="border-y border-black bg-white p-5">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-black/40">Prix du modèle</p>
-                <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-4xl font-black tracking-tight text-black">
-                    {price.toLocaleString('fr-FR')}
-                  </span>
-                  <span className="text-sm font-semibold text-black/40">FCFA</span>
-                </div>
-                <p className="mt-2 text-sm text-black/62">Paiement unique, livraison sous 48h après réception des contenus.</p>
-              </div>
-
               <div className="grid gap-3">
                 <Link
-                  href={`/commande?templateId=${template.id}`}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-black px-7 py-4 text-sm font-black text-white transition-colors hover:bg-[#e60000]"
+                  href={orderUrl}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-black px-7 py-4 text-sm font-black text-white transition-colors hover:bg-[#e60000] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                   onClick={() =>
                     trackFunnelEvent('start_order', {
                       template_id: template.id,
@@ -397,132 +398,270 @@ export default function TemplateDetailPage() {
                     })
                   }
                 >
-                  Commander ce modèle
+                  Choisir ce modèle
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
                 <div className="grid grid-cols-2 gap-3">
-                  {livePreviewEnabled && (
-                    <Link
-                      href={`/templates/${template.id}/preview`}
-                      className="inline-flex items-center justify-center rounded-full border border-black/15 px-4 py-3 text-sm font-black text-black transition-colors hover:border-black"
-                      onClick={() =>
-                        trackFunnelEvent('open_preview', {
-                          template_id: template.id,
-                          template_name: template.name,
-                          source: 'template_detail_sidebar',
-                        })
-                      }
-                    >
-                      Démo
-                    </Link>
-                  )}
                   <Link
-                    href="/contact"
+                    href={previewUrl}
                     className={cn(
-                      'inline-flex items-center justify-center rounded-full border border-black/15 px-4 py-3 text-sm font-black text-black transition-colors hover:border-black',
+                      'inline-flex items-center justify-center gap-2 rounded-full border border-black/15 px-4 py-3 text-sm font-black text-black transition-colors hover:border-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2',
                       !livePreviewEnabled && 'col-span-2'
                     )}
+                    onClick={() =>
+                      trackFunnelEvent('open_preview', {
+                        template_id: template.id,
+                        template_name: template.name,
+                        source: 'template_detail_sidebar',
+                      })
+                    }
                   >
-                    Question
+                    Voir l’aperçu
+                    <ExternalLink className="h-4 w-4" />
                   </Link>
+                  {livePreviewEnabled && (
+                    <Link
+                      href="/contact"
+                      className="inline-flex items-center justify-center rounded-full border border-black/15 px-4 py-3 text-sm font-black text-black transition-colors hover:border-black focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                    >
+                      Question
+                    </Link>
+                  )}
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => toggleFavorite(template.id)}
-                  aria-pressed={favoriteActive}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black transition-colors',
-                    favoriteActive ? 'border-black bg-black text-white' : 'border-black/15 text-black/62 hover:border-black hover:text-black'
-                  )}
-                >
-                  <Heart className={cn('h-3.5 w-3.5', favoriteActive ? 'fill-white' : '')} />
-                  {favoriteActive ? 'Favori' : 'Favoris'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleToggleCompare}
-                  aria-pressed={comparedActive}
-                  className={cn(
-                    'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black transition-colors',
-                    comparedActive ? 'border-black bg-black text-white' : 'border-black/15 text-black/62 hover:border-black hover:text-black'
-                  )}
-                >
-                  <Scale className="h-3.5 w-3.5" />
-                  {comparedActive ? 'Comparé' : `Comparer ${compareIds.length}/${maxCompareItems}`}
-                </button>
-                <Link href="/templates/compare" className="inline-flex items-center rounded-full border border-black/15 px-4 py-2 text-xs font-black text-black/62 transition-colors hover:border-black hover:text-black">
-                  Comparaison
-                </Link>
+              <div className="grid grid-cols-2 border-y border-black">
+                <div className="border-r border-black/10 py-4 pr-4">
+                  <p className="text-xs font-black text-black/45">Prix</p>
+                  <p className="mt-1 text-2xl font-black tracking-[-0.02em] text-black">
+                    {price.toLocaleString('fr-FR')} FCFA
+                  </p>
+                </div>
+                <div className="py-4 pl-4">
+                  <p className="text-xs font-black text-black/45">Livraison</p>
+                  <p className="mt-1 text-2xl font-black tracking-[-0.02em] text-black">48h</p>
+                </div>
               </div>
 
-              {visibleFeatures.length > 0 && (
-                <div>
-                  <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-black/40">Pensé pour</p>
-                  <div className="grid gap-2">
-                    {visibleFeatures.map((feature) => (
-                      <div key={feature} className="flex items-center gap-3 bg-white px-4 py-3 text-sm font-semibold text-black/70">
-                        <Check className="h-4 w-4 rounded-full bg-black p-0.5 text-white" />
-                        <span>{feature}</span>
-                      </div>
+              <div className="grid gap-3 border-y border-black py-4">
+                <a
+                  href="#style-options"
+                  className="group flex items-center justify-between gap-4 border-b border-black/10 pb-3 text-sm font-black text-black transition-colors hover:text-[#2563eb] focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                >
+                  <span>
+                    Style modifiable
+                    <span className="mt-1 block text-xs font-semibold leading-5 text-black/55 group-hover:text-[#2563eb]">
+                      Ajustez les couleurs et la typographie avant commande.
+                    </span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" />
+                </a>
+                <a href="#style-options" className="group grid gap-3 text-left">
+                  <span className="flex items-center justify-between gap-4">
+                    <span className="flex items-center gap-2 text-sm font-black text-black">
+                      <Paintbrush className="h-4 w-4 text-black/45" />
+                      Couleurs
+                    </span>
+                    <span className="text-xs font-black text-black/45 group-hover:text-black">Modifier</span>
+                  </span>
+                  <span className="grid h-10 grid-cols-4 overflow-hidden border border-black/10">
+                    {selectedColors.map((color, index) => (
+                      <span key={`${selectedPalette?.id}-${color}-${index}`} style={{ backgroundColor: color }} />
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {includedPreview.length > 0 && (
-              <div className="hidden sm:block">
-                <p className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-black/40">Inclus</p>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-black/62">
-                  {includedPreview.map((item) => (
-                    <div key={item} className="flex items-start gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-black" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
+                  </span>
+                  <span className="text-sm font-black text-black/65">{selectedPalette?.name}</span>
+                </a>
+                <a href="#style-options" className="group border-t border-black/10 pt-3">
+                  <span className="flex items-center justify-between gap-4">
+                    <span className="flex items-center gap-2 text-sm font-black text-black">
+                      <Type className="h-4 w-4 text-black/45" />
+                      Typographie
+                    </span>
+                    <span className="text-xs font-black text-black/45 group-hover:text-black">Modifier</span>
+                  </span>
+                  <span className="mt-2 block text-sm font-black text-black/65">
+                    {selectedFontPairing?.name}
+                  </span>
+                  <span className="mt-1 block text-xs text-black/50">
+                    {selectedFontPairing?.heading || 'Titre'} + {selectedFontPairing?.body || 'Texte'}
+                  </span>
+                </a>
               </div>
-              )}
 
-              <div className="bg-black p-5 text-white">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-white/50">Après commande</p>
-                <p className="mt-3 text-lg font-black leading-snug">FRILO vous demande seulement les contenus utiles, puis adapte le modèle à votre activité.</p>
-              </div>
             </div>
           </aside>
         </section>
 
-        <PublicBenefitStrip
-          className="py-10"
-          items={[
-            {
-              title: 'Pensé pour',
-              description: visibleFeatures.length > 0 ? visibleFeatures.join(' · ') : 'Les profils clients adaptés apparaîtront ici.',
-            },
-            {
-              title: 'Inclus',
-              description: includedPreview.length > 0 ? includedPreview.join(' · ') : 'Les éléments inclus apparaîtront ici.',
-            },
-            {
-              title: 'Adapté par FRILO',
-              description: 'Vos textes, photos, contacts et liens remplacent les exemples du modèle.',
-            },
-          ]}
-        />
+        <section id="style-options" className="border-t border-black/10 bg-white px-6 py-12 md:px-8 md:py-16">
+          <div className="mx-auto grid max-w-[1360px] gap-10 lg:grid-cols-[360px_minmax(0,1fr)]">
+            <div>
+              <h2 className="text-balance text-4xl font-black leading-[0.98] tracking-[-0.03em] text-black md:text-5xl">
+                Ajustez le style avant de commander.
+              </h2>
+              <p className="mt-5 max-w-sm text-base leading-7 text-black/62">
+                Choisissez une direction visuelle. FRILO garde cette préférence pendant la commande et adapte le rendu final.
+              </p>
+            </div>
 
-        <PublicSplitSection
-          title={PUBLIC_PAGE_TEXT.templateDetail.reassuranceTitle}
-          description={PUBLIC_PAGE_TEXT.templateDetail.reassuranceDescription}
-        >
-          <div className="grid gap-0 border-y border-black bg-white">
-            {['Pages adaptées', 'Version mobile vérifiée', 'Contacts visibles', 'Lien livré'].map((item) => (
-              <div key={item} className="border-b border-black/10 px-5 py-4 text-sm font-black last:border-b-0">
-                {item}
+            <div className="grid gap-8">
+              <div>
+                <div className="mb-4 flex items-center gap-2">
+                  <Paintbrush className="h-4 w-4 text-black/45" />
+                  <p className="text-sm font-black text-black">Palettes de couleurs</p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {colorPalettes.map((palette) => {
+                    const active = palette.id === selectedPalette?.id;
+                    const colors = palette.colors?.slice(0, 4) ?? [];
+
+                    return (
+                      <button
+                        type="button"
+                        key={palette.id}
+                        data-testid={`template-palette-${palette.id}`}
+                        onPointerDown={() => setSelectedPaletteId(palette.id)}
+                        onClick={() => setSelectedPaletteId(palette.id)}
+                        aria-pressed={active}
+                        className={cn(
+                          'min-w-0 border p-3 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2',
+                          active ? 'border-black bg-black text-white' : 'border-black/10 bg-white text-black hover:border-black'
+                        )}
+                      >
+                        <span className="grid h-16 grid-cols-4 overflow-hidden border border-black/10">
+                          {colors.map((color, index) => (
+                            <span
+                              key={`${palette.id}-${color}-${index}`}
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </span>
+                        <span className="mt-3 flex items-center justify-between gap-3">
+                          <span className="truncate text-sm font-black">{palette.name}</span>
+                          <span className={cn(
+                            'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
+                            active ? 'border-white bg-white text-black' : 'border-black/20 text-transparent'
+                          )}>
+                            <Check className="h-3.5 w-3.5" />
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            ))}
+
+              <div className="border-t border-black/10 pt-8">
+                <div className="mb-4 flex items-center gap-2">
+                  <Type className="h-4 w-4 text-black/45" />
+                  <p className="text-sm font-black text-black">Packs de polices</p>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {fontPairings.map((pairing) => {
+                    const active = pairing.id === selectedFontPairing?.id;
+
+                    return (
+                      <button
+                        type="button"
+                        key={pairing.id}
+                        data-testid={`template-font-${pairing.id}`}
+                        onPointerDown={() => setSelectedFontPairingId(pairing.id)}
+                        onClick={() => setSelectedFontPairingId(pairing.id)}
+                        aria-pressed={active}
+                        className={cn(
+                          'border p-5 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2',
+                          active ? 'border-black bg-black text-white' : 'border-black/10 bg-white text-black hover:border-black'
+                        )}
+                      >
+                        <span className="flex items-start justify-between gap-4">
+                          <span>
+                            <span className="block text-sm font-black">{pairing.name}</span>
+                            <span className={cn('mt-1 block text-xs', active ? 'text-white/60' : 'text-black/50')}>
+                              {pairing.heading || 'Titre'} + {pairing.body || 'Texte'}
+                            </span>
+                          </span>
+                          <span className={cn(
+                            'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
+                            active ? 'border-white bg-white text-black' : 'border-black/20 text-transparent'
+                          )}>
+                            <Check className="h-3.5 w-3.5" />
+                          </span>
+                        </span>
+                        <span className={cn('mt-6 block border-t pt-4', active ? 'border-white/20' : 'border-black/10')}>
+                          <span className="block text-3xl font-black leading-none tracking-[-0.03em]">Titre du site</span>
+                          <span className={cn('mt-3 block max-w-sm text-sm leading-6', active ? 'text-white/65' : 'text-black/55')}>
+                            Une phrase claire pour présenter l’activité, les services et le contact.
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
-        </PublicSplitSection>
+        </section>
+
+        {recommendedTemplates.length > 0 && (
+          <section className="bg-[#f7f8f8] px-6 py-12 md:px-8 md:py-16">
+            <div className="mx-auto max-w-[1360px]">
+              <div className="mb-8 flex flex-col gap-4 border-b border-black pb-6 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <h2 className="text-balance text-4xl font-black leading-[0.98] tracking-[-0.03em] text-black md:text-5xl">
+                    Autres modèles proches.
+                  </h2>
+                  <p className="mt-4 max-w-2xl text-base leading-7 text-black/62">
+                    Comparez rapidement quelques bases avant de passer commande.
+                  </p>
+                </div>
+                <Link href="/templates" className="inline-flex w-fit items-center justify-center rounded-full border border-black px-5 py-3 text-sm font-black text-black transition-colors hover:bg-black hover:text-white">
+                  Tout le catalogue
+                </Link>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-3">
+                {recommendedTemplates.map((item) => {
+                  const image = getTemplateImage(item);
+                  const itemPrice = typeof item.price === 'string' ? parseInt(item.price, 10) : item.price;
+
+                  return (
+                    <article key={item.id} className="group flex min-h-full flex-col bg-white">
+                      <Link href={`/templates/${item.id}`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
+                        {image ? (
+                          <div
+                            aria-label={item.name}
+                            role="img"
+                            className="h-full w-full bg-cover bg-center transition-transform duration-200 group-hover:scale-[1.02]"
+                            style={{ backgroundImage: `url(${image})` }}
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-black/35">
+                            <Monitor className="h-10 w-10" />
+                          </div>
+                        )}
+                      </Link>
+                      <div className="flex flex-1 flex-col border-x border-b border-black/10 p-5">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            {item.sector && <p className="text-sm font-black text-[#2563eb]">{item.sector.name}</p>}
+                            <h3 className="mt-2 text-2xl font-black tracking-[-0.02em] text-black">{item.name}</h3>
+                          </div>
+                          <p className="shrink-0 rounded-full bg-black px-3 py-2 text-xs font-black text-white">
+                            {itemPrice.toLocaleString('fr-FR')} FCFA
+                          </p>
+                        </div>
+                        <p className="mt-4 line-clamp-2 text-base leading-7 text-black/62">{item.description}</p>
+                        <Link href={`/templates/${item.id}`} className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-black text-black">
+                          Voir le modèle
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section id="template-reviews" className="border-t border-black/10 bg-white px-6 py-12 md:px-8 md:py-16">
           <div className="mx-auto grid max-w-[1360px] gap-8 lg:grid-cols-[360px_minmax(0,1fr)]">
@@ -638,7 +777,7 @@ export default function TemplateDetailPage() {
                     <p className="text-sm text-slate-500">
                       {reviewEligibility?.message || 'Vous devez avoir acheté ce modèle pour laisser un avis.'}
                     </p>
-                    <Link href={`/commande?templateId=${template.id}`} className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white">
+                    <Link href={orderUrl} className="inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white">
                       Commander
                     </Link>
                   </div>
@@ -649,13 +788,6 @@ export default function TemplateDetailPage() {
         </section>
       </main>
 
-      <PublicFinalCta
-        title={`Prêt à partir de ${template.name} ?`}
-        description="Passez commande, ajoutez vos informations, puis FRILO prépare votre site."
-        href={`/commande?templateId=${template.id}`}
-        label="Commander ce modèle"
-      />
-
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white/95 backdrop-blur lg:hidden">
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="min-w-0">
@@ -663,7 +795,7 @@ export default function TemplateDetailPage() {
             <p className="truncate text-sm font-black text-black">{price.toLocaleString('fr-FR')} FCFA</p>
           </div>
           <Link
-            href={`/commande?templateId=${template.id}`}
+            href={orderUrl}
             className="inline-flex flex-1 items-center justify-center rounded-full bg-black px-4 py-3 text-sm font-black text-white"
             onClick={() =>
               trackFunnelEvent('start_order', {
@@ -678,11 +810,18 @@ export default function TemplateDetailPage() {
         </div>
       </div>
 
-      {compareNotice && (
-        <div className="fixed bottom-24 right-4 z-50 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-          <p className="text-sm text-amber-800">{compareNotice}</p>
-        </div>
-      )}
     </PublicPageShell>
   );
+}
+
+function getTemplateImage(template: Template): string {
+  return parsePreviewGallery(template.preview_gallery)[0] || template.full_thumbnail_url || getSectorFallbackImage(template.sector?.slug);
+}
+
+function getSectorFallbackImage(slug?: string | null): string {
+  if (!slug) {
+    return '/image/client-satisfait-frilo.jpg';
+  }
+
+  return SECTOR_FALLBACK_IMAGES[slug] || '/image/client-satisfait-frilo.jpg';
 }

@@ -58,7 +58,7 @@ export function parsePreviewGallery(value: unknown): string[] {
     return [];
 }
 
-export function buildPreviewUrl(baseUrl: string, path: string): string {
+export function buildPreviewUrl(baseUrl: string, path: string, params: Record<string, string | undefined> = {}): string {
     try {
         if (/^https?:\/\//i.test(path)) {
             return path;
@@ -72,14 +72,18 @@ export function buildPreviewUrl(baseUrl: string, path: string): string {
 
         if (!path || path === '/') {
             if (isExternalBase) {
+                applyPreviewParams(base, params);
                 return base.toString();
             }
 
             if (/\.[a-z0-9]+$/i.test(base.pathname)) {
+                applyPreviewParams(base, params);
                 return `${base.pathname}${base.search}${base.hash}`;
             }
 
-            return `${base.pathname.endsWith('/') ? base.pathname : `${base.pathname}/`}index.html`;
+            base.pathname = `${base.pathname.endsWith('/') ? base.pathname : `${base.pathname}/`}index.html`;
+            applyPreviewParams(base, params);
+            return `${base.pathname}${base.search}${base.hash}`;
         }
 
         if (path.startsWith('/')) {
@@ -87,13 +91,21 @@ export function buildPreviewUrl(baseUrl: string, path: string): string {
                 base.pathname = path;
                 base.search = '';
                 base.hash = '';
+                applyPreviewParams(base, params);
                 return base.toString();
+            }
+
+            if (Object.values(params).some(Boolean)) {
+                const localUrl = new URL(path, 'https://preview.local');
+                applyPreviewParams(localUrl, params);
+                return `${localUrl.pathname}${localUrl.search}${localUrl.hash}`;
             }
 
             return path;
         }
 
         const resolved = new URL(path, base);
+        applyPreviewParams(resolved, params);
 
         return isExternalBase
             ? resolved.toString()
@@ -101,6 +113,14 @@ export function buildPreviewUrl(baseUrl: string, path: string): string {
     } catch {
         return baseUrl;
     }
+}
+
+function applyPreviewParams(url: URL, params: Record<string, string | undefined>): void {
+    Object.entries(params).forEach(([key, value]) => {
+        if (value) {
+            url.searchParams.set(key, value);
+        }
+    });
 }
 
 export function hasLivePreview(previewUrl: string | undefined | null): boolean {

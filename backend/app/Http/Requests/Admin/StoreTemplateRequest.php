@@ -28,6 +28,10 @@ class StoreTemplateRequest extends FormRequest
             'preview_url' => ['nullable', 'string', 'max:500'],
             'preview_pages_raw' => ['nullable', 'string'],
             'preview_gallery_raw' => ['nullable', 'string'],
+            'color_palettes_raw' => ['nullable', 'string'],
+            'font_pairings_raw' => ['nullable', 'string'],
+            'default_color_palette' => ['nullable', 'string', 'max:80'],
+            'default_font_pairing' => ['nullable', 'string', 'max:80'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

@@ -27,6 +27,10 @@ class Template extends Model
         'preview_url',
         'preview_pages',
         'preview_gallery',
+        'color_palettes',
+        'font_pairings',
+        'default_color_palette',
+        'default_font_pairing',
         'is_active',
     ];
 
@@ -36,6 +40,8 @@ class Template extends Model
         'included_features' => 'array',
         'preview_pages' => 'array',
         'preview_gallery' => 'array',
+        'color_palettes' => 'array',
+        'font_pairings' => 'array',
         'is_active' => 'boolean',
         'price' => 'integer',
         'normal_price' => 'integer',

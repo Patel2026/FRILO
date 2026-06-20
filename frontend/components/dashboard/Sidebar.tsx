@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, ShoppingBag, User, LogOut, Globe, X, Bell, MonitorSmartphone, Users, Wallet, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { authService } from '@/services/auth.service';
 import { notificationsService, NOTIFICATIONS_UPDATED_EVENT } from '@/services/notifications.service';
 import { deadlinesService } from '@/services/deadlines.service';
@@ -78,8 +79,8 @@ export function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
 
       {/* Logo */}
       <div className="relative border-b border-neutral-200 px-4 py-4">
-        <Link href="/" className="text-xl font-black tracking-tight text-neutral-950">
-          FRILO
+        <Link href="/" className="inline-flex w-[104px] transition-opacity hover:opacity-80" aria-label="Accueil FRILO">
+          <BrandLogo variant="dark" priority />
         </Link>
         <p className="mt-1 text-[10px] font-black uppercase tracking-[0.18em] text-neutral-400">Espace client</p>
         <button

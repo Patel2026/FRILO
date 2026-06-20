@@ -1,16 +1,25 @@
 "use client"
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import axios from 'axios';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { authService, loginSchema, LoginCredentials } from '@/services/auth.service';
 
-export default function LoginPage() {
+function getSafeNextPath(next: string | null) {
+  if (!next || !next.startsWith('/') || next.startsWith('//')) return '/dashboard';
+
+  return next;
+}
+
+function LoginPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = getSafeNextPath(searchParams.get('next'));
   const [error, setError] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginCredentials>({
@@ -32,7 +41,7 @@ export default function LoginPage() {
       if (!isMounted) return;
 
       if (user) {
-        router.replace('/dashboard');
+        router.replace(nextPath);
         return;
       }
 
@@ -47,13 +56,13 @@ export default function LoginPage() {
     return () => {
       isMounted = false;
     };
-  }, [router]);
+  }, [nextPath, router]);
 
   const onSubmit = async (data: LoginCredentials) => {
     setError(null);
     try {
       await authService.login(data);
-      router.push('/dashboard');
+      router.push(nextPath);
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 422) {
         setError('Email ou mot de passe incorrect.');
@@ -76,7 +85,9 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen bg-white">
       <div className="hidden bg-[oklch(7%_0.006_29)] p-16 text-white lg:flex lg:w-1/2 lg:flex-col lg:justify-between">
-        <Link href="/" className="text-2xl font-black tracking-tight">FRILO</Link>
+        <Link href="/" className="inline-flex w-[118px] transition-opacity hover:opacity-80" aria-label="Accueil FRILO">
+          <BrandLogo variant="light" priority />
+        </Link>
         <div>
           <p className="mb-5 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Espace client</p>
           <h2 className="max-w-xl text-5xl font-black leading-[0.98]">
@@ -91,16 +102,22 @@ export default function LoginPage() {
 
       <div className="flex flex-1 flex-col justify-center bg-white px-6 py-10 md:px-16 lg:px-24">
         <div className="mx-auto w-full max-w-sm">
-          <Link href="/" className="mb-12 inline-flex text-xl font-black lg:hidden">FRILO</Link>
+          <Link href="/" className="mb-12 inline-flex w-[104px] transition-opacity hover:opacity-80 lg:hidden" aria-label="Accueil FRILO">
+            <BrandLogo variant="dark" priority />
+          </Link>
 
           <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-[oklch(57%_0.24_29)]">Connexion</p>
-          <h1 className="text-3xl font-black leading-tight text-slate-950">Accédez à votre espace.</h1>
+          <h1 className="text-3xl font-black leading-tight text-slate-950">
+            {nextPath.startsWith('/commande') ? 'Connectez-vous pour vérifier votre commande.' : 'Accédez à votre espace.'}
+          </h1>
           <p className="mt-3 text-sm leading-6 text-slate-500">
-            Utilisez l’adresse e-mail associée à votre commande FRILO.
+            {nextPath.startsWith('/commande')
+              ? 'Votre saisie est conservée. Après connexion, vous revenez directement à la vérification.'
+              : 'Utilisez l’adresse e-mail associée à votre commande FRILO.'}
           </p>
           <p className="mt-5 text-sm text-slate-500">
             Pas encore de compte ?{' '}
-            <Link href="/register" className="font-black text-slate-950 underline underline-offset-4">
+            <Link href={`/register?next=${encodeURIComponent(nextPath)}`} className="font-black text-slate-950 underline underline-offset-4">
               S'inscrire
             </Link>
           </p>
@@ -155,5 +172,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-black border-t-transparent" />
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }

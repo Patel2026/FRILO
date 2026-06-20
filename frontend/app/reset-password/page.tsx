@@ -8,6 +8,7 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Lock, Mail } from 'lucide-react';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { z } from 'zod';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { authService, ResetPasswordPayload } from '@/services/auth.service';
 
 type ResetFormValues = Omit<ResetPasswordPayload, 'token'>;
@@ -124,7 +125,9 @@ function ResetPasswordPageContent() {
     <main className="min-h-screen bg-white px-6 py-8 md:px-10">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[1180px] flex-col">
         <header className="mb-10 flex items-center justify-between border-b border-gray-200 pb-5">
-          <Link href="/" className="text-xl font-black tracking-tight text-black">FRILO</Link>
+          <Link href="/" className="inline-flex w-[104px] transition-opacity hover:opacity-80" aria-label="Accueil FRILO">
+            <BrandLogo variant="dark" priority />
+          </Link>
           <Link href="/login" className="text-sm font-black text-gray-500 transition-colors hover:text-black">
             Connexion
           </Link>

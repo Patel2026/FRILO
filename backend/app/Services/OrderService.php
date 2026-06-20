@@ -54,6 +54,18 @@ class OrderService
 
             $optionsTotal = (int) $options->sum('price');
             $totalPrice = (int) $template->price + $optionsTotal;
+            $selectedColorPalette = $this->resolveTemplateChoice(
+                $template->color_palettes ?? [],
+                $data['color_palette_id'] ?? null,
+                $template->default_color_palette,
+                'color_palette_id'
+            );
+            $selectedFontPairing = $this->resolveTemplateChoice(
+                $template->font_pairings ?? [],
+                $data['font_pairing_id'] ?? null,
+                $template->default_font_pairing,
+                'font_pairing_id'
+            );
 
             $order = Order::create([
                 'user_id' => $user->id,
@@ -61,6 +73,8 @@ class OrderService
                 'status' => OrderStatus::Pending,
                 'payment_status' => PaymentStatus::AwaitingPayment,
                 'price' => $totalPrice,
+                'selected_color_palette' => $selectedColorPalette,
+                'selected_font_pairing' => $selectedFontPairing,
             ]);
 
             $order->instruction()->create([
@@ -96,6 +110,31 @@ class OrderService
         $this->adminNotificationService->notifyOrderCreated($order);
 
         return $order;
+    }
+
+    private function resolveTemplateChoice(array $choices, ?string $requestedId, ?string $defaultId, string $field): ?array
+    {
+        if ($choices === []) {
+            return null;
+        }
+
+        $requestedId = trim((string) ($requestedId ?: $defaultId ?: ''));
+
+        if ($requestedId === '') {
+            $firstChoice = $choices[0] ?? null;
+
+            return is_array($firstChoice) ? $firstChoice : null;
+        }
+
+        foreach ($choices as $choice) {
+            if (is_array($choice) && (string) ($choice['id'] ?? '') === $requestedId) {
+                return $choice;
+            }
+        }
+
+        throw ValidationException::withMessages([
+            $field => 'Le choix de personnalisation selectionne n est pas disponible pour ce template.',
+        ]);
     }
 
     /**

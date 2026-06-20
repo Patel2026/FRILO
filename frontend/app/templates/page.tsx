@@ -2,16 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Search, Star, X } from 'lucide-react';
-import { TemplateCard } from '@/components/business/TemplateCard';
+import { ArrowRight, Layers2, Search, Star, X } from 'lucide-react';
 import {
-  PublicBenefitStrip,
   PublicEmptyState,
-  PublicFinalCta,
-  PublicHero,
   PublicPageShell,
 } from '@/components/public/PublicPageShell';
-import { PUBLIC_PAGE_TEXT } from '@/components/public/publicPageCopy';
 import { usePublicPricing } from '@/hooks/usePublicPricing';
 import { formatPublicPrice } from '@/lib/publicPricing';
 import { businessService, Sector, Template } from '@/services/business.service';
@@ -32,12 +27,31 @@ interface PersistedTemplateFilters {
 
 const FILTERS_STORAGE_KEY = 'frilo.templates.filters.v1';
 
+const DEFAULT_TEMPLATE_IMAGES: Record<string, string> = {
+  restaurants: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+  btp: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80',
+  sante: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1200&q=80',
+  avocats: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
+  coaching: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80',
+  immobilier: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80',
+  accompagnement: '/image/client-satisfait-frilo.jpg',
+};
+
 function getTemplatePrice(template: Template): number {
   return typeof template.price === 'string' ? parseInt(template.price, 10) : template.price;
 }
 
 function getTemplateImage(template: Template): string {
   return template.full_thumbnail_url || parsePreviewGallery(template.preview_gallery)[0] || '';
+}
+
+function getTemplateDisplayImage(template: Template): string {
+  const templateImage = getTemplateImage(template);
+  if (templateImage) {
+    return templateImage;
+  }
+
+  return DEFAULT_TEMPLATE_IMAGES[template.sector?.slug ?? ''] || '/image/client-satisfait-frilo.jpg';
 }
 
 export default function TemplatesPage() {
@@ -241,45 +255,43 @@ export default function TemplatesPage() {
   const compareHref = compareIds.length > 0 ? `/templates/compare?ids=${compareIds.join(',')}` : '/templates/compare';
 
   return (
-    <PublicPageShell className="pb-28 lg:pb-0">
-      <PublicHero
-        eyebrow="Modèles FRILO"
-        title={PUBLIC_PAGE_TEXT.templates.heroTitle}
-        description={PUBLIC_PAGE_TEXT.templates.heroDescription}
-        primaryAction={{ label: 'Voir les modèles', href: '#catalogue' }}
-        secondaryAction={{ label: 'Besoin d’aide ?', href: '/contact?subject=Choix%20du%20mod%C3%A8le' }}
-        aside={(
-          <div className="grid gap-4 bg-white p-5 shadow-[0_1px_0_rgba(0,0,0,0.16)]">
-            <p className="text-lg font-black leading-tight text-black">
-              Choisissez comme un client regarde votre entreprise.
-            </p>
-            <div className="grid gap-3 text-sm leading-6 text-black/62">
-              <p>1. L’image doit rassurer vite.</p>
-              <p>2. Le contenu doit parler de votre activité.</p>
-              <p>3. FRILO remplace les exemples par vos informations.</p>
-            </div>
+    <PublicPageShell className="bg-white pb-28 lg:pb-0">
+      <section className="border-b border-gray-200 bg-white px-5 pt-28 md:px-8 md:pt-32">
+        <div className="mx-auto max-w-[1240px] pb-12 text-center md:pb-16">
+          <h1 className="mx-auto max-w-5xl text-balance text-5xl font-black leading-[0.95] text-black md:text-6xl lg:text-[5.75rem]">
+            Trouvez une base claire pour votre futur site.
+          </h1>
+          <p className="mx-auto mt-6 max-w-3xl text-pretty text-base leading-7 text-gray-700 md:text-lg md:leading-8">
+            Parcourez des modèles pensés par activité. Vous choisissez le point de départ, FRILO adapte les textes, les images et les contacts avant livraison.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a
+              href="#catalogue"
+              className="inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-[#2563eb]"
+            >
+              Parcourir les modèles
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </a>
+            <Link
+              href="/contact?subject=Choix%20du%20mod%C3%A8le"
+              className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-black text-black transition-colors hover:border-black"
+            >
+              Demander une recommandation
+            </Link>
           </div>
-        )}
-      />
+        </div>
+      </section>
 
-      <PublicBenefitStrip
-        items={[
-          { title: 'Aperçu concret', description: 'Vous voyez la base visuelle avant de commander.' },
-          { title: 'Prix visible', description: 'Le prix du modèle et les options restent lisibles.' },
-          { title: 'Adaptation FRILO', description: 'Le modèle devient un site à votre nom, avec vos contenus.' },
-        ]}
-      />
-
-      <div className="sticky top-16 z-30 border-b border-black/10 bg-[#f7f4ec]/95 backdrop-blur">
-        <div className="mx-auto max-w-[1360px] px-5 md:px-8">
-          <div className="flex items-center gap-2 overflow-x-auto py-3 scrollbar-hide">
+      <section className="sticky top-16 z-30 border-b border-gray-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto max-w-[1440px] px-5 md:px-8">
+          <div className="flex items-center gap-6 overflow-x-auto py-4 scrollbar-hide">
             <button
               onClick={() => setActiveSlug(null)}
               className={cn(
-                'whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition-colors',
+                'whitespace-nowrap border-b-2 px-0.5 pb-1 text-sm font-black transition-colors',
                 activeSlug === null
-                  ? 'bg-black text-white'
-                  : 'bg-white text-black/62 hover:bg-black hover:text-white'
+                  ? 'border-black text-black'
+                  : 'border-transparent text-gray-500 hover:text-black'
               )}
             >
               Tous
@@ -289,10 +301,10 @@ export default function TemplatesPage() {
                 key={sector.slug}
                 onClick={() => setActiveSlug(sector.slug)}
                 className={cn(
-                  'whitespace-nowrap rounded-full px-4 py-2 text-sm font-black transition-colors',
+                  'whitespace-nowrap border-b-2 px-0.5 pb-1 text-sm font-black transition-colors',
                   activeSlug === sector.slug
-                    ? 'bg-black text-white'
-                    : 'bg-white text-black/62 hover:bg-black hover:text-white'
+                    ? 'border-black text-black'
+                    : 'border-transparent text-gray-500 hover:text-black'
                 )}
               >
                 {sector.name}
@@ -300,135 +312,238 @@ export default function TemplatesPage() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div id="catalogue" className="px-5 py-10 md:px-8 md:py-12">
-        <div className="mx-auto max-w-[1360px]">
-          <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">Sélection</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight text-black md:text-4xl">
-                Trouvez une base qui ressemble déjà à une vraie entreprise.
+      <section id="catalogue" className="px-5 py-10 md:px-8 md:py-14">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="mb-8 grid gap-5 border-b border-gray-200 pb-6 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.75fr)] lg:items-end">
+            <div>
+              <h2 className="text-3xl font-black leading-tight text-black md:text-4xl">
+                Modèles disponibles
               </h2>
-            </div>
             {!loading && !error && (
-              <p className="max-w-sm text-sm leading-6 text-black/62">
+                <p className="mt-2 text-sm font-semibold text-gray-600">
                 {visibleTemplates.length} modèle{visibleTemplates.length > 1 ? 's' : ''} affiché{visibleTemplates.length > 1 ? 's' : ''}
                 {normalizedSearch ? ` pour “${searchTerm.trim()}”` : ''}.
               </p>
             )}
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_170px_170px]">
+              <label htmlFor="templates-search" className="block">
+                <span className="sr-only">Rechercher un modèle</span>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    id="templates-search"
+                    type="text"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    placeholder="Rechercher"
+                    className="w-full rounded-none border border-gray-300 bg-white py-3 pl-10 pr-3 text-sm text-black outline-none transition-colors placeholder:text-gray-600 focus:border-black"
+                  />
+                </div>
+              </label>
+
+              <label htmlFor="templates-sort" className="block">
+                <span className="sr-only">Trier les modèles</span>
+                <select
+                  id="templates-sort"
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value as TemplateSort)}
+                  className="w-full rounded-none border border-gray-300 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
+                >
+                  <option value="featured">Tri recommandé</option>
+                  <option value="price_asc">Prix croissant</option>
+                  <option value="price_desc">Prix décroissant</option>
+                  <option value="name_asc">Nom A → Z</option>
+                  <option value="name_desc">Nom Z → A</option>
+                </select>
+              </label>
+
+              <label htmlFor="templates-price-filter" className="block">
+                <span className="sr-only">Filtrer par budget</span>
+                <select
+                  id="templates-price-filter"
+                  value={priceFilter}
+                  onChange={(event) => setPriceFilter(event.target.value as TemplatePriceFilter)}
+                  className="w-full rounded-none border border-gray-300 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
+                >
+                  <option value="all">Tous budgets</option>
+                  <option value="budget">Budget {budgetThresholdLabel}</option>
+                  <option value="premium">Premium &gt; {budgetThresholdLabel}</option>
+                </select>
+              </label>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 border-y border-black bg-white p-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_220px_220px_auto_auto]">
-          <label htmlFor="templates-search" className="block">
-            <span className="sr-only">Rechercher un modèle</span>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                id="templates-search"
-                type="text"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Rechercher un modèle"
-                className="w-full rounded-full border border-black/15 bg-white py-3 pl-10 pr-3 text-sm text-black outline-none transition-colors focus:border-black"
-              />
-            </div>
-          </label>
-
-          <label htmlFor="templates-sort" className="block">
-            <span className="sr-only">Trier les modèles</span>
-            <select
-              id="templates-sort"
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value as TemplateSort)}
-              className="w-full rounded-full border border-black/15 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
+          <div className="mb-8 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setShowFavoritesOnly((prev) => !prev)}
+              className={cn(
+                'inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-black transition-colors',
+                showFavoritesOnly
+                  ? 'border-black bg-black text-white'
+                  : 'border-gray-300 bg-white text-gray-700 hover:border-black hover:text-black'
+              )}
             >
-              <option value="featured">Tri recommandé</option>
-              <option value="price_asc">Prix croissant</option>
-              <option value="price_desc">Prix décroissant</option>
-              <option value="name_asc">Nom A → Z</option>
-              <option value="name_desc">Nom Z → A</option>
-            </select>
-          </label>
+              <Star className={cn('h-4 w-4', showFavoritesOnly ? 'fill-white' : '')} />
+              Favoris ({favoriteIds.length})
+            </button>
 
-          <label htmlFor="templates-price-filter" className="block">
-            <span className="sr-only">Filtrer par budget</span>
-            <select
-              id="templates-price-filter"
-              value={priceFilter}
-              onChange={(event) => setPriceFilter(event.target.value as TemplatePriceFilter)}
-              className="w-full rounded-full border border-black/15 bg-white px-3 py-3 text-sm text-black outline-none transition-colors focus:border-black"
+            <button
+              type="button"
+              onClick={resetFilters}
+              disabled={!hasActiveFilters}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2.5 text-sm font-black text-gray-700 transition-colors enabled:hover:border-black enabled:hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <option value="all">Tous les budgets</option>
-              <option value="budget">Budget {budgetThresholdLabel}</option>
-              <option value="premium">Premium &gt; {budgetThresholdLabel}</option>
-            </select>
-          </label>
+              <X className="h-4 w-4" />
+              Réinitialiser
+            </button>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setShowFavoritesOnly((prev) => !prev)}
-            className={cn(
-              'inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-black transition-colors',
-              showFavoritesOnly
-                ? 'border-black bg-black text-white'
-                : 'border-black/15 bg-white text-black/62 hover:border-black hover:text-black'
-            )}
-          >
-            <Star className={cn('w-4 h-4', showFavoritesOnly ? 'fill-white' : '')} />
-            Favoris ({favoriteIds.length})
-          </button>
-
-          <button
-            type="button"
-            onClick={resetFilters}
-            disabled={!hasActiveFilters}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-4 py-3 text-sm font-black text-black/62 transition-colors enabled:hover:border-black enabled:hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <X className="w-4 h-4" />
-            Réinitialiser
-          </button>
-        </div>
-        </div>
-      </div>
-
-      <div className="px-5 pb-14 md:px-8 md:pb-16">
-        <div className="mx-auto max-w-[1360px]">
-          {loading ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {loading ? (
+            <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
               {[...Array(8)].map((_, index) => (
-                <div key={index} className="aspect-[3/2] animate-pulse rounded-2xl bg-slate-100" />
+                <div key={index} className="h-96 animate-pulse bg-gray-100" />
               ))}
             </div>
           ) : error ? (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-6 py-10 text-center">
+            <div className="border border-amber-200 bg-amber-50 px-6 py-10 text-center">
               <p className="text-sm text-amber-800">{error}</p>
             </div>
           ) : visibleTemplates.length > 0 ? (
-            <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-              {visibleTemplates.map((template) => (
-                <TemplateCard
-                  key={template.id}
-                  id={String(template.id)}
-                  name={template.name}
-                  sectorName={template.sector?.name}
-                  price={getTemplatePrice(template)}
-                  features={parseFeatures(template.features)}
-                  image={getTemplateImage(template)}
-                  hasLivePreview={hasLivePreview(template.preview_url)}
-                  previewScreens={parsePreviewGallery(template.preview_gallery).length}
-                  isFavorite={isFavorite(template.id)}
-                  isCompared={isCompared(template.id)}
-                  compareDisabled={compareIds.length >= maxCompareItems}
-                  onToggleFavorite={toggleFavorite}
-                  onToggleCompare={(templateId) => {
-                    const result = toggleCompare(templateId);
-                    if (result === 'max_reached') {
-                      setCompareNotice(`Vous pouvez comparer jusqu'à ${maxCompareItems} modèles.`);
-                    }
-                  }}
-                />
-              ))}
+            <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+              {visibleTemplates.map((template) => {
+                const templateId = template.id;
+                const image = getTemplateDisplayImage(template);
+                const price = getTemplatePrice(template);
+                const features = parseFeatures(template.features);
+                const livePreview = hasLivePreview(template.preview_url);
+                const galleryCount = parsePreviewGallery(template.preview_gallery).length;
+
+                return (
+                  <article
+                    key={template.id}
+                    className="group flex min-h-full flex-col bg-white"
+                  >
+                    <Link href={`/templates/${template.id}`} className="relative block aspect-[4/3] overflow-hidden bg-gray-100">
+                        <div
+                          aria-hidden="true"
+                          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.03]"
+                          style={{ backgroundImage: `url(${image})` }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
+                        <div className="absolute bottom-4 left-4 right-16">
+                          {template.sector?.name && (
+                            <p className="text-xs font-black text-white/75">{template.sector.name}</p>
+                          )}
+                          <p className="mt-1 text-balance text-2xl font-black leading-tight text-white">
+                            {template.name}
+                          </p>
+                        </div>
+                        <div className="absolute right-3 top-3 flex items-center gap-2 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
+                          <button
+                            type="button"
+                            aria-label={isFavorite(templateId) ? `Retirer ${template.name} des favoris` : `Ajouter ${template.name} aux favoris`}
+                            aria-pressed={isFavorite(templateId)}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              toggleFavorite(templateId);
+                            }}
+                            className={cn(
+                              'inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors',
+                              isFavorite(templateId)
+                                ? 'border-black bg-black text-white'
+                                : 'border-white bg-white/95 text-black hover:border-black'
+                            )}
+                          >
+                            <Star className={cn('h-4 w-4', isFavorite(templateId) ? 'fill-white' : '')} />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={isCompared(templateId) ? `Retirer ${template.name} de la comparaison` : `Ajouter ${template.name} à la comparaison`}
+                            aria-pressed={isCompared(templateId)}
+                            disabled={compareIds.length >= maxCompareItems && !isCompared(templateId)}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              const result = toggleCompare(templateId);
+                              if (result === 'max_reached') {
+                                setCompareNotice(`Vous pouvez comparer jusqu'à ${maxCompareItems} modèles.`);
+                              }
+                            }}
+                            className={cn(
+                              'inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-45',
+                              isCompared(templateId)
+                                ? 'border-[#2563eb] bg-[#2563eb] text-white'
+                                : 'border-white bg-white/95 text-black hover:border-black'
+                            )}
+                          >
+                            <Layers2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </Link>
+
+                      <div className="flex flex-1 flex-col gap-4 pt-4">
+                        <div className="grid gap-3 border-b border-gray-200 pb-4">
+                          <div className="grid gap-2">
+                            <div className="flex items-start justify-between gap-4">
+                            <Link
+                              href={`/templates/${template.id}`}
+                                className="block text-balance text-2xl font-black leading-tight text-black transition-colors hover:text-[#2563eb]"
+                            >
+                              {template.name}
+                            </Link>
+                              <p className="shrink-0 text-sm font-black text-black">
+                              {price.toLocaleString('fr-FR')} <span className="text-xs font-bold text-gray-500">FCFA</span>
+                            </p>
+                            </div>
+                            {template.sector?.name && (
+                              <p className="text-sm font-black text-[#2563eb]">{template.sector.name}</p>
+                            )}
+                            {template.description && (
+                              <p className="line-clamp-2 text-sm leading-6 text-gray-700">{template.description}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          {livePreview && (
+                            <span className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-black text-[#1d4ed8]">
+                              Aperçu interactif
+                            </span>
+                          )}
+                          {!livePreview && galleryCount > 0 && (
+                            <span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-black text-gray-700">
+                              {galleryCount} capture{galleryCount > 1 ? 's' : ''}
+                            </span>
+                          )}
+                          {features.slice(0, 2).map((feature) => (
+                            <span key={feature} className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-bold text-gray-700">
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row">
+                          <Link
+                            href={`/templates/${template.id}`}
+                            className="inline-flex items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-black text-white transition-colors hover:bg-[#2563eb]"
+                          >
+                            Voir ce modèle
+                          </Link>
+                          <Link
+                            href={`/commande?templateId=${template.id}`}
+                            className="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-5 py-3 text-sm font-black text-black transition-colors hover:border-black"
+                          >
+                            Commander
+                          </Link>
+                        </div>
+                      </div>
+                  </article>
+                );
+              })}
             </div>
           ) : (
             <PublicEmptyState
@@ -438,14 +553,24 @@ export default function TemplatesPage() {
             />
           )}
         </div>
-      </div>
+      </section>
 
-      <PublicFinalCta
-        title="Vous hésitez entre plusieurs modèles ?"
-        description="Dites-nous votre activité, votre budget et le type de clients que vous voulez rassurer."
-        href="/contact?subject=Choix%20du%20mod%C3%A8le"
-        label="Demander un avis"
-      />
+      <section className="px-5 pb-8 md:px-8 md:pb-10">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-5 border-y border-black py-7 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-2xl font-black leading-tight text-black">Vous ne trouvez pas le modèle adapté ?</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
+              Décrivez votre activité. FRILO vous proposera le modèle le plus proche avant la commande.
+            </p>
+          </div>
+          <Link
+            href="/contact?subject=Choix%20du%20mod%C3%A8le"
+            className="inline-flex shrink-0 items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-[#2563eb]"
+          >
+            Demander un avis
+          </Link>
+        </div>
+      </section>
 
       {comparedTemplates.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur">

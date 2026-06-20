@@ -7,6 +7,7 @@ import { authService } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ExternalLink, Menu, Plus, Search } from "lucide-react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 export default function DashboardLayout({
   children,
@@ -63,8 +64,8 @@ export default function DashboardLayout({
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <Link href="/" className="text-sm font-black tracking-tight text-white md:hidden">
-                FRILO
+              <Link href="/" className="inline-flex w-[86px] transition-opacity hover:opacity-80 md:hidden" aria-label="Accueil FRILO">
+                <BrandLogo variant="light" priority />
               </Link>
             </div>
             <div className="hidden min-w-0 flex-1 md:block">

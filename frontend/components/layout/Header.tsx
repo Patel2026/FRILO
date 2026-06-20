@@ -6,11 +6,12 @@ import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { cn } from '@/lib/utils';
+import { BrandLogo } from './BrandLogo';
 
 const navLinks = [
   { name: 'Secteurs', href: '/secteurs' },
   { name: 'Modèles', href: '/templates' },
-  { name: 'Comment ça marche', href: '/#how-it-works' },
+  { name: 'Comment ça marche', href: '/comment-ca-marche' },
   { name: 'FAQ', href: '/faq' },
   { name: 'Contact', href: '/contact' },
 ];
@@ -22,18 +23,58 @@ const supportLinks = [
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isOverDarkZone, setIsOverDarkZone] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const { isAuthenticated, hasToken, loading: authLoading } = useAuthState();
   const isHome = pathname === '/';
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 40);
+    let animationFrameId = 0;
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    const updateHeaderState = () => {
+      setIsScrolled(window.scrollY > 40);
 
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+      if (window.location.pathname !== '/') {
+        setIsOverDarkZone(false);
+        return;
+      }
+
+      const darkZones = Array.from(document.querySelectorAll<HTMLElement>('[data-header-theme="dark"]'));
+      const headerLogoY = 48;
+      const overlapsDarkZone = darkZones.some((zone) => {
+        const rect = zone.getBoundingClientRect();
+
+        return rect.top <= headerLogoY && rect.bottom >= headerLogoY;
+      });
+
+      setIsOverDarkZone(overlapsDarkZone);
+    };
+
+    const scheduleHeaderUpdate = () => {
+      window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = window.requestAnimationFrame(updateHeaderState);
+    };
+
+    updateHeaderState();
+    scheduleHeaderUpdate();
+    window.setTimeout(updateHeaderState, 120);
+
+    const observer = new MutationObserver(scheduleHeaderUpdate);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener('scroll', updateHeaderState, { passive: true });
+    window.addEventListener('resize', scheduleHeaderUpdate);
+    window.addEventListener('load', updateHeaderState);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
+      window.removeEventListener('scroll', updateHeaderState);
+      window.removeEventListener('resize', scheduleHeaderUpdate);
+      window.removeEventListener('load', updateHeaderState);
+    };
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
@@ -59,7 +100,7 @@ export function Header() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [mobileOpen]);
 
-  const dark = isHome && !isScrolled;
+  const dark = isHome && isOverDarkZone && !isScrolled;
   const showDashboard = isAuthenticated || (authLoading && hasToken);
   const accountLink = showDashboard
     ? { label: 'Dashboard', href: '/dashboard' }
@@ -98,11 +139,12 @@ export function Header() {
           <Link
             href="/"
             className={cn(
-              'text-xl font-black tracking-tight select-none transition-colors',
+              'inline-flex w-[104px] select-none items-center transition-opacity hover:opacity-80',
               mobileOpen || dark ? 'text-white' : 'text-black'
             )}
+            aria-label="Accueil FRILO"
           >
-            FRILO
+            <BrandLogo variant={mobileOpen || dark ? 'light' : 'dark'} priority />
           </Link>
 
           <nav className="hidden justify-center justify-self-center lg:flex">

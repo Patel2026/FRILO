@@ -25,10 +25,29 @@ export interface Template {
     preview_url?: string;
     preview_pages?: Array<{ label?: string; path?: string }> | string | null;
     preview_gallery?: string[] | string | null;
+    color_palettes?: TemplateColorPalette[] | string | null;
+    font_pairings?: TemplateFontPairing[] | string | null;
+    default_color_palette?: string | null;
+    default_font_pairing?: string | null;
     is_active: boolean;
     is_system?: boolean;
     sector_id: number;
     sector?: Sector;
+}
+
+export interface TemplateColorPalette {
+    id: string;
+    name: string;
+    colors?: string[];
+    [key: string]: unknown;
+}
+
+export interface TemplateFontPairing {
+    id: string;
+    name: string;
+    heading?: string;
+    body?: string;
+    [key: string]: unknown;
 }
 
 export interface TemplateReview {
@@ -158,6 +177,8 @@ export interface Order {
     } | null;
     instruction: OrderInstruction | null;
     selected_options?: SelectedOrderOption[];
+    selected_color_palette?: TemplateColorPalette | null;
+    selected_font_pairing?: TemplateFontPairing | null;
     payment?: PaymentInfo | null;
     // Backward compatibility with older payloads
     instructions?: OrderInstruction[];
@@ -208,6 +229,8 @@ export interface CreateOrderPayload {
     activity_description?: string;
     colors?: string[];
     specific_instructions?: string;
+    color_palette_id?: string;
+    font_pairing_id?: string;
     option_ids?: number[];
 }
 

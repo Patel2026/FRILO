@@ -1,7 +1,7 @@
 "use client"
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
   Check,
@@ -13,10 +13,11 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import axios from 'axios';
-import { AuthForms } from '@/components/business/AuthForms';
 import { ProjectDetailsForm } from '@/components/business/ProjectDetailsForm';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { useAuthState } from '@/hooks/useAuthState';
 import { trackFunnelEvent } from '@/lib/analytics';
+import { resolveTemplateFontPairings, resolveTemplatePalettes } from '@/lib/templatePersonalization';
 import { cn } from '@/lib/utils';
 import { businessService, OrderOption, Template } from '@/services/business.service';
 
@@ -53,11 +54,15 @@ function formatPrice(value: number) {
 }
 
 function OrderTunnelContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const templateId = searchParams.get('templateId');
+  const selectedPaletteId = searchParams.get('palette') ?? undefined;
+  const selectedFontPairingId = searchParams.get('font') ?? undefined;
+  const requestedStep = searchParams.get('step');
   const { isAuthenticated } = useAuthState();
   const [currentMoment, setCurrentMoment] = useState<OrderMoment>('personalize');
-  const [showAuthGate, setShowAuthGate] = useState(false);
+  const [redirectingToAuth, setRedirectingToAuth] = useState(false);
   const [formData, setFormData] = useState<ProjectDetails & { templateId: string | null }>({ templateId });
   const [template, setTemplate] = useState<Template | null>(null);
   const [orderOptions, setOrderOptions] = useState<OrderOption[]>([]);
@@ -181,22 +186,58 @@ function OrderTunnelContent() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [currentMoment]);
 
+  useEffect(() => {
+    if (!isAuthenticated || !draftLoaded || requestedStep !== 'review') return;
+
+    setCurrentMoment('review');
+  }, [draftLoaded, isAuthenticated, requestedStep]);
+
   const basePrice = template
     ? (typeof template.price === 'string' ? parseInt(template.price) : template.price)
     : 0;
   const selectedOptions = orderOptions.filter(option => selectedOptionIds.includes(option.id));
   const optionsTotal = selectedOptions.reduce((sum, option) => sum + option.price, 0);
   const finalPrice = basePrice + optionsTotal;
+  const availablePalettes = template ? resolveTemplatePalettes(template) : [];
+  const availableFontPairings = template ? resolveTemplateFontPairings(template) : [];
+  const selectedPalette = availablePalettes.find((palette) => palette.id === selectedPaletteId) ?? availablePalettes[0] ?? null;
+  const selectedFontPairing = availableFontPairings.find((pairing) => pairing.id === selectedFontPairingId) ?? availableFontPairings[0] ?? null;
+  const selectedStyleLabel = [selectedPalette?.name, selectedFontPairing?.name].filter(Boolean).join(' + ');
   const visibleMoment = currentMoment === 'confirmation' ? 'payment' : currentMoment;
   const visibleMomentIndex = VISIBLE_MOMENTS.findIndex(moment => moment.id === visibleMoment);
 
   const goToPersonalize = (target?: 'details' | 'options') => {
     setCurrentMoment('personalize');
-    setShowAuthGate(false);
     window.setTimeout(() => {
       document.getElementById(target === 'options' ? 'order-options' : 'project-details')
         ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
+  };
+
+  const redirectToAuthentication = (nextData?: ProjectDetails) => {
+    if (!templateId) return;
+
+    const draft: OrderDraft = {
+      templateId,
+      domainName: nextData?.domainName ?? formData.domainName,
+      description: nextData?.description ?? formData.description,
+      colors: nextData?.colors ?? formData.colors,
+      specific_instructions: nextData?.specific_instructions ?? formData.specific_instructions,
+      optionIds: selectedOptionIds,
+      updatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(ORDER_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    setRedirectingToAuth(true);
+
+    const returnParams = new URLSearchParams(window.location.search);
+    returnParams.set('step', 'review');
+    const returnPath = `${window.location.pathname}?${returnParams.toString()}`;
+    const params = new URLSearchParams({
+      next: returnPath,
+      reason: 'order',
+    });
+    router.push(`/login?${params.toString()}`);
   };
 
   const handlePersonalizeSuccess = (data: ProjectDetails) => {
@@ -212,10 +253,7 @@ function OrderTunnelContent() {
       return;
     }
 
-    setShowAuthGate(true);
-    window.setTimeout(() => {
-      document.getElementById('order-authentication')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+    redirectToAuthentication(data);
   };
 
   const handlePayment = async () => {
@@ -237,8 +275,10 @@ function OrderTunnelContent() {
           template_id: templateId,
           enterprise_name: formData.domainName,
           activity_description: formData.description,
-          colors: formData.colors ? formData.colors.split(',').map(color => color.trim()) : [],
+          colors: selectedPalette?.colors ?? [],
           specific_instructions: formData.specific_instructions,
+          color_palette_id: selectedPalette?.id,
+          font_pairing_id: selectedFontPairing?.id,
           option_ids: selectedOptions.map(option => option.id),
         });
 
@@ -315,7 +355,7 @@ function OrderTunnelContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5] pb-24 text-slate-950 lg:pb-0">
+    <div className="min-h-screen bg-white pb-24 text-slate-950 lg:pb-0">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-5 px-4 md:px-8">
           <Link
@@ -349,7 +389,9 @@ function OrderTunnelContent() {
             })}
           </nav>
 
-          <Link href="/" className="hidden shrink-0 text-xl font-black tracking-tight md:block">FRILO</Link>
+          <Link href="/" className="hidden w-[104px] shrink-0 transition-opacity hover:opacity-80 md:inline-flex" aria-label="Accueil FRILO">
+            <BrandLogo variant="dark" priority />
+          </Link>
         </div>
       </header>
 
@@ -386,6 +428,7 @@ function OrderTunnelContent() {
                   }}
                   onChange={(data) => setFormData(prev => ({ ...prev, ...data }))}
                   onSuccess={handlePersonalizeSuccess}
+                  selectedStyleLabel={selectedStyleLabel}
                 />
               </div>
             </section>
@@ -401,7 +444,7 @@ function OrderTunnelContent() {
                 </div>
               </div>
 
-              <div className="divide-y divide-slate-100">
+              <div className="grid gap-3 p-5 md:grid-cols-2 md:p-7 xl:grid-cols-3">
                 {orderOptions.map(option => {
                   const selected = selectedOptionIds.includes(option.id);
                   return (
@@ -415,31 +458,35 @@ function OrderTunnelContent() {
                           : [...current, option.id]
                       )}
                       className={cn(
-                        'flex w-full items-start gap-4 px-5 py-4 text-left transition-colors md:px-7',
-                        selected ? 'bg-slate-950 text-white' : 'bg-white hover:bg-slate-50'
+                        'flex min-h-[164px] w-full flex-col justify-between border p-4 text-left transition-colors',
+                        selected
+                          ? 'border-slate-950 bg-slate-950 text-white'
+                          : 'border-slate-200 bg-white hover:border-slate-950 hover:bg-slate-50'
                       )}
                     >
-                      <span className={cn(
-                        'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border',
-                        selected ? 'border-white bg-white text-slate-950' : 'border-slate-300 text-transparent'
-                      )}>
-                        <Check className="h-3.5 w-3.5" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex flex-wrap items-start justify-between gap-x-5 gap-y-1">
-                          <span className="text-sm font-black">{option.name}</span>
-                          <span className="shrink-0 text-sm font-black">+{formatPrice(option.price)} FCFA</span>
+                      <span className="flex items-start justify-between gap-3">
+                        <span className="flex min-w-0 items-start gap-3">
+                          <span className={cn(
+                            'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border',
+                            selected ? 'border-white bg-white text-slate-950' : 'border-slate-300 text-transparent'
+                          )}>
+                            <Check className="h-3.5 w-3.5" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-sm font-black leading-5">{option.name}</span>
+                            {option.description && (
+                              <span className={cn('mt-2 line-clamp-2 block text-sm leading-6', selected ? 'text-white/70' : 'text-slate-500')}>
+                                {option.description}
+                              </span>
+                            )}
+                          </span>
                         </span>
-                        {option.description && (
-                          <span className={cn('mt-1 block text-sm leading-6', selected ? 'text-white/70' : 'text-slate-500')}>
-                            {option.description}
-                          </span>
-                        )}
-                        {option.persona_hint && (
-                          <span className={cn('mt-2 block text-xs font-bold', selected ? 'text-white/55' : 'text-slate-400')}>
-                            Utile pour : {option.persona_hint}
-                          </span>
-                        )}
+                        <span className={cn(
+                          'shrink-0 rounded-full px-3 py-1.5 text-xs font-black',
+                          selected ? 'bg-white text-slate-950' : 'bg-slate-100 text-slate-950'
+                        )}>
+                          +{formatPrice(option.price)}
+                        </span>
                       </span>
                     </button>
                   );
@@ -460,29 +507,14 @@ function OrderTunnelContent() {
               </div>
             </section>
 
-            {showAuthGate && (
-              <section id="order-authentication" className="mt-8 scroll-mt-24 border border-slate-200 bg-white px-5 py-6 md:px-7">
-                <div className="grid gap-7 md:grid-cols-[minmax(0,0.75fr)_minmax(320px,1fr)]">
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-red-600">Avant de vérifier</p>
-                    <h2 className="mt-3 text-2xl font-black">Gardez votre commande dans votre espace.</h2>
-                    <p className="mt-3 text-sm leading-6 text-slate-500">
-                      Connectez-vous ou créez votre compte. Votre saisie et vos options restent enregistrées.
-                    </p>
-                  </div>
-                  <AuthForms onSuccess={() => {
-                    setShowAuthGate(false);
-                    setCurrentMoment('review');
-                  }} />
-                </div>
-              </section>
-            )}
           </div>
 
           <aside className="hidden lg:block">
             <div className="sticky top-24 border border-slate-200 bg-white">
               <OrderSummary
                 template={template}
+                selectedPaletteName={selectedPalette?.name}
+                selectedFontPairingName={selectedFontPairing?.name}
                 selectedOptions={selectedOptions}
                 basePrice={basePrice}
                 optionsTotal={optionsTotal}
@@ -492,10 +524,10 @@ function OrderTunnelContent() {
                 <button
                   type="submit"
                   form={PROJECT_FORM_ID}
-                  disabled={!template || optionsStatus !== 'ready'}
+                  disabled={!template || optionsStatus !== 'ready' || redirectingToAuth}
                   className="inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-5 py-3.5 text-sm font-black text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Vérifier ma commande <ChevronRight className="ml-1 h-4 w-4" />
+                  {redirectingToAuth ? 'Préparation du compte…' : 'Vérifier ma commande'} <ChevronRight className="ml-1 h-4 w-4" />
                 </button>
                 <Link href={supportHref} className="mt-4 flex items-center justify-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-950">
                   <CircleHelp className="h-4 w-4" /> Besoin d’aide ?
@@ -507,138 +539,201 @@ function OrderTunnelContent() {
       )}
 
       {currentMoment === 'review' && (
-        <main className="mx-auto max-w-5xl px-4 py-8 md:px-8 lg:py-12">
-          <div className="mb-8 max-w-2xl">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-red-600">Avant le paiement</p>
-            <h1 className="mt-3 text-3xl font-black md:text-4xl">Vérifiez votre commande.</h1>
-            <p className="mt-3 text-sm leading-6 text-slate-500">Tout est encore modifiable. Le paiement créera ensuite votre commande.</p>
-          </div>
-
-          <div className="border-y border-slate-200 bg-white">
-            <ReviewSection title="Modèle choisi" onEdit={() => goToPersonalize()}>
-              <p className="font-black">{template?.name ?? 'Non sélectionné'}</p>
-              {template?.sector && <p className="mt-1 text-sm text-slate-500">{template.sector.name}</p>}
-            </ReviewSection>
-            <ReviewSection title="Votre activité" onEdit={() => goToPersonalize('details')}>
-              <p className="font-black">{formData.domainName}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-500">{formData.description}</p>
-              {formData.colors && <p className="mt-2 text-sm text-slate-500">Style : {formData.colors}</p>}
-              {formData.specific_instructions && <p className="mt-2 text-sm text-slate-500">Note : {formData.specific_instructions}</p>}
-            </ReviewSection>
-            <ReviewSection title="Fonctions supplémentaires" onEdit={() => goToPersonalize('options')}>
-              {selectedOptions.length > 0 ? (
-                <div className="space-y-2">
-                  {selectedOptions.map(option => (
-                    <div key={option.id} className="flex justify-between gap-5 text-sm">
-                      <span className="font-bold">{option.name}</span>
-                      <span className="shrink-0 font-black">+{formatPrice(option.price)} FCFA</span>
-                    </div>
-                  ))}
-                </div>
-              ) : <p className="text-sm text-slate-500">Aucune option ajoutée.</p>}
-            </ReviewSection>
-            <div className="grid gap-5 px-5 py-6 md:grid-cols-[180px_minmax(0,1fr)] md:px-7">
-              <p className="text-sm font-black">Inclus par FRILO</p>
-              <div className="grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
-                <p>Adaptation du modèle</p>
-                <p>Version mobile</p>
-                <p>Mise en ligne</p>
-                <p>Suivi dans votre espace client</p>
+        <main className="w-full bg-white">
+          <div className="flex flex-col gap-5 border-b border-slate-950 px-5 py-5 md:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-10 xl:px-14">
+            <div className="max-w-3xl">
+              <p className="text-xs font-black text-red-600">Étape 2 sur 3</p>
+              <h1 className="mt-2 text-2xl font-black tracking-[-0.02em] md:text-3xl">Vérifiez avant paiement.</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Le modèle, les informations de votre activité et le total sont regroupés ici. Chaque partie reste modifiable.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="min-w-[220px] border border-slate-950 bg-white px-5 py-3">
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-500">Total</p>
+                <p className="mt-1 text-2xl font-black">{formatPrice(finalPrice)} FCFA</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-6 border border-slate-200 bg-white p-5 md:grid-cols-[minmax(0,1fr)_280px] md:p-7">
-            <div>
-              <p className="text-sm font-black">Votre total</p>
-              <div className="mt-4 max-w-md divide-y divide-slate-100 border-y border-slate-100 text-sm">
+          <div className="grid min-h-[calc(100vh-210px)] border-b border-slate-950 bg-white lg:grid-cols-[0.95fr_1.35fr_1fr]">
+            <ReviewPanel title="Modèle choisi" onEdit={() => goToPersonalize()} className="lg:border-r">
+              {template?.full_thumbnail_url && (
+                <Image
+                  src={template.full_thumbnail_url}
+                  alt={template.name}
+                  width={720}
+                  height={420}
+                  className="mb-6 h-52 w-full object-cover object-center"
+                />
+              )}
+              <p className="text-xl font-black">{template?.name ?? 'Non sélectionné'}</p>
+              {template?.sector && <p className="mt-1 text-sm font-bold text-blue-600">{template.sector.name}</p>}
+              <div className="mt-5 border-t border-slate-200 pt-4">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">Style sélectionné</p>
+                <p className="mt-2 text-sm font-bold text-slate-700">{selectedStyleLabel || 'Style par défaut'}</p>
+              </div>
+            </ReviewPanel>
+
+            <ReviewPanel title="Votre activité" onEdit={() => goToPersonalize('details')} className="lg:border-r">
+              <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.7fr)]">
+                <div>
+                  <p className="text-xl font-black">{formData.domainName || 'Nom de l’entreprise à compléter'}</p>
+                  <p className="mt-4 line-clamp-6 text-sm leading-6 text-slate-600">
+                    {formData.description || 'Votre activité sera utilisée pour adapter les contenus du modèle.'}
+                  </p>
+                </div>
+                <div className="border-t border-slate-200 pt-4 xl:border-l xl:border-t-0 xl:pl-5 xl:pt-0">
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">À savoir</p>
+                  <p className="mt-2 line-clamp-5 text-sm leading-6 text-slate-600">
+                    {formData.specific_instructions || 'Aucune précision ajoutée.'}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-8 border-t border-slate-200 pt-6">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">Inclus</p>
+                <div className="mt-4 grid gap-3 text-sm font-bold text-slate-700 sm:grid-cols-2">
+                  <p>Adaptation du modèle</p>
+                  <p>Version mobile</p>
+                  <p>Mise en ligne</p>
+                  <p>Suivi client</p>
+                </div>
+              </div>
+            </ReviewPanel>
+
+            <ReviewPanel title="Prix et options" onEdit={() => goToPersonalize('options')}>
+              <div className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
                 <PriceRow label="Site FRILO" value={`${formatPrice(basePrice)} FCFA`} />
                 <PriceRow label="Options choisies" value={`+${formatPrice(optionsTotal)} FCFA`} />
                 <PriceRow label="Total à payer" value={`${formatPrice(finalPrice)} FCFA`} strong />
               </div>
-            </div>
-            <div className="self-end">
-              <button
-                type="button"
-                onClick={() => setCurrentMoment('payment')}
-                className="inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-5 py-3.5 text-sm font-black text-white transition-colors hover:bg-red-700"
-              >
-                Continuer vers le paiement <ChevronRight className="ml-1 h-4 w-4" />
-              </button>
-              <p className="mt-3 text-center text-xs leading-5 text-slate-400">Aucun paiement n’est encore effectué.</p>
-            </div>
+              <div className="mt-5">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">Fonctions supplémentaires</p>
+                {selectedOptions.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {selectedOptions.map(option => (
+                      <span key={option.id} className="inline-flex items-center rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-700">
+                        {option.name} · +{formatPrice(option.price)} FCFA
+                      </span>
+                    ))}
+                  </div>
+                ) : <p className="mt-3 text-sm text-slate-500">Aucune option ajoutée.</p>}
+              </div>
+              <div className="mt-auto pt-8">
+                <button
+                  type="button"
+                  onClick={() => setCurrentMoment('payment')}
+                  className="inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-5 py-4 text-sm font-black text-white transition-colors hover:bg-red-700"
+                >
+                  Continuer vers le paiement <ChevronRight className="ml-1 h-4 w-4" />
+                </button>
+              </div>
+            </ReviewPanel>
           </div>
         </main>
       )}
 
       {currentMoment === 'payment' && (
-        <main className="mx-auto grid max-w-5xl gap-8 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:py-12">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-red-600">Paiement sécurisé</p>
-            <h1 className="mt-3 text-3xl font-black md:text-4xl">Validez le lancement de votre site.</h1>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-500">
-              Après confirmation du paiement, FRILO reçoit votre commande et peut commencer l’adaptation du modèle.
-            </p>
-
-            <div className="mt-8 border-y border-slate-200 bg-white">
-              <PriceRow label="Modèle et adaptation" value={`${formatPrice(basePrice)} FCFA`} />
-              <PriceRow label="Options choisies" value={`+${formatPrice(optionsTotal)} FCFA`} />
-              <PriceRow label="Total à payer" value={`${formatPrice(finalPrice)} FCFA`} strong />
+        <main className="w-full bg-white">
+          <div className="flex flex-col gap-5 border-b border-slate-950 px-5 py-5 md:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-10 xl:px-14">
+            <div className="max-w-3xl">
+              <p className="text-xs font-black text-red-600">Étape 3 sur 3</p>
+              <h1 className="mt-2 text-2xl font-black tracking-[-0.02em] md:text-3xl">Paiement de votre commande.</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Le paiement se fait via FedaPay. Après validation, FRILO reçoit la commande et lance l’adaptation du modèle.
+              </p>
             </div>
-
-            <button type="button" onClick={() => setCurrentMoment('review')} className="mt-5 inline-flex items-center gap-2 text-sm font-black text-slate-500 hover:text-slate-950">
-              <Pencil className="h-4 w-4" /> Revenir à la vérification
+            <button type="button" onClick={() => setCurrentMoment('review')} className="inline-flex items-center gap-2 self-start text-sm font-black text-slate-500 hover:text-slate-950 lg:self-auto">
+              <Pencil className="h-4 w-4" /> Modifier la vérification
             </button>
           </div>
 
-          <div className="self-start border border-slate-200 bg-white p-5 md:p-7">
-            <div className="flex items-start justify-between gap-5">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">Total à payer</p>
-                <p className="mt-2 text-4xl font-black">{formatPrice(finalPrice)}</p>
-                <p className="mt-1 text-sm font-bold text-slate-400">FCFA</p>
+          <div className="grid min-h-[calc(100vh-210px)] border-b border-slate-950 bg-white lg:grid-cols-[1fr_1.15fr_0.9fr]">
+            <section className="flex min-h-full flex-col border-slate-200 px-5 py-5 md:px-8 lg:border-r lg:px-10 xl:px-12">
+              <p className="text-sm font-black">Montant à payer</p>
+              <div className="mt-8">
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400">Total</p>
+                <p className="mt-2 text-5xl font-black tracking-[-0.03em]">{formatPrice(finalPrice)}</p>
+                <p className="mt-1 text-sm font-bold text-slate-500">FCFA</p>
               </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-white">
-                <ShieldCheck className="h-5 w-5" />
+              <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200 text-sm">
+                <PriceRow label="Site FRILO" value={`${formatPrice(basePrice)} FCFA`} />
+                <PriceRow label="Options choisies" value={`+${formatPrice(optionsTotal)} FCFA`} />
+                <PriceRow label="Total à payer" value={`${formatPrice(finalPrice)} FCFA`} strong />
               </div>
-            </div>
+            </section>
 
-            <div className="mt-6 border-l-2 border-slate-950 bg-slate-50 px-4 py-3">
-              <p className="text-sm font-black">Paiement via FedaPay</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">Vous serez redirigé vers l’espace de paiement sécurisé.</p>
-              {createdOrderId && <p className="mt-2 text-xs font-bold text-slate-400">Commande préparée : #{String(createdOrderId).padStart(5, '0')}</p>}
-            </div>
-
-            {paymentError && (
-              <div className="mt-5 border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                <p>{paymentError}</p>
-                {paymentErrorType === 'auth' && (
-                  <button type="button" onClick={() => {
-                    setCurrentMoment('personalize');
-                    setShowAuthGate(true);
-                  }} className="mt-3 font-black underline underline-offset-4">
-                    Se reconnecter
-                  </button>
-                )}
-                {paymentErrorType === 'generic' && (
-                  <button type="button" onClick={handlePayment} className="mt-3 font-black underline underline-offset-4">
-                    Réessayer maintenant
-                  </button>
-                )}
+            <section className="flex min-h-full flex-col border-slate-200 px-5 py-5 md:px-8 lg:border-r lg:px-10 xl:px-12">
+              <div className="flex items-start justify-between gap-5">
+                <div>
+                  <p className="text-sm font-black">Moyen de paiement prévu</p>
+                  <h2 className="mt-5 text-3xl font-black tracking-[-0.03em]">FedaPay sécurisé.</h2>
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
+                    Vous serez redirigé vers l’espace FedaPay pour choisir le moyen disponible et finaliser le paiement.
+                  </p>
+                </div>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-950 text-white">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
               </div>
-            )}
 
-            <button
-              type="button"
-              onClick={handlePayment}
-              disabled={isSubmitting || redirectingToPayment}
-              className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-5 py-3.5 text-sm font-black text-white transition-colors hover:bg-red-700 disabled:opacity-50"
-            >
-              {isSubmitting || redirectingToPayment ? 'Redirection vers FedaPay…' : 'Payer maintenant'}
-            </button>
-            <Link href={supportHref} className="mt-4 flex items-center justify-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-950">
-              <CircleHelp className="h-4 w-4" /> Une question avant de payer ?
-            </Link>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                <div className="border border-slate-200 p-4">
+                  <p className="text-sm font-black">Mobile Money</p>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">Paiement depuis votre numéro mobile si disponible dans FedaPay.</p>
+                </div>
+                <div className="border border-slate-200 p-4">
+                  <p className="text-sm font-black">Carte bancaire</p>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">Paiement par carte depuis l’interface sécurisée.</p>
+                </div>
+              </div>
+
+              {createdOrderId && (
+                <p className="mt-6 border border-slate-200 px-4 py-3 text-xs font-bold text-slate-500">
+                  Commande préparée : #{String(createdOrderId).padStart(5, '0')}
+                </p>
+              )}
+            </section>
+
+            <section className="flex min-h-full flex-col px-5 py-5 md:px-8 lg:px-10 xl:px-12">
+              <p className="text-sm font-black">Validation</p>
+              <div className="mt-8 border-y border-slate-200 py-5">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">À faire maintenant</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Cliquez sur le bouton ci-dessous pour créer la commande et ouvrir la page de paiement FedaPay.
+                </p>
+              </div>
+
+              {paymentError && (
+                <div className="mt-5 border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                  <p>{paymentError}</p>
+                  {paymentErrorType === 'auth' && (
+                    <button type="button" onClick={() => redirectToAuthentication(formData)} className="mt-3 font-black underline underline-offset-4">
+                      Se reconnecter
+                    </button>
+                  )}
+                  {paymentErrorType === 'generic' && (
+                    <button type="button" onClick={handlePayment} className="mt-3 font-black underline underline-offset-4">
+                      Réessayer maintenant
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-auto pt-8">
+                <button
+                  type="button"
+                  onClick={handlePayment}
+                  disabled={isSubmitting || redirectingToPayment}
+                  className="inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-5 py-4 text-sm font-black text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+                >
+                  {isSubmitting || redirectingToPayment ? 'Ouverture de FedaPay…' : 'Payer avec FedaPay'} <ChevronRight className="ml-1 h-4 w-4" />
+                </button>
+                <Link href={supportHref} className="mt-4 flex items-center justify-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-950">
+                  <CircleHelp className="h-4 w-4" /> Besoin d’aide avant de payer ?
+                </Link>
+              </div>
+            </section>
           </div>
         </main>
       )}
@@ -671,10 +766,10 @@ function OrderTunnelContent() {
             <button
               type="submit"
               form={PROJECT_FORM_ID}
-              disabled={!template || optionsStatus !== 'ready'}
+              disabled={!template || optionsStatus !== 'ready' || redirectingToAuth}
               className="inline-flex shrink-0 items-center justify-center rounded-lg bg-red-600 px-4 py-3 text-sm font-black text-white disabled:opacity-40"
             >
-              Vérifier <ChevronRight className="ml-1 h-4 w-4" />
+              {redirectingToAuth ? 'Préparation…' : 'Vérifier'} <ChevronRight className="ml-1 h-4 w-4" />
             </button>
           </div>
         </div>
@@ -685,12 +780,16 @@ function OrderTunnelContent() {
 
 function OrderSummary({
   template,
+  selectedPaletteName,
+  selectedFontPairingName,
   selectedOptions,
   basePrice,
   optionsTotal,
   finalPrice,
 }: {
   template: Template | null;
+  selectedPaletteName?: string;
+  selectedFontPairingName?: string;
   selectedOptions: OrderOption[];
   basePrice: number;
   optionsTotal: number;
@@ -705,6 +804,11 @@ function OrderSummary({
         <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">Votre sélection</p>
         <p className="mt-3 text-lg font-black">{template?.name ?? 'Aucun modèle sélectionné'}</p>
         {template?.sector && <p className="mt-1 text-xs text-slate-500">{template.sector.name}</p>}
+        {(selectedPaletteName || selectedFontPairingName) && (
+          <p className="mt-3 text-xs font-bold text-slate-500">
+            Style : {[selectedPaletteName, selectedFontPairingName].filter(Boolean).join(' + ')}
+          </p>
+        )}
         <div className="mt-5 divide-y divide-slate-100 border-y border-slate-100 text-sm">
           <PriceRow label="Site FRILO" value={`${formatPrice(basePrice)} FCFA`} />
           <PriceRow label={`${selectedOptions.length} option${selectedOptions.length > 1 ? 's' : ''}`} value={`+${formatPrice(optionsTotal)} FCFA`} />
@@ -715,15 +819,27 @@ function OrderSummary({
   );
 }
 
-function ReviewSection({ title, onEdit, children }: { title: string; onEdit: () => void; children: React.ReactNode }) {
+function ReviewPanel({
+  title,
+  onEdit,
+  children,
+  className,
+}: {
+  title: string;
+  onEdit: () => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="grid gap-4 border-b border-slate-200 px-5 py-6 md:grid-cols-[180px_minmax(0,1fr)_auto] md:px-7">
-      <p className="text-sm font-black">{title}</p>
-      <div>{children}</div>
-      <button type="button" onClick={onEdit} className="inline-flex items-center gap-1.5 self-start text-sm font-black text-red-600 hover:text-red-700">
-        <Pencil className="h-3.5 w-3.5" /> Modifier
-      </button>
-    </div>
+    <section className={cn('flex min-h-full flex-col border-slate-200 px-5 py-5 md:px-8 lg:px-10 xl:px-12', className)}>
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <p className="text-sm font-black">{title}</p>
+        <button type="button" onClick={onEdit} className="inline-flex items-center gap-1.5 text-sm font-black text-red-600 hover:text-red-700">
+          <Pencil className="h-3.5 w-3.5" /> Modifier
+        </button>
+      </div>
+      {children}
+    </section>
   );
 }
 

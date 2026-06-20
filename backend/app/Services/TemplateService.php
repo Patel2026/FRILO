@@ -75,6 +75,14 @@ class TemplateService
             'preview_url' => $previewUrl,
             'preview_pages' => $previewPages,
             'preview_gallery' => $previewGallery,
+            'color_palettes' => $this->parseJsonList($data['color_palettes_raw'] ?? null, 'color_palettes_raw'),
+            'font_pairings' => $this->parseJsonList($data['font_pairings_raw'] ?? null, 'font_pairings_raw'),
+            'default_color_palette' => filled($data['default_color_palette'] ?? null)
+                ? Str::limit(trim((string) $data['default_color_palette']), 80, '')
+                : null,
+            'default_font_pairing' => filled($data['default_font_pairing'] ?? null)
+                ? Str::limit(trim((string) $data['default_font_pairing']), 80, '')
+                : null,
             'is_active' => (bool) ($data['is_active'] ?? false),
         ];
     }
@@ -84,6 +92,59 @@ class TemplateService
         return array_values(array_filter(
             array_map('trim', preg_split('/\r\n|\r|\n/', $raw ?? '') ?: [])
         ));
+    }
+
+    private function parseJsonList(?string $raw, string $field): array
+    {
+        $value = trim((string) $raw);
+
+        if ($value === '') {
+            return [];
+        }
+
+        $decoded = json_decode($value, true);
+
+        if (! is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+            throw ValidationException::withMessages([
+                $field => 'Le champ doit contenir un tableau JSON valide.',
+            ]);
+        }
+
+        $items = [];
+
+        foreach ($decoded as $index => $item) {
+            if (! is_array($item)) {
+                throw ValidationException::withMessages([
+                    $field => 'Chaque entrée doit être un objet JSON.',
+                ]);
+            }
+
+            $id = trim((string) ($item['id'] ?? ''));
+            $name = trim((string) ($item['name'] ?? ''));
+
+            if ($id === '' || $name === '') {
+                throw ValidationException::withMessages([
+                    $field => 'Chaque entrée doit contenir au minimum "id" et "name".',
+                ]);
+            }
+
+            $normalized = [
+                'id' => Str::limit(Str::slug($id), 80, ''),
+                'name' => Str::limit($name, 120, ''),
+            ];
+
+            foreach ($item as $key => $itemValue) {
+                if (in_array($key, ['id', 'name'], true)) {
+                    continue;
+                }
+
+                $normalized[$key] = $itemValue;
+            }
+
+            $items[$index] = $normalized;
+        }
+
+        return array_values($items);
     }
 
     private function parsePreviewPages(?string $raw): array

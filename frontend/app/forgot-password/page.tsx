@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, ArrowLeft, CheckCircle2, Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { authService, forgotPasswordSchema, ForgotPasswordPayload } from '@/services/auth.service';
 
 export default function ForgotPasswordPage() {
@@ -78,7 +79,9 @@ export default function ForgotPasswordPage() {
     <main className="min-h-screen bg-white px-6 py-8 md:px-10">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[1180px] flex-col">
         <header className="mb-10 flex items-center justify-between border-b border-gray-200 pb-5">
-          <Link href="/" className="text-xl font-black tracking-tight text-black">FRILO</Link>
+          <Link href="/" className="inline-flex w-[104px] transition-opacity hover:opacity-80" aria-label="Accueil FRILO">
+            <BrandLogo variant="dark" priority />
+          </Link>
           <Link href="/login" className="text-sm font-black text-gray-500 transition-colors hover:text-black">
             Connexion
           </Link>

@@ -2,17 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Mail, Phone, Send } from 'lucide-react';
+import { ArrowRight, Check, Mail, MessageCircle, Send } from 'lucide-react';
 import axios from 'axios';
-import {
-  PublicHero,
-  PublicPageShell,
-} from '@/components/public/PublicPageShell';
+import { PublicPageShell } from '@/components/public/PublicPageShell';
 import {
   contactService,
   ContactRequestPayload,
   ContactRequestValidationErrors,
 } from '@/services/contact.service';
+
+type ContactRequestType = 'model' | 'order' | 'guidance' | 'general';
 
 type ContactFormState = {
   name: string;
@@ -24,20 +23,42 @@ type ContactFormState = {
   message: string;
 };
 
-const CONTACT_CHANNELS = [
+const REQUEST_TYPES: Array<{
+  value: ContactRequestType;
+  label: string;
+  subject: string;
+  description: string;
+  requiresReference?: boolean;
+}> = [
   {
-    icon: Phone,
-    value: '+229 00 00 00 00',
-    href: 'tel:+22900000000',
+    value: 'model',
+    label: 'Choisir un modèle',
+    subject: 'Choix du modèle',
+    description: 'Vous hésitez entre plusieurs bases ou vous voulez valider le bon point de départ.',
   },
   {
-    icon: Mail,
-    value: 'contact@frilo.com',
-    href: 'mailto:contact@frilo.com',
+    value: 'order',
+    label: 'Suivre une commande',
+    subject: 'Suivi de commande',
+    description: 'Vous avez déjà commencé ou payé une commande et vous voulez une précision.',
+    requiresReference: true,
+  },
+  {
+    value: 'guidance',
+    label: 'Demander une orientation',
+    subject: 'Orientation FRILO',
+    description: 'Votre activité ne rentre pas exactement dans un modèle et vous voulez être conseillé.',
+  },
+  {
+    value: 'general',
+    label: 'Question générale',
+    subject: 'Question générale',
+    description: 'Prix, contenu, délai, paiement ou fonctionnement : posez votre question directement.',
   },
 ];
 
 export default function ContactPage() {
+  const [requestType, setRequestType] = useState<ContactRequestType>('guidance');
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -59,6 +80,14 @@ export default function ContactPage() {
     const message = params.get('message') ?? '';
     const orderReference = params.get('order_reference') ?? '';
 
+    if (/commande|order/i.test(subject) || orderReference) {
+      setRequestType('order');
+    } else if (/mod[eè]le|template/i.test(subject)) {
+      setRequestType('model');
+    } else if (/secteur|orientation|recommandation/i.test(subject)) {
+      setRequestType('guidance');
+    }
+
     if (!subject && !message && !orderReference) {
       return;
     }
@@ -76,6 +105,20 @@ export default function ContactPage() {
     setFieldErrors(prev => ({ ...prev, [field]: [] }));
   };
 
+  const selectedRequestType = REQUEST_TYPES.find(item => item.value === requestType) ?? REQUEST_TYPES[0];
+
+  const handleRequestTypeChange = (type: ContactRequestType) => {
+    const nextType = REQUEST_TYPES.find(item => item.value === type) ?? REQUEST_TYPES[0];
+
+    setRequestType(type);
+    setFieldErrors(prev => ({ ...prev, subject: [], order_reference: [] }));
+    setForm(prev => ({
+      ...prev,
+      subject: nextType.subject,
+      order_reference: nextType.requiresReference ? prev.order_reference : '',
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
@@ -91,7 +134,7 @@ export default function ContactPage() {
     const payload: ContactRequestPayload = {
       name: form.name.trim(),
       email: form.email.trim(),
-      subject: form.subject.trim(),
+      subject: form.subject.trim() || selectedRequestType.subject,
       message: form.message.trim(),
       phone: form.phone.trim() || undefined,
       company: form.company.trim() || undefined,
@@ -118,56 +161,104 @@ export default function ContactPage() {
   };
 
   return (
-    <PublicPageShell>
-      <PublicHero
-        eyebrow="Contact"
-        title="Dites-nous ce dont vous avez besoin."
-        description="Une question sur un modèle, une commande ou votre futur site ? Envoyez un message court, on vous répond avec la prochaine étape."
-        primaryAction={{ label: 'Écrire un message', href: '#message' }}
-        secondaryAction={{ label: 'Voir les modèles', href: '/templates' }}
-        aside={(
-          <div className="grid gap-3 border-y border-black bg-white p-5">
-            {CONTACT_CHANNELS.map(({ icon: Icon, value, href }) => (
+    <PublicPageShell className="bg-white">
+      <section className="bg-white px-5 pb-8 pt-24 md:px-8 md:pb-10 md:pt-28">
+        <div className="mx-auto grid max-w-[1360px] gap-8 lg:grid-cols-[minmax(0,0.98fr)_minmax(360px,0.62fr)] lg:items-end">
+          <div>
+            <p className="text-sm font-black text-[#e60000]">Contact FRILO</p>
+            <h1 className="mt-5 max-w-3xl text-balance text-4xl font-black leading-[0.98] text-black sm:text-5xl md:text-6xl">
+              Contactez FRILO.
+            </h1>
+            <p className="mt-5 max-w-2xl text-pretty text-base leading-7 text-slate-700 md:text-lg md:leading-8">
+              Une question sur un modèle, une commande ou votre futur site ? Envoyez l’essentiel, nous vous répondons avec la prochaine étape.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <a
-                key={value}
-                href={href}
-                className="inline-flex items-center gap-3 border-b border-black/10 py-3 text-sm font-black text-black transition-colors last:border-b-0 hover:text-[#e60000]"
+                href="#message"
+                className="inline-flex items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-black text-white transition-colors hover:bg-[#e60000]"
               >
-                <Icon className="h-4 w-4" />
-                {value}
+                Écrire à FRILO
+                <ArrowRight className="ml-2 h-4 w-4" />
               </a>
-            ))}
+              <Link
+                href="/templates"
+                className="inline-flex items-center justify-center rounded-full border border-black px-6 py-3 text-sm font-black text-black transition-colors hover:bg-slate-50"
+              >
+                Voir les modèles
+              </Link>
+            </div>
           </div>
-        )}
-      />
 
-      <div id="message" className="px-5 py-12 md:px-8 md:py-16">
-        <div className="mx-auto max-w-5xl">
-            <div className="border-y border-black bg-white p-5 md:p-8">
-              <div className="mb-8">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#e60000]">Message</p>
-                <h2 className="mt-3 text-3xl font-black leading-tight text-black md:text-4xl">Écrivez simplement.</h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-black/62">
-                  Votre nom, votre contact et le sujet suffisent pour démarrer. Ajoutez une référence seulement si vous parlez d’une commande.
+          <div className="hidden border-y border-black py-5 md:block">
+            <p className="text-sm font-black text-black">Réponse habituelle sous 24h ouvrées.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Pour une commande existante, choisissez “Suivre une commande” dans le formulaire.
+            </p>
+            <a
+              href="mailto:contact@frilo.com"
+              className="mt-5 inline-flex items-center gap-3 text-sm font-black text-black transition-colors hover:text-[#e60000]"
+            >
+              <Mail className="h-4 w-4" />
+              contact@frilo.com
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="message" className="border-t border-black bg-white px-5 py-10 md:px-8 md:py-12">
+        <div className="mx-auto grid max-w-[1360px] gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="border-y border-black bg-white py-8">
+            <div className="grid gap-8 px-0 md:px-8 lg:grid-cols-[240px_minmax(0,1fr)]">
+              <div>
+                <p className="text-sm font-black text-[#e60000]">Votre message</p>
+                <h2 className="mt-3 max-w-sm text-balance text-2xl font-black leading-tight text-black md:text-4xl">
+                  Dites-nous l’essentiel.
+                </h2>
+                <p className="mt-4 hidden max-w-sm text-sm leading-6 text-slate-600 sm:block">
+                  Choisissez le contexte, puis laissez un message court.
                 </p>
               </div>
 
               {sent ? (
-                <div className="border-y border-black/10 bg-[#f7f4ec] p-10 text-center">
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-black">
+                <div className="border-y border-black bg-slate-50 p-10 text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#e60000]">
                     <Send className="h-5 w-5 text-white" />
                   </div>
                   <h2 className="mb-2 text-xl font-black text-black">Message envoyé.</h2>
-                  <p className="text-sm text-black/62">Nous vous répondrons dans les 24 heures.</p>
+                  <p className="text-sm text-slate-600">Nous vous répondrons dans les 24 heures ouvrées.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="border-b border-black/10 pb-2 text-xs font-black uppercase tracking-[0.14em] text-black/40">
-                    Vos informations
+                  <div>
+                    <label className="mb-3 block text-xs font-black uppercase tracking-[0.08em] text-black">
+                      Votre demande
+                    </label>
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {REQUEST_TYPES.map(item => {
+                        const active = item.value === requestType;
+
+                        return (
+                          <button
+                            key={item.value}
+                            type="button"
+                            onClick={() => handleRequestTypeChange(item.value)}
+                            className={`flex items-center justify-between border px-4 py-3 text-left text-sm font-black transition-colors ${
+                              active
+                                ? 'border-black bg-black text-white'
+                                : 'border-slate-300 bg-white text-black hover:border-black'
+                            }`}
+                          >
+                            {item.label}
+                            {active && <Check className="h-4 w-4" />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-black">
                         Nom <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -176,12 +267,12 @@ export default function ContactPage() {
                         value={form.name}
                         onChange={(e) => handleChange('name', e.target.value)}
                         required
-                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
+                        className="w-full border border-slate-300 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-slate-500 focus:border-black"
                       />
                       {fieldErrors.name?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.name[0]}</p>}
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-black">
                         E-mail <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -190,70 +281,53 @@ export default function ContactPage() {
                         value={form.email}
                         onChange={(e) => handleChange('email', e.target.value)}
                         required
-                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
+                        className="w-full border border-slate-300 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-slate-500 focus:border-black"
                       />
                       {fieldErrors.email?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.email[0]}</p>}
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">Téléphone</label>
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-black">Téléphone</label>
                       <input
                         type="text"
                         placeholder="+229 00 00 00 00"
                         value={form.phone}
                         onChange={(e) => handleChange('phone', e.target.value)}
-                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
+                        className="w-full border border-slate-300 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-slate-500 focus:border-black"
                       />
                       {fieldErrors.phone?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.phone[0]}</p>}
                     </div>
                     <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">Entreprise</label>
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-black">
+                        Objet <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="text"
-                        placeholder="Mon entreprise"
-                        value={form.company}
-                        onChange={(e) => handleChange('company', e.target.value)}
-                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
+                        placeholder="J'ai une question sur…"
+                        value={form.subject || selectedRequestType.subject}
+                        onChange={(e) => handleChange('subject', e.target.value)}
+                        required
+                        className="w-full border border-slate-300 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-slate-500 focus:border-black"
                       />
-                      {fieldErrors.company?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.company[0]}</p>}
+                      {fieldErrors.subject?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.subject[0]}</p>}
                     </div>
                   </div>
-                  <div className="border-b border-black/10 pb-2 pt-3 text-xs font-black uppercase tracking-[0.14em] text-black/40">
-                    Contexte
-                  </div>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_0.62fr]">
+                  {selectedRequestType.requiresReference && (
                     <div>
-                    <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
-                      Sujet <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="J'ai une question sur…"
-                      value={form.subject}
-                      onChange={(e) => handleChange('subject', e.target.value)}
-                      required
-                      className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
-                    />
-                    {fieldErrors.subject?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.subject[0]}</p>}
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">Référence</label>
+                      <label className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-black">Référence commande</label>
                       <input
                         type="text"
                         placeholder="#ORD-00042"
                         value={form.order_reference}
                         onChange={(e) => handleChange('order_reference', e.target.value)}
-                        className="w-full rounded-full border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
+                        className="w-full border border-slate-300 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-slate-500 focus:border-black"
                       />
                       {fieldErrors.order_reference?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.order_reference[0]}</p>}
                     </div>
-                  </div>
-                  <div className="border-b border-black/10 pb-2 pt-3 text-xs font-black uppercase tracking-[0.14em] text-black/40">
-                    Message
-                  </div>
+                  )}
                   <div>
-                    <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-black">
+                    <label className="mb-2 block text-xs font-black uppercase tracking-[0.08em] text-black">
                       Message <span className="text-red-500">*</span>
                     </label>
                     <textarea
@@ -262,11 +336,11 @@ export default function ContactPage() {
                       value={form.message}
                       onChange={(e) => handleChange('message', e.target.value)}
                       required
-                      className="w-full resize-none rounded-2xl border border-black/15 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-black/30 focus:border-black"
+                      className="w-full resize-none border border-slate-300 bg-white px-4 py-3.5 text-sm text-black outline-none transition-colors placeholder:text-slate-500 focus:border-black"
                     />
                     {fieldErrors.message?.[0] && <p className="text-red-500 text-xs mt-1.5">{fieldErrors.message[0]}</p>}
                   </div>
-                  <div className="border-y border-black/10 bg-[#f7f4ec] px-4 py-4">
+                  <div className="border-y border-slate-200 bg-slate-50 px-4 py-4">
                     <label className="flex items-start gap-3 cursor-pointer">
                       <input
                         type="checkbox"
@@ -297,8 +371,8 @@ export default function ContactPage() {
                   </div>
                   {submitError && <p className="text-sm text-red-600 text-center">{submitError}</p>}
                   <div className="flex flex-col gap-4 pt-2 md:flex-row md:items-center md:justify-between">
-                    <p className="text-xs leading-relaxed text-slate-400">
-                      Réponse habituelle sous 24h ouvrées.
+                    <p className="text-xs leading-relaxed text-slate-500">
+                      Aucune commande n’est créée depuis cette page. Elle sert uniquement à vous orienter.
                     </p>
                     <button
                       type="submit"
@@ -311,8 +385,31 @@ export default function ContactPage() {
                 </form>
               )}
             </div>
+          </div>
+
+          <aside className="h-fit border-y border-black py-6 lg:sticky lg:top-24">
+            <div className="space-y-6">
+              <div>
+                <p className="text-sm font-black text-black">Réponse</p>
+                <p className="mt-3 text-sm leading-6 text-slate-700">
+                  Nous répondons habituellement sous 24h ouvrées avec une suite claire.
+                </p>
+              </div>
+
+              <div className="border-t border-slate-200 pt-5">
+                <p className="text-sm font-black text-black">Canal direct</p>
+                <a
+                  href="mailto:contact@frilo.com"
+                  className="mt-4 inline-flex items-center gap-3 text-sm font-black text-black transition-colors hover:text-[#e60000]"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  contact@frilo.com
+                </a>
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
+      </section>
     </PublicPageShell>
   );
 }

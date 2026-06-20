@@ -1,17 +1,21 @@
 "use client"
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { businessService, Template } from '@/services/business.service';
 import { cn } from '@/lib/utils';
 import { buildPreviewUrl, hasLivePreview, parsePreviewPages } from '@/lib/templatePreview';
+import { buildOrderUrl } from '@/lib/templatePersonalization';
 import { trackFunnelEvent } from '@/lib/analytics';
 
 export default function TemplateImmersivePreviewPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params?.id as string;
+  const selectedPaletteId = searchParams.get('palette') ?? undefined;
+  const selectedFontPairingId = searchParams.get('font') ?? undefined;
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
@@ -70,8 +74,12 @@ export default function TemplateImmersivePreviewPage() {
   const livePreviewEnabled = hasLivePreview(template.preview_url);
 
   const iframeSrc = livePreviewEnabled && template.preview_url
-    ? buildPreviewUrl(template.preview_url, activePreviewPath)
+    ? buildPreviewUrl(template.preview_url, activePreviewPath, {
+      palette: selectedPaletteId,
+      font: selectedFontPairingId,
+    })
     : null;
+  const orderUrl = buildOrderUrl(template.id, selectedPaletteId, selectedFontPairingId);
 
   if (!livePreviewEnabled || !iframeSrc) {
     return (
@@ -178,7 +186,7 @@ export default function TemplateImmersivePreviewPage() {
             </button>
           </div>
           <Link
-            href={`/commande?templateId=${template.id}`}
+            href={orderUrl}
             onClick={() =>
               trackFunnelEvent('start_order', {
                 template_id: template.id,
@@ -201,7 +209,10 @@ export default function TemplateImmersivePreviewPage() {
           viewMode === 'mobile' && "h-full max-h-[760px] w-[360px] rounded-[2.5rem] border-[10px] border-zinc-900"
         )}>
           <iframe
-            src={buildPreviewUrl(template.preview_url!, activePreviewPath)}
+            src={buildPreviewUrl(template.preview_url!, activePreviewPath, {
+              palette: selectedPaletteId,
+              font: selectedFontPairingId,
+            })}
             className="h-full w-full"
             title={`Demo ${template.name}`}
           />
@@ -210,7 +221,7 @@ export default function TemplateImmersivePreviewPage() {
 
       <div className="border-t border-white/10 bg-[oklch(7%_0.006_29)] px-4 py-3 sm:hidden">
         <Link
-          href={`/commande?templateId=${template.id}`}
+          href={orderUrl}
           onClick={() =>
             trackFunnelEvent('start_order', {
               template_id: template.id,

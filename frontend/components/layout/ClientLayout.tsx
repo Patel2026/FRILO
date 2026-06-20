@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { CookieConsentBanner } from './CookieConsentBanner';
 
 // Routes where the global header/footer must NOT appear
 // (they have their own navigation: top bar, sidebar, split-screen)
@@ -36,6 +37,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       <Header />
       <main className="flex-grow">{children}</main>
       <Footer />
+      <CookieConsentBanner />
     </>
   );
 }

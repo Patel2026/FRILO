@@ -25,6 +25,8 @@ class CreateOrderRequest extends FormRequest
             'colors'                => ['nullable', 'array'],
             'colors.*'              => ['string', 'max:50'],
             'specific_instructions' => ['nullable', 'string'],
+            'color_palette_id'      => ['nullable', 'string', 'max:80'],
+            'font_pairing_id'       => ['nullable', 'string', 'max:80'],
             'option_ids'            => ['nullable', 'array', 'max:20'],
             'option_ids.*'          => [
                 'integer',

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AlertTriangle, ArrowRight, CheckCircle2, Loader2, RefreshCcw } from 'lucide-react';
 import axios from 'axios';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { businessService, OrderPaymentResponse, PaymentStatus } from '@/services/business.service';
 import { cn } from '@/lib/utils';
 
@@ -118,7 +119,9 @@ function PaymentReturnContent() {
     <main className="min-h-screen bg-neutral-50 px-4 py-6 text-black md:px-8 md:py-10">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-[1180px] flex-col">
         <header className="mb-10 flex items-center justify-between border-b border-gray-200 pb-5">
-          <Link href="/" className="text-xl font-black tracking-tight text-black">FRILO</Link>
+          <Link href="/" className="inline-flex w-[104px] transition-opacity hover:opacity-80" aria-label="Accueil FRILO">
+            <BrandLogo variant="dark" priority />
+          </Link>
           <Link href="/dashboard/orders" className="text-sm font-black text-gray-500 transition-colors hover:text-black">
             Mes commandes
           </Link>

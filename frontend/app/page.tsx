@@ -30,6 +30,16 @@ import { cn, parseFeatures } from '@/lib/utils';
 
 const FEATURED_TEMPLATE_LIMIT = 6;
 
+const TEMPLATE_FALLBACK_IMAGES: Record<string, string> = {
+  restaurants: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+  btp: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80',
+  sante: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=1200&q=80',
+  avocats: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
+  coaching: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80',
+  immobilier: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80',
+  accompagnement: '/image/client-satisfait-frilo.jpg',
+};
+
 type SectorFeature = {
   id: number | string;
   name: string;
@@ -75,7 +85,12 @@ function getTemplatePrice(template: Template): number {
 }
 
 function getTemplateImage(template: Template): string {
-  return template.full_thumbnail_url || parsePreviewGallery(template.preview_gallery)[0] || '';
+  return (
+    template.full_thumbnail_url
+    || parsePreviewGallery(template.preview_gallery)[0]
+    || TEMPLATE_FALLBACK_IMAGES[template.sector?.slug ?? '']
+    || '/image/client-satisfait-frilo.jpg'
+  );
 }
 
 function selectFeaturedTemplates(templates: Template[]): Template[] {
@@ -226,12 +241,14 @@ function SectionIntro({
   title,
   description,
   action,
+  titleClassName,
   invert = false,
 }: {
   label?: string;
   title: string;
   description?: string;
   action?: ReactNode;
+  titleClassName?: string;
   invert?: boolean;
 }) {
   return (
@@ -242,7 +259,7 @@ function SectionIntro({
             {label}
           </p>
         )}
-        <h2 className={cn('max-w-4xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.04em] text-balance md:text-5xl lg:text-6xl', invert ? 'text-white' : 'text-black')}>
+        <h2 className={cn('max-w-4xl font-serif text-4xl font-medium leading-[0.96] tracking-[-0.04em] text-balance md:text-5xl lg:text-6xl', invert ? 'text-white' : 'text-black', titleClassName)}>
           {title}
         </h2>
       </div>
@@ -399,7 +416,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col overflow-x-hidden bg-white text-black">
-      <section className="relative isolate min-h-[calc(100svh-4rem)] overflow-hidden bg-black text-white">
+      <section data-header-theme="dark" className="relative isolate min-h-[calc(100svh-4rem)] overflow-hidden bg-black text-white">
         <img
           src={hero.image.url}
           alt={hero.image.alt}
@@ -445,7 +462,7 @@ export default function Home() {
           <SectionIntro
             label={modelsSection.content.eyebrow}
             title={modelsSection.content.headline}
-            description={modelsSection.content.description}
+            titleClassName="max-w-3xl text-3xl leading-[1.02] tracking-[-0.035em] md:text-4xl lg:text-5xl"
             action={(
               <PillLink href={modelsSection.content.cta.url} variant="outline-black">
                 {modelsSection.content.cta.label}

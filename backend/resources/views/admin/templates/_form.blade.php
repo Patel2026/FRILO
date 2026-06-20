@@ -12,6 +12,14 @@
             ->implode("\n")
     );
     $previewGalleryRaw = old('preview_gallery_raw', implode("\n", $template?->preview_gallery ?? []));
+    $colorPalettesRaw = old('color_palettes_raw', $template?->color_palettes
+        ? json_encode($template->color_palettes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        : ''
+    );
+    $fontPairingsRaw = old('font_pairings_raw', $template?->font_pairings
+        ? json_encode($template->font_pairings, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        : ''
+    );
     $resolvedPreviewSource = old('preview_source',
         \Illuminate\Support\Str::startsWith((string) ($template?->preview_url ?? ''), '/template-previews/')
             ? 'local'
@@ -173,6 +181,38 @@
               placeholder="https://.../home.jpg&#10;https://.../about.jpg">{{ $resolvedPreviewSource === 'external' ? $previewGalleryRaw : '' }}</textarea>
     @error('preview_gallery_raw')<div class="invalid-feedback">{{ $message }}</div>@enderror
     <div class="form-text">Fallback image uniquement pour le mode liens d'accès.</div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-3">
+        <label class="form-label">Palettes de couleurs (JSON)</label>
+        <textarea name="color_palettes_raw" class="form-control font-monospace @error('color_palettes_raw') is-invalid @enderror" rows="8"
+                  placeholder='[{"id":"clair","name":"Clair","colors":["#ffffff","#111111","#e60000"]}]'>{{ $colorPalettesRaw }}</textarea>
+        @error('color_palettes_raw')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        <div class="form-text">Chaque palette doit contenir <code>id</code>, <code>name</code> et idéalement <code>colors</code>.</div>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <label class="form-label">Packs de polices (JSON)</label>
+        <textarea name="font_pairings_raw" class="form-control font-monospace @error('font_pairings_raw') is-invalid @enderror" rows="8"
+                  placeholder='[{"id":"editorial","name":"Editorial","heading":"Instrument Serif","body":"Inter"}]'>{{ $fontPairingsRaw }}</textarea>
+        @error('font_pairings_raw')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        <div class="form-text">Chaque pack doit contenir <code>id</code>, <code>name</code>, puis <code>heading</code> et <code>body</code>.</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Palette par défaut</label>
+        <input type="text" name="default_color_palette" class="form-control @error('default_color_palette') is-invalid @enderror"
+               value="{{ old('default_color_palette', $template?->default_color_palette) }}" placeholder="clair">
+        @error('default_color_palette')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Pack de polices par défaut</label>
+        <input type="text" name="default_font_pairing" class="form-control @error('default_font_pairing') is-invalid @enderror"
+               value="{{ old('default_font_pairing', $template?->default_font_pairing) }}" placeholder="editorial">
+        @error('default_font_pairing')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
 </div>
 
 <div class="form-check form-switch mb-0">
