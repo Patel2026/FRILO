@@ -1,7 +1,10 @@
 <meta charset="utf-8" />
-<title>@yield('title') | Velzon - Admin & Dashboard Template</title>
+<title>@yield('title', 'Administration') | FRILO Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-<meta content="Themesbrand" name="author" />
+<meta content="@yield('meta_description', 'Espace d’administration FRILO pour piloter les commandes, contenus, paiements et clients.')" name="description" />
+<meta content="FRILO" name="author" />
+<meta name="robots" content="noindex,nofollow">
 <!-- App favicon -->
-<link rel="shortcut icon" href="{{ URL::asset('build/images/favicon.ico')}}">
+<link rel="icon" href="{{ URL::asset('favicon.ico') }}" sizes="any">
+<link rel="icon" href="{{ URL::asset('favicon.png') }}" type="image/png">
+<link rel="apple-touch-icon" href="{{ URL::asset('favicon.png') }}">

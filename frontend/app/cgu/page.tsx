@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const startingPriceLabel = formatPublicPrice(pricing.starting_price, pricing.currency_label);
 
   return {
-    title: 'CGU / CGV | FRILO',
+    title: 'CGU / CGV',
     description: `Consultez les conditions d'utilisation et de vente FRILO, incluant la tarification publique à partir de ${startingPriceLabel}.`,
   };
 }

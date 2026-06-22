@@ -29,8 +29,8 @@ class AdminAuthRoutingTest extends TestCase
     {
         $this->get('/frilo-console')
             ->assertOk()
-            ->assertSee('FRILO — Administration')
-            ->assertSee('Connectez-vous pour accéder à l\'administration.', false);
+            ->assertSee('Connexion admin')
+            ->assertSee('Connectez-vous avec votre compte FRILO actif pour accéder au pilotage interne.', false);
     }
 
     public function test_public_login_is_not_laravel_admin_login(): void
