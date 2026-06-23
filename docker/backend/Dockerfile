@@ -30,7 +30,8 @@ COPY backend/ ./
 COPY template/ /var/www/html/template-source/
 COPY docker/backend/entrypoint.sh /usr/local/bin/frilo-backend-entrypoint
 
-RUN chmod +x /usr/local/bin/frilo-backend-entrypoint
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
+ && chmod +x /usr/local/bin/frilo-backend-entrypoint
 
 EXPOSE 9000
 
