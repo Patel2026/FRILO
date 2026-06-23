@@ -18,5 +18,7 @@
 @endif
 <!-- custom Css-->
 <link href="{{ URL::asset('build/css/custom.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
-<link href="{{ URL::asset('frilo-admin.css') }}" rel="stylesheet" type="text/css" />
+@if(file_exists(public_path('frilo-admin.css')))
+<link href="{{ URL::asset('frilo-admin.css') }}?v={{ filemtime(public_path('frilo-admin.css')) }}" rel="stylesheet" type="text/css" />
+@endif
 {{-- @yield('css') --}}

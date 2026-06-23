@@ -9,7 +9,15 @@
     var html = document.documentElement;
     var buttonIcon = document.querySelector(".hamburger-icon");
     var width = html.clientWidth;
-    var layout = html.getAttribute("data-layout");
+    var layout = html.getAttribute("data-layout") || "vertical";
+
+    function rememberSidebarSize(size) {
+      try {
+        window.sessionStorage.setItem("data-sidebar-size", size);
+      } catch (error) {
+        // Storage can be unavailable in hardened browser contexts.
+      }
+    }
 
     if (buttonIcon && width > 767) {
       buttonIcon.classList.toggle("open");
@@ -27,6 +35,7 @@
     if (width <= 767) {
       document.body.classList.add("vertical-sidebar-enable");
       html.setAttribute("data-sidebar-size", "lg");
+      rememberSidebarSize("lg");
       return;
     }
 
@@ -37,6 +46,7 @@
         "data-sidebar-size",
         html.getAttribute("data-sidebar-size") === "sm" ? "" : "sm"
       );
+      rememberSidebarSize(html.getAttribute("data-sidebar-size") || "lg");
       return;
     }
 
@@ -44,6 +54,7 @@
       "data-sidebar-size",
       html.getAttribute("data-sidebar-size") === "lg" ? "sm" : "lg"
     );
+    rememberSidebarSize(html.getAttribute("data-sidebar-size") || "lg");
   }
 
   function bindAdminShell() {
@@ -53,7 +64,16 @@
 
     if (hamburger && !hamburger.dataset.friloBound) {
       hamburger.dataset.friloBound = "true";
-      hamburger.addEventListener("click", toggleSidebar);
+      hamburger.setAttribute("aria-controls", "navbar-nav");
+      hamburger.addEventListener(
+        "click",
+        function (event) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          toggleSidebar();
+        },
+        true
+      );
     }
 
     if (overlay && !overlay.dataset.friloBound) {

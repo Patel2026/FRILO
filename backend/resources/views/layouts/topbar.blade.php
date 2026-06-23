@@ -2,7 +2,7 @@
     $adminUser = auth()->user();
     $adminUnreadCount = $adminUser ? $adminUser->unreadNotifications()->count() : 0;
     $adminLatestNotifications = $adminUser
-        ? $adminUser->notifications()->latest()->limit(6)->get()
+        ? $adminUser->notifications()->latest()->limit(4)->get()
         : collect();
 @endphp
 
@@ -38,19 +38,19 @@
                             </span>
                         @endif
                     </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0">
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 frilo-notification-menu">
                         <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border d-flex align-items-center justify-content-between">
                             <h6 class="m-0 fs-16 fw-semibold">Notifications</h6>
                             <a href="{{ route('admin.notifications.index') }}" class="text-reset text-decoration-underline small">Voir tout</a>
                         </div>
-                        <div data-simplebar style="max-height: 320px;">
+                        <div class="frilo-notification-list">
                             @forelse($adminLatestNotifications as $notification)
                                 @php
                                     $data = is_array($notification->data) ? $notification->data : [];
                                     $title = (string) ($data['title'] ?? 'Notification');
                                     $message = (string) ($data['message'] ?? '');
                                 @endphp
-                                <a href="{{ route('admin.notifications.index') }}" class="dropdown-item notify-item {{ $notification->read_at ? '' : 'bg-light-subtle' }}">
+                                <a href="{{ route('admin.notifications.index') }}" class="dropdown-item notify-item frilo-notification-item {{ $notification->read_at ? '' : 'bg-light-subtle' }}">
                                     <div class="d-flex">
                                         <div class="avatar-xs me-3">
                                             <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-16">
@@ -58,11 +58,11 @@
                                             </span>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <h6 class="mb-1">{{ \Illuminate\Support\Str::limit($title, 60) }}</h6>
+                                            <h6 class="mb-1 frilo-notification-title">{{ \Illuminate\Support\Str::limit($title, 54) }}</h6>
                                             @if($message !== '')
-                                                <div class="text-muted fs-12">{{ \Illuminate\Support\Str::limit($message, 90) }}</div>
+                                                <div class="text-muted fs-12 frilo-notification-message">{{ \Illuminate\Support\Str::limit($message, 72) }}</div>
                                             @endif
-                                            <small class="text-muted">{{ $notification->created_at?->diffForHumans() }}</small>
+                                            <small class="text-muted frilo-notification-date">{{ $notification->created_at?->diffForHumans() }}</small>
                                         </div>
                                     </div>
                                 </a>
@@ -71,6 +71,11 @@
                                     Aucune notification récente.
                                 </div>
                             @endforelse
+                        </div>
+                        <div class="p-2 border-top">
+                            <a href="{{ route('admin.notifications.index') }}" class="btn btn-soft-secondary btn-sm w-100">
+                                Voir toutes les notifications
+                            </a>
                         </div>
                         @if($adminUnreadCount > 0)
                             <div class="p-2 border-top">
