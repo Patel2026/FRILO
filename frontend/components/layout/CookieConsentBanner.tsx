@@ -137,10 +137,13 @@ export function CookieConsentBanner() {
   return (
     <section
       aria-label="Préférences de cookies"
-      className="fixed inset-x-0 bottom-0 z-[2147483647] max-h-[64svh] overflow-y-auto border-t border-black bg-white px-4 py-2.5 text-black md:px-6 md:py-4"
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-[60] flex max-h-[52vh] max-h-[52dvh] flex-col overflow-hidden border-t border-black bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2.5 text-black md:px-6 md:pb-4 md:pt-4",
+        settingsOpen && "max-h-[82vh] max-h-[82dvh]"
+      )}
     >
-      <div className="mx-auto grid max-w-[1360px] gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-        <div className="max-w-4xl">
+      <div className="mx-auto flex min-h-0 w-full max-w-[1360px] flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-4">
+        <div className="min-h-0 max-w-4xl overflow-y-auto pr-1 overscroll-contain">
           <p className="text-pretty text-[13px] leading-5 text-slate-900 md:text-sm md:leading-6">
             FRILO utilise des cookies nécessaires et, avec votre accord, des cookies de mesure et de personnalisation. Vous pouvez accepter, refuser ou gérer vos choix. Voir nos{' '}
             <Link href="/mentions-legales" className="font-semibold underline underline-offset-4">
@@ -195,7 +198,7 @@ export function CookieConsentBanner() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-[auto_auto_auto] sm:items-center md:gap-2 lg:justify-end">
+        <div className="grid shrink-0 grid-cols-2 gap-1.5 border-t border-slate-200 pt-2 sm:grid-cols-[auto_auto_auto] sm:items-center md:gap-2 lg:justify-end lg:border-t-0 lg:pt-0">
           <button
             type="button"
             onClick={acceptAll}

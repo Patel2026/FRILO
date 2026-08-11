@@ -127,7 +127,7 @@ export function Header() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+          'fixed top-0 left-0 right-0 z-[90] transition-all duration-300',
           mobileOpen
             ? 'bg-black border-b border-white/10 py-4'
             : dark
@@ -226,12 +226,12 @@ export function Header() {
         aria-modal="true"
         aria-hidden={!mobileOpen}
         className={cn(
-          'fixed inset-0 z-40 bg-black text-white transition-all duration-300 lg:hidden',
+          'fixed inset-0 z-[80] h-screen h-[100dvh] max-h-screen max-h-[100dvh] overflow-hidden bg-black text-white transition-all duration-300 lg:hidden',
           mobileOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         )}
       >
-        <div className="flex min-h-full flex-col overflow-y-auto px-6 pb-8 pt-24">
-          <div className="grid gap-8 py-2">
+        <div className="flex h-full min-h-0 flex-col overflow-y-auto overscroll-contain px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-24">
+          <div className="grid shrink-0 gap-8 py-2">
             <div className="space-y-4">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-gray-500">
                 Produit
@@ -304,7 +304,7 @@ export function Header() {
             )}
           </div>
 
-          <div className="mt-auto border-t border-white/10 pt-6">
+          <div className="mt-auto shrink-0 border-t border-white/10 pt-6">
             <div className="space-y-4">
               <Link
                 href="/templates"
