@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Sector;
 use App\Models\Template;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class TemplateApiTest extends TestCase
@@ -156,5 +157,35 @@ class TemplateApiTest extends TestCase
             ->assertJsonPath('features.0', 'Legacy inclus 1')
             ->assertJsonPath('target_audience', [])
             ->assertJsonPath('included_features', []);
+    }
+
+    public function test_template_show_ignores_missing_thumbnail_file(): void
+    {
+        Storage::fake('public');
+
+        $sector = Sector::create([
+            'name' => 'BTP',
+            'slug' => 'btp',
+            'description' => 'Secteur test',
+            'icon' => 'Hammer',
+            'gradient' => 'from-slate-500 to-slate-700',
+            'is_active' => true,
+        ]);
+
+        $template = Template::create([
+            'sector_id' => $sector->id,
+            'name' => 'Template sans fichier',
+            'slug' => 'template-sans-fichier',
+            'description' => 'Visible',
+            'price' => 50000,
+            'features' => ['A'],
+            'thumbnail' => 'templates/missing-thumbnail.png',
+            'is_active' => true,
+        ]);
+
+        $this->getJson('/api/templates/'.$template->id)
+            ->assertOk()
+            ->assertJsonPath('thumbnail', 'templates/missing-thumbnail.png')
+            ->assertJsonPath('full_thumbnail_url', null);
     }
 }

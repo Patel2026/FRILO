@@ -71,6 +71,10 @@ class Template extends Model
             return null;
         }
 
+        if (! Storage::disk('public')->exists($this->thumbnail)) {
+            return null;
+        }
+
         return Storage::url($this->thumbnail);
     }
 
