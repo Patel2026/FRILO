@@ -31,6 +31,7 @@ export function BrandLogo({ variant = 'dark', className, priority = false }: Bra
         width={logo.width}
         height={logo.height}
         priority={priority}
+        unoptimized
         sizes="(max-width: 768px) 112px, 128px"
         className="h-auto w-full object-contain"
       />
