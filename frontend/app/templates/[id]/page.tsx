@@ -10,6 +10,7 @@ import { useAuthState } from '@/hooks/useAuthState';
 import { businessService, Template, TemplateReview, TemplateReviewEligibility, TemplateReviewSummary } from '@/services/business.service';
 import { cn } from '@/lib/utils';
 import { buildPreviewUrl, hasLivePreview, parsePreviewGallery, parsePreviewPages } from '@/lib/templatePreview';
+import { TemplatePreview } from '@/components/business/TemplatePreview';
 import {
   buildOrderUrl,
   buildTemplatePreviewUrl,
@@ -329,7 +330,7 @@ export default function TemplateDetailPage() {
               style={{ outlineColor: selectedColors[2] ?? undefined }}
             >
               {iframeSrc ? (
-                <iframe src={iframeSrc} className="h-full w-full" title={`Aperçu interactif ${template.name}`} />
+                <TemplatePreview url={iframeSrc} mode={template.preview_mode} image={template.full_thumbnail_url || primaryPreviewImage} name={template.name} title={`Aperçu interactif ${template.name}`} />
               ) : primaryPreviewImage ? (
                 <div
                   className="h-full w-full bg-cover bg-center bg-no-repeat"

@@ -103,6 +103,7 @@ export function TemplateCard({
 
         {image ? (
           <Image
+            unoptimized
             src={image}
             alt={name}
             fill

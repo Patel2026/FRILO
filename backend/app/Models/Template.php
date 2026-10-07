@@ -25,6 +25,7 @@ class Template extends Model
         'included_features',
         'thumbnail',
         'preview_url',
+        'preview_mode',
         'preview_pages',
         'preview_gallery',
         'color_palettes',
@@ -75,7 +76,7 @@ class Template extends Model
             return null;
         }
 
-        return Storage::url($this->thumbnail);
+        return Storage::disk('public')->url($this->thumbnail);
     }
 
     public function getEffectivePriceAttribute(): int

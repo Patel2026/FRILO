@@ -59,59 +59,32 @@ export function parsePreviewGallery(value: unknown): string[] {
 }
 
 export function buildPreviewUrl(baseUrl: string, path: string, params: Record<string, string | undefined> = {}): string {
+    if (!hasLivePreview(baseUrl)) return '';
+    if (/[\x00-\x20\x7f\\]/.test(path) || path.startsWith('//')) return '';
+    if (/^[a-z][a-z0-9+.-]*:/i.test(path)) return hasLivePreview(path) ? path : '';
+
     try {
-        if (/^https?:\/\//i.test(path)) {
-            return path;
-        }
-
-        const isExternalBase = /^https?:\/\//i.test(baseUrl);
-        const normalizedBase = isExternalBase
-            ? baseUrl
-            : `https://preview.local${baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`}`;
-        const base = new URL(normalizedBase.endsWith('/') ? normalizedBase : `${normalizedBase}/`);
-
+        const isExternal = /^https?:\/\//i.test(baseUrl);
+        const base = new URL(baseUrl, 'https://preview.local');
         if (!path || path === '/') {
-            if (isExternalBase) {
-                applyPreviewParams(base, params);
-                return base.toString();
+            if (isExternal) return baseUrl;
+            if (!/\.[a-z0-9]+$/i.test(base.pathname)) {
+                base.pathname = `${base.pathname.replace(/\/$/, '')}/index.html`;
             }
-
-            if (/\.[a-z0-9]+$/i.test(base.pathname)) {
-                applyPreviewParams(base, params);
-                return `${base.pathname}${base.search}${base.hash}`;
+        } else {
+            // Directory URLs without a trailing slash keep their historical meaning.
+            if (!/\.[a-z0-9]+$/i.test(base.pathname) && !base.pathname.endsWith('/')) {
+                base.pathname += '/';
             }
-
-            base.pathname = `${base.pathname.endsWith('/') ? base.pathname : `${base.pathname}/`}index.html`;
-            applyPreviewParams(base, params);
-            return `${base.pathname}${base.search}${base.hash}`;
+            const resolved = new URL(path, base);
+            if (isExternal) return resolved.toString();
+            applyPreviewParams(resolved, params);
+            return `${resolved.pathname}${resolved.search}${resolved.hash}`;
         }
-
-        if (path.startsWith('/')) {
-            if (isExternalBase) {
-                base.pathname = path;
-                base.search = '';
-                base.hash = '';
-                applyPreviewParams(base, params);
-                return base.toString();
-            }
-
-            if (Object.values(params).some(Boolean)) {
-                const localUrl = new URL(path, 'https://preview.local');
-                applyPreviewParams(localUrl, params);
-                return `${localUrl.pathname}${localUrl.search}${localUrl.hash}`;
-            }
-
-            return path;
-        }
-
-        const resolved = new URL(path, base);
-        applyPreviewParams(resolved, params);
-
-        return isExternalBase
-            ? resolved.toString()
-            : `${resolved.pathname}${resolved.search}${resolved.hash}`;
+        applyPreviewParams(base, params);
+        return `${base.pathname}${base.search}${base.hash}`;
     } catch {
-        return baseUrl;
+        return '';
     }
 }
 
@@ -124,6 +97,12 @@ function applyPreviewParams(url: URL, params: Record<string, string | undefined>
 }
 
 export function hasLivePreview(previewUrl: string | undefined | null): boolean {
-    return typeof previewUrl === 'string'
-        && (previewUrl.startsWith('/') || /^https?:\/\//i.test(previewUrl));
+    if (!previewUrl || /[\x00-\x20\x7f\\]/.test(previewUrl) || previewUrl.startsWith('//')) return false;
+    if (previewUrl.startsWith('/')) return true;
+    try {
+        const url = new URL(previewUrl);
+        return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password;
+    } catch {
+        return false;
+    }
 }

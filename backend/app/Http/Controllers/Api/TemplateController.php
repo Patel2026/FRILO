@@ -54,6 +54,7 @@ class TemplateController extends Controller
             'thumbnail' => $template->thumbnail,
             'full_thumbnail_url' => $template->full_thumbnail_url,
             'preview_url' => $template->preview_url,
+            'preview_mode' => $template->preview_mode ?? 'iframe',
             'preview_pages' => $template->preview_pages ?? [],
             'preview_gallery' => $template->preview_gallery ?? [],
             'color_palettes' => $template->color_palettes ?? [],

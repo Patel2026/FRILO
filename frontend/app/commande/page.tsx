@@ -560,6 +560,7 @@ function OrderTunnelContent() {
             <ReviewPanel title="Modèle choisi" onEdit={() => goToPersonalize()} className="lg:border-r">
               {template?.full_thumbnail_url && (
                 <Image
+                  unoptimized
                   src={template.full_thumbnail_url}
                   alt={template.name}
                   width={720}
@@ -798,7 +799,7 @@ function OrderSummary({
   return (
     <div>
       {template?.full_thumbnail_url && (
-        <Image src={template.full_thumbnail_url} alt={template.name} width={680} height={380} className="h-36 w-full object-cover object-top" />
+        <Image unoptimized src={template.full_thumbnail_url} alt={template.name} width={680} height={380} className="h-36 w-full object-cover object-top" />
       )}
       <div className="p-5">
         <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">Votre sélection</p>

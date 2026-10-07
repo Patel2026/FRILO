@@ -98,7 +98,7 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Thumbnail</label>
+    <label class="form-label" for="template-thumbnail-input">Miniature (Thumbnail)</label>
     <div class="row g-3 align-items-start">
         <div class="col-md-5">
             <div class="rounded border bg-light p-2">
@@ -116,9 +116,11 @@
             </div>
         </div>
         <div class="col-md-7">
-            <input id="template-thumbnail-input" type="file" name="thumbnail" class="form-control" accept="image/jpeg,image/png,image/webp">
-            <div class="form-text">
+            <input id="template-thumbnail-input" type="file" name="thumbnail" class="form-control @error('thumbnail') is-invalid @enderror" accept="image/jpeg,image/png,image/webp" aria-describedby="thumbnail-help @error('thumbnail') thumbnail-error @enderror" @error('thumbnail') aria-invalid="true" @enderror>
+            @error('thumbnail')<div id="thumbnail-error" class="invalid-feedback">{{ $message }}</div>@enderror
+            <div id="thumbnail-help" class="form-text">
                 Format recommandé : image horizontale 4:3, 1200 × 900 px minimum. JPG, PNG ou WebP — max 2 Mo.
+                Disponible pour les templates locaux et externes. Laisser vide pour conserver la miniature actuelle.
             </div>
         </div>
     </div>
@@ -160,11 +162,21 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">URL de prévisualisation externe</label>
-    <input type="text" name="preview_url" class="form-control @error('preview_url') is-invalid @enderror"
+    <label class="form-label" for="preview_url">URL de prévisualisation externe</label>
+    <input id="preview_url" type="text" name="preview_url" class="form-control @error('preview_url') is-invalid @enderror"
            value="{{ old('preview_url', $resolvedPreviewSource === 'external' ? $template?->preview_url : '') }}" placeholder="https://...">
     @error('preview_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    <div class="form-text">Utilisé seulement si le mode <strong>Liens d'accès</strong> est sélectionné.</div>
+    <div class="form-text">Pour ThemeForest ou une autre plateforme, coller de préférence le lien de démonstration du créateur. Si la démo refuse l'affichage intégré, choisir l'ouverture dans un nouvel onglet.</div>
+</div>
+
+<div class="mb-3">
+    <label class="form-label" for="preview_mode">Ouverture de la démo externe</label>
+    <select id="preview_mode" name="preview_mode" class="form-select @error('preview_mode') is-invalid @enderror" aria-describedby="preview-mode-help">
+        <option value="iframe" @selected(old('preview_mode', $template?->preview_mode ?? 'iframe') === 'iframe')>Intégrée dans FRILO</option>
+        <option value="external" @selected(old('preview_mode', $template?->preview_mode ?? 'iframe') === 'external')>Dans un nouvel onglet</option>
+    </select>
+    @error('preview_mode')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    <div id="preview-mode-help" class="form-text">En nouvel onglet, FRILO affiche votre miniature avec un lien vers la démo. Les templates locaux restent intégrés. Un lien d'ouverture directe reste disponible dans les deux modes.</div>
 </div>
 
 <div class="mb-3">

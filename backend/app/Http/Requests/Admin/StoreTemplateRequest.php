@@ -24,6 +24,7 @@ class StoreTemplateRequest extends FormRequest
             'included_features_raw' => ['nullable', 'string'],
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'preview_source' => ['required', 'in:external,local'],
+            'preview_mode' => ['sometimes', 'required', 'in:iframe,external'],
             'local_preview_template' => ['nullable', 'string', 'max:255'],
             'preview_url' => ['nullable', 'string', 'max:500'],
             'preview_pages_raw' => ['nullable', 'string'],

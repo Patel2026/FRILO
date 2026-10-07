@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use League\Flysystem\UnableToWriteFile;
 
 class TemplateService
 {
@@ -18,7 +19,7 @@ class TemplateService
         $payload = $this->normalizePayload($data);
 
         if ($thumbnail !== null) {
-            $payload['thumbnail'] = $thumbnail->store('templates', 'public');
+            $payload['thumbnail'] = $this->storeThumbnail($thumbnail);
         }
 
         return Template::create($payload);
@@ -27,16 +28,17 @@ class TemplateService
     public function update(Template $template, array $data, ?UploadedFile $thumbnail = null): Template
     {
         $payload = $this->normalizePayload($data, $template);
+        $previousThumbnail = $template->thumbnail;
 
         if ($thumbnail !== null) {
-            if ($template->thumbnail) {
-                Storage::disk('public')->delete($template->thumbnail);
-            }
-
-            $payload['thumbnail'] = $thumbnail->store('templates', 'public');
+            $payload['thumbnail'] = $this->storeThumbnail($thumbnail);
         }
 
         $template->update($payload);
+
+        if ($thumbnail !== null && $previousThumbnail) {
+            Storage::disk('public')->delete($previousThumbnail);
+        }
 
         return $template->fresh();
     }
@@ -44,6 +46,23 @@ class TemplateService
     public function delete(Template $template): void
     {
         $template->delete();
+    }
+
+    private function storeThumbnail(UploadedFile $thumbnail): string
+    {
+        try {
+            $path = $thumbnail->store('templates', 'public');
+        } catch (UnableToWriteFile) {
+            $path = false;
+        }
+
+        if ($path === false) {
+            throw ValidationException::withMessages([
+                'thumbnail' => 'La miniature n’a pas pu être enregistrée. Réessayez ou contactez l’administrateur.',
+            ]);
+        }
+
+        return $path;
     }
 
     private function normalizePayload(array $data, ?Template $template = null): array
@@ -73,6 +92,9 @@ class TemplateService
             'target_audience' => $this->parseMultiline($data['target_audience_raw'] ?? ''),
             'included_features' => $this->parseMultiline($data['included_features_raw'] ?? ''),
             'preview_url' => $previewUrl,
+            'preview_mode' => $data['preview_source'] === 'local'
+                ? 'iframe'
+                : ($data['preview_mode'] ?? $template?->preview_mode ?? 'iframe'),
             'preview_pages' => $previewPages,
             'preview_gallery' => $previewGallery,
             'color_palettes' => $this->parseJsonList($data['color_palettes_raw'] ?? null, 'color_palettes_raw'),
@@ -163,6 +185,12 @@ class TemplateService
                 continue;
             }
 
+            if ($path !== '' && ! $this->isSafePreviewLink($path, allowRelative: true)) {
+                throw ValidationException::withMessages([
+                    'preview_pages_raw' => 'Chaque page doit utiliser un chemin ou une URL HTTP(S) valide.',
+                ]);
+            }
+
             $pages[] = [
                 'label' => Str::limit($label, 60, ''),
                 'path' => $path !== '' ? Str::limit($path, 255, '') : '/',
@@ -183,9 +211,13 @@ class TemplateService
                 continue;
             }
 
-            if (Str::startsWith($url, '/') || filter_var($url, FILTER_VALIDATE_URL)) {
-                $urls[] = Str::limit($url, 500, '');
+            if (! $this->isSafePreviewLink($url)) {
+                throw ValidationException::withMessages([
+                    'preview_gallery_raw' => 'Chaque image doit utiliser un chemin interne ou une URL HTTP(S) valide.',
+                ]);
             }
+
+            $urls[] = Str::limit($url, 500, '');
         }
 
         return $urls;
@@ -199,13 +231,32 @@ class TemplateService
 
         $value = trim($previewUrl);
 
-        if (Str::startsWith($value, '/') || filter_var($value, FILTER_VALIDATE_URL)) {
+        if ($this->isSafePreviewLink($value)) {
             return;
         }
 
         throw ValidationException::withMessages([
             'preview_url' => 'La prévisualisation doit être une URL http(s) ou un chemin interne commençant par /.',
         ]);
+    }
+
+    private function isSafePreviewLink(string $value, bool $allowRelative = false): bool
+    {
+        if (preg_match('/[\x00-\x20\x7f\\\\]/', $value) || Str::startsWith($value, '//')) {
+            return false;
+        }
+
+        if (Str::startsWith($value, '/')) {
+            return true;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return in_array(strtolower((string) parse_url($value, PHP_URL_SCHEME)), ['http', 'https'], true)
+                && parse_url($value, PHP_URL_USER) === null
+                && parse_url($value, PHP_URL_PASS) === null;
+        }
+
+        return $allowRelative && ! preg_match('/^[a-z][a-z0-9+.-]*:/i', $value);
     }
 
     private function resolvePreviewConfiguration(

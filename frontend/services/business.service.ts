@@ -23,6 +23,7 @@ export interface Template {
     thumbnail: string;
     full_thumbnail_url: string;
     preview_url?: string;
+    preview_mode?: 'iframe' | 'external';
     preview_pages?: Array<{ label?: string; path?: string }> | string | null;
     preview_gallery?: string[] | string | null;
     color_palettes?: TemplateColorPalette[] | string | null;

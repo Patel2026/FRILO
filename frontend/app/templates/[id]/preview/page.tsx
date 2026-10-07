@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { buildPreviewUrl, hasLivePreview, parsePreviewPages } from '@/lib/templatePreview';
 import { buildOrderUrl } from '@/lib/templatePersonalization';
 import { trackFunnelEvent } from '@/lib/analytics';
+import { TemplatePreview } from '@/components/business/TemplatePreview';
 
 export default function TemplateImmersivePreviewPage() {
   const params = useParams();
@@ -208,12 +209,11 @@ export default function TemplateImmersivePreviewPage() {
           viewMode === 'tablet' && "h-full max-h-[900px] w-full max-w-[820px] rounded-[2rem] border-[10px] border-zinc-900",
           viewMode === 'mobile' && "h-full max-h-[760px] w-[360px] rounded-[2.5rem] border-[10px] border-zinc-900"
         )}>
-          <iframe
-            src={buildPreviewUrl(template.preview_url!, activePreviewPath, {
-              palette: selectedPaletteId,
-              font: selectedFontPairingId,
-            })}
-            className="h-full w-full"
+          <TemplatePreview
+            url={iframeSrc}
+            mode={template.preview_mode}
+            image={template.full_thumbnail_url}
+            name={template.name}
             title={`Demo ${template.name}`}
           />
         </div>
