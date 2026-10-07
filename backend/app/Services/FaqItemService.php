@@ -54,6 +54,7 @@ class FaqItemService
     public function update(FaqItem $faqItem, array $data, User $actor): FaqItem
     {
         return DB::transaction(function () use ($faqItem, $data, $actor) {
+            $faqItem = FaqItem::query()->lockForUpdate()->findOrFail($faqItem->id);
             $faqItem->update($this->normalizePayload($data));
 
             $this->auditLogger->record(

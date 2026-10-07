@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ContactRequest extends Model
 {
+    use SoftDeletes;
+
     public const STATUS_NEW = 'new';
 
     public const STATUS_IN_PROGRESS = 'in_progress';

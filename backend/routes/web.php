@@ -87,6 +87,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
 
     // Templates
     Route::middleware('super_admin:content_admin')->group(function () {
+        foreach (['templates', 'faqs'] as $resource) {
+            Route::delete($resource.'/bulk', [\App\Http\Controllers\Admin\CatalogSelectionController::class, 'destroy'])->name($resource.'.bulk-destroy');
+            Route::post($resource.'/bulk/restore', [\App\Http\Controllers\Admin\CatalogSelectionController::class, 'restore'])->name($resource.'.bulk-restore');
+        }
+        Route::patch('sectors/bulk/visibility', [\App\Http\Controllers\Admin\CatalogSelectionController::class, 'visibility'])->name('sectors.bulk-visibility');
+
         Route::resource('templates', AdminTemplateController::class)->except(['show']);
 
         // Options payantes du tunnel de commande
@@ -122,6 +128,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'super_admin'])->gro
         Route::patch('clients/{user}/active', [ClientController::class, 'toggleActive'])->name('clients.toggle-active');
 
         // Demandes de contact
+        Route::delete('contact-requests/bulk', [AdminContactRequestController::class, 'bulkDestroy'])->name('contact-requests.bulk-destroy');
+        Route::post('contact-requests/bulk/restore', [AdminContactRequestController::class, 'bulkRestore'])->name('contact-requests.bulk-restore');
         Route::get('contact-requests', [AdminContactRequestController::class, 'index'])->name('contact-requests.index');
         Route::patch('contact-requests/{contactRequest}/status', [AdminContactRequestController::class, 'updateStatus'])
             ->name('contact-requests.status');

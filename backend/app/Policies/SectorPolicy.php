@@ -6,6 +6,11 @@ use App\Models\User;
 
 class SectorPolicy
 {
+    public function manageSelection(User $user): bool
+    {
+        return $user->hasAnyAdminRole(['content_admin']);
+    }
+
     /**
      * Les secteurs sont publics.
      */

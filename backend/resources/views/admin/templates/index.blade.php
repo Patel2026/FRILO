@@ -23,10 +23,12 @@
 
 <div class="card">
     <div class="card-body">
+        @include('admin.partials.catalog-selection', ['resource' => 'templates', 'trashed' => $trashed ?? false])
         <div class="table-responsive">
             <table class="table table-nowrap align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
+                        <th><input type="checkbox" id="catalog-select-page" class="form-check-input" aria-label="Sélectionner toute la page"></th>
                         <th>Nom</th>
                         <th class="frilo-table-secondary">Secteur</th>
                         <th class="frilo-table-money">Prix</th>
@@ -38,6 +40,7 @@
                 <tbody>
                     @forelse($templates as $template)
                     <tr>
+                        <td><input type="checkbox" class="form-check-input catalog-select" name="ids[]" value="{{ $template->id }}" form="catalog-bulk-form" aria-label="Sélectionner {{ $template->name }}"></td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 @if($template->full_thumbnail_url)
@@ -64,23 +67,31 @@
                         </td>
                         <td>{{ $template->orders_count ?? 0 }}</td>
                         <td class="frilo-table-actions">
+                            @if(!$trashed)
                             <a href="{{ route('admin.templates.edit', $template) }}" class="btn btn-sm btn-soft-primary me-1">
                                 <i class="ri-edit-line"></i>
                             </a>
                             <form action="{{ route('admin.templates.destroy', $template) }}" method="POST" class="d-inline"
-                                  onsubmit="return confirm('Désactiver ce template ?')">
+                                  onsubmit="return confirm('Déplacer ce template dans la corbeille ?')">
                                 @csrf @method('DELETE')
                                 <button class="btn btn-sm btn-soft-danger"><i class="ri-delete-bin-line"></i></button>
                             </form>
+                            @else
+                                <span class="text-muted">Dans la corbeille</span>
+                            @endif
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-center text-muted py-4">Aucun template.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Aucun template.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">{{ $templates->links() }}</div>
+        <div class="mt-3">{{ $templates->withQueryString()->links() }}</div>
     </div>
 </div>
+@endsection
+
+@section('script')
+@include('admin.partials.catalog-selection-script')
 @endsection

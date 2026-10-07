@@ -7,6 +7,11 @@ use App\Models\User;
 
 class FaqItemPolicy
 {
+    public function manageSelection(User $user): bool
+    {
+        return $user->hasAnyAdminRole(['content_admin']);
+    }
+
     public function viewAny(?User $user): bool
     {
         return true;

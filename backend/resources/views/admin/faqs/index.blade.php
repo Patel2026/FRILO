@@ -27,6 +27,7 @@
 <div class="card">
     <div class="card-body">
         <form method="GET" class="row g-3 align-items-end">
+            @if($trashed)<input type="hidden" name="trashed" value="1">@endif
             <div class="col-md-5">
                 <label class="form-label">Recherche</label>
                 <input type="text" name="search" value="{{ $filters['search'] }}" class="form-control" placeholder="Question ou réponse">
@@ -41,7 +42,7 @@
             </div>
             <div class="col-md-4">
                 <button type="submit" class="btn btn-primary">Filtrer</button>
-                <a href="{{ route('admin.faqs.index') }}" class="btn btn-soft-secondary ms-1">Réinitialiser</a>
+                <a href="{{ route('admin.faqs.index', $trashed ? ['trashed' => 1] : []) }}" class="btn btn-soft-secondary ms-1">Réinitialiser</a>
             </div>
         </form>
     </div>
@@ -52,10 +53,12 @@
         <h5 class="card-title mb-0">{{ $faqs->total() }} question(s)</h5>
     </div>
     <div class="card-body">
+        @include('admin.partials.catalog-selection', ['resource' => 'faqs', 'trashed' => $trashed ?? false])
         <div class="table-responsive">
             <table class="table table-nowrap align-middle mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th><input type="checkbox" id="catalog-select-page" class="form-check-input" aria-label="Sélectionner toute la page"></th>
                         <th>Ordre</th>
                         <th>Question</th>
                         <th>Réponse</th>
@@ -67,6 +70,7 @@
                 <tbody>
                     @forelse($faqs as $faq)
                         <tr>
+                        <td><input type="checkbox" class="form-check-input catalog-select" name="ids[]" value="{{ $faq->id }}" form="catalog-bulk-form" aria-label="Sélectionner {{ $faq->question }}"></td>
                             <td>
                                 <span class="badge badge-soft-dark">{{ $faq->sort_order }}</span>
                             </td>
@@ -85,7 +89,8 @@
                                 {{ $faq->updated_at?->format('d/m/Y H:i') }}
                             </td>
                             <td class="text-end">
-                                <a href="{{ route('admin.faqs.edit', $faq) }}" class="btn btn-sm btn-soft-primary me-1">
+                                @if(!$trashed)
+                            <a href="{{ route('admin.faqs.edit', $faq) }}" class="btn btn-sm btn-soft-primary me-1">
                                     <i class="ri-edit-line"></i>
                                 </a>
                                 <form
@@ -100,17 +105,24 @@
                                         <i class="ri-delete-bin-line"></i>
                                     </button>
                                 </form>
+                            @else
+                                <span class="text-muted">Dans la corbeille</span>
+                            @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Aucune question FAQ configurée.</td>
+                            <td colspan="7" class="text-center text-muted py-4">Aucune question FAQ configurée.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">{{ $faqs->links() }}</div>
+        <div class="mt-3">{{ $faqs->withQueryString()->links() }}</div>
     </div>
 </div>
+@endsection
+
+@section('script')
+@include('admin.partials.catalog-selection-script')
 @endsection

@@ -3,47 +3,54 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BulkContactRequest;
+use App\Http\Requests\Admin\UpdateContactRequestStatusRequest;
 use App\Models\ContactRequest;
+use App\Services\ContactRequestService;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ContactRequestController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(private readonly ContactRequestService $service) {}
+
+    public function index(Request $request): View
     {
-        $query = ContactRequest::query()->latest();
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('reference')) {
-            $query->where('order_reference', 'like', '%'.$request->string('reference')->trim().'%');
-        }
-
-        $contactRequests = $query->paginate(20);
+        $this->authorize('viewAny', ContactRequest::class);
 
         return view('admin.contact-requests.index', [
-            'contactRequests' => $contactRequests,
+            'contactRequests' => $this->service->paginate(
+                $request->string('status')->toString(),
+                $request->string('reference')->trim()->toString(),
+                $request->boolean('trashed'),
+            ),
             'statuses' => ContactRequest::STATUSES,
+            'trashed' => $request->boolean('trashed'),
         ]);
     }
 
-    public function updateStatus(Request $request, ContactRequest $contactRequest)
+    public function updateStatus(UpdateContactRequestStatusRequest $request, ContactRequest $contactRequest): RedirectResponse
     {
-        $request->validate([
-            'status' => ['required', 'string', Rule::in(ContactRequest::STATUSES)],
-        ]);
+        $this->authorize('update', $contactRequest);
+        $this->service->updateStatus($contactRequest, $request->validated('status'));
 
-        $status = $request->string('status')->toString();
+        return back()->with('success', 'Statut de la demande de contact mis à jour.');
+    }
 
-        $contactRequest->update([
-            'status' => $status,
-            'processed_at' => $status === ContactRequest::STATUS_DONE ? now() : null,
-        ]);
+    public function bulkDestroy(BulkContactRequest $request): RedirectResponse
+    {
+        $this->authorize('deleteAny', ContactRequest::class);
+        $count = $this->service->moveSelection($request->validated('ids'), false);
 
-        return redirect()
-            ->route('admin.contact-requests.index')
-            ->with('success', 'Statut de la demande de contact mis à jour.');
+        return back()->with('success', $count.' demande(s) déplacée(s) dans la corbeille.');
+    }
+
+    public function bulkRestore(BulkContactRequest $request): RedirectResponse
+    {
+        $this->authorize('restoreAny', ContactRequest::class);
+        $count = $this->service->moveSelection($request->validated('ids'), true);
+
+        return back()->with('success', $count.' demande(s) restaurée(s).');
     }
 }

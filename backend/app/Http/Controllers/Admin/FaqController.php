@@ -23,6 +23,7 @@ class FaqController extends Controller
         $visibility = (string) $request->string('visibility', '');
 
         $faqs = FaqItem::query()
+            ->when($request->boolean('trashed'), fn ($query) => $query->onlyTrashed())
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($innerQuery) use ($search): void {
                     $innerQuery
@@ -39,6 +40,7 @@ class FaqController extends Controller
 
         return view('admin.faqs.index', [
             'faqs' => $faqs,
+            'trashed' => $request->boolean('trashed'),
             'filters' => [
                 'search' => $search,
                 'visibility' => $visibility,

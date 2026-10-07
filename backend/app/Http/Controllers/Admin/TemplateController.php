@@ -17,16 +17,17 @@ class TemplateController extends Controller
         private readonly TemplateService $templateService
     ) {}
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $this->authorize('viewAny', Template::class);
 
         $templates = Template::with('sector')
+            ->when($request->boolean('trashed'), fn ($query) => $query->onlyTrashed())
             ->withCount('orders')
             ->latest()
             ->paginate(20);
 
-        return view('admin.templates.index', compact('templates'));
+        return view('admin.templates.index', ['templates' => $templates, 'trashed' => $request->boolean('trashed')]);
     }
 
     public function create()

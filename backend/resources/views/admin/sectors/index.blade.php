@@ -23,10 +23,12 @@
 
 <div class="card">
     <div class="card-body">
+        @include('admin.partials.catalog-selection', ['resource' => 'sectors', 'trashed' => $trashed ?? false])
         <div class="table-responsive">
             <table class="table align-middle mb-0 frilo-admin-table">
                 <thead class="table-light">
                     <tr>
+                        <th><input type="checkbox" id="catalog-select-page" class="form-check-input" aria-label="Sélectionner toute la page"></th>
                         <th>Nom</th>
                         <th class="frilo-table-secondary">Slug</th>
                         <th>Templates</th>
@@ -37,6 +39,7 @@
                 <tbody>
                     @forelse($sectors as $sector)
                     <tr>
+                        <td><input type="checkbox" class="form-check-input catalog-select" name="ids[]" value="{{ $sector->id }}" form="catalog-bulk-form" aria-label="Sélectionner {{ $sector->name }}"></td>
                         <td><strong>{{ $sector->name }}</strong></td>
                         <td class="frilo-table-secondary"><code>{{ $sector->slug }}</code></td>
                         <td>{{ $sector->templates_count }}</td>
@@ -57,12 +60,16 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="text-center text-muted py-4">Aucun secteur.</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4">Aucun secteur.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">{{ $sectors->links() }}</div>
+        <div class="mt-3">{{ $sectors->withQueryString()->links() }}</div>
     </div>
 </div>
+@endsection
+
+@section('script')
+@include('admin.partials.catalog-selection-script')
 @endsection
