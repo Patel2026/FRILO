@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -77,7 +77,12 @@ function saveConsent(choice: CookieConsent['choice'], preferences: CookiePrefere
     updatedAt: new Date().toISOString(),
   };
 
-  storage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(payload));
+  try {
+    storage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // A blocked/full storage must not prevent dismissing the banner.
+    // Without persistence, the choice will be requested on the next page load.
+  }
 }
 
 function hasExistingConsent() {
@@ -99,12 +104,28 @@ function hasExistingConsent() {
   }
 }
 
+function subscribeToConsent(onChange: () => void) {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === COOKIE_CONSENT_STORAGE_KEY || event.key === null) {
+      onChange();
+    }
+  };
+  window.addEventListener('storage', onStorage);
+  return () => window.removeEventListener('storage', onStorage);
+}
+
+function getServerConsent() {
+  return false;
+}
+
 export function CookieConsentBanner() {
-  const [visible, setVisible] = useState(() => !hasExistingConsent());
+  // Match the server snapshot during hydration, then read browser storage.
+  const existingConsent = useSyncExternalStore(subscribeToConsent, hasExistingConsent, getServerConsent);
+  const [visible, setVisible] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [preferences, setPreferences] = useState<CookiePreferences>(DEFAULT_PREFERENCES);
 
-  if (!visible) {
+  if (!visible || existingConsent) {
     return null;
   }
 
@@ -176,6 +197,7 @@ export function CookieConsentBanner() {
                     type="button"
                     onClick={() => updatePreference(item.key)}
                     disabled={item.locked}
+                    aria-pressed={active}
                     className={cn(
                       "flex min-h-[96px] flex-col border-b border-slate-200 p-3 text-left last:border-b-0 md:min-h-[104px] md:border-b-0 md:border-r md:last:border-r-0",
                       item.locked ? "cursor-not-allowed bg-white" : "bg-white transition-colors hover:bg-slate-100"
