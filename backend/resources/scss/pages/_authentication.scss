@@ -31,7 +31,7 @@
 }
 
 .auth-one-bg{
-    background-image: url("../images/auth-one-bg.jpg");
+    background-image: url("/build/images/auth-one-bg.jpg");
     background-position: center;
     background-size: cover;
 
@@ -99,7 +99,7 @@
     background: $auth-bg-cover;
 
     > .bg-overlay{
-        background-image: url("../images/cover-pattern.png");
+        background-image: url("/build/images/cover-pattern.png");
         background-position: center;
         background-size: cover;
         opacity: 1;

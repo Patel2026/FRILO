@@ -1,5 +1,5 @@
 /**
- * simplebar - v6.3.1
+ * simplebar - v6.3.3
  * Scrollbars, simpler.
  * https://grsmto.github.io/simplebar/
  *
@@ -596,7 +596,7 @@ var SimpleBar = (function () {
     }
 
     /**
-     * simplebar-core - v1.3.1
+     * simplebar-core - v1.3.2
      * Scrollbars, simpler.
      * https://grsmto.github.io/simplebar/
      *

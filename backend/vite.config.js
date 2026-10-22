@@ -1,106 +1,55 @@
-
 import { defineConfig } from 'vite';
-import laravel, { refreshPaths } from 'laravel-vite-plugin';
+import laravel from 'laravel-vite-plugin';
+import { cp, readFile, stat } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import fs from 'fs-extra';
-import path from 'path';
-
-const folder = {
-    src: "resources/", // source files
-    src_assets: "resources/", // source assets files
-    dist: "public/", // build files
-    dist_assets: "public/build/" //build assets files
-};
+const root = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
     build: {
         manifest: true,
-        rtl: true,
-        outDir: 'public/build/',
-        cssCodeSplit: true,
+        outDir: 'public/build',
+        emptyOutDir: true,
         rollupOptions: {
             output: {
-                assetFileNames: (css) => {
-                    if (css.name.split('.').pop() == 'css') {
-                        return 'css/' + `[name]` + '.min.' + 'css';
-                    } else {
-                        return 'icons/' + css.name;
-                    }
+                assetFileNames: (asset) => {
+                    const name = asset.names?.[0] ?? asset.name;
+                    return name.endsWith('.css') ? 'css/[name].min.css' : 'icons/[name][extname]';
                 },
-                entryFileNames: 'js/' + `[name]` + `.js`,
+                entryFileNames: 'js/[name].js',
             },
         },
     },
     css: {
         preprocessorOptions: {
             scss: {
-                silenceDeprecations: [
-                    'import',
-                    'mixed-decls',
-                    'color-functions',
-                    'global-builtin',
-                ],
+                silenceDeprecations: ['import', 'color-functions', 'global-builtin'],
             },
         },
     },
     plugins: [
-        laravel(
-            {
-                input: [
-                    'resources/scss/bootstrap.scss',
-                    'resources/scss/icons.scss',
-                    'resources/scss/app.scss',
-                    'resources/scss/custom.scss',
-                ],
-                refresh: [
-                    ...refreshPaths,
-                    'resources/views/**',
-                ],
-            }
-        ),
+        laravel({
+            input: ['bootstrap', 'icons', 'app', 'custom'].map(name => `resources/scss/${name}.scss`),
+            refresh: ['resources/views/**'],
+        }),
         {
-            name: 'copy-specific-packages',
+            name: 'copy-admin-assets',
             async writeBundle() {
-
-                try {
-                    // Copy images, json, fonts, and js
-                    await Promise.all([
-                        fs.copy(folder.src_assets + 'fonts', folder.dist_assets + 'fonts'),
-                        fs.copy(folder.src_assets + 'images', folder.dist_assets + 'images'),
-                        fs.copy(folder.src_assets + 'js', folder.dist_assets + 'js'),
-                        fs.copy(folder.src_assets + 'json', folder.dist_assets + 'json'),
-                    ]);
-                } catch (error) {
-                    console.error('Error copying assets:', error);
+                const output = path.join(root, 'public/build');
+                // Preserve theme media; publish only scripts used by routed FRILO views.
+                for (const dir of ['fonts', 'images']) {
+                    await cp(path.join(root, 'resources', dir), path.join(output, dir), { recursive: true });
                 }
-
-                const outputPath = path.resolve(__dirname, folder.dist_assets); // Adjust the destination path
-                const configPath = path.resolve(__dirname, 'package-copy-config.json');
-
-                try {
-                    const configContent = await fs.readFile(configPath, 'utf-8');
-                    const { packagesToCopy } = JSON.parse(configContent);
-
-                    for (const packageName of packagesToCopy) {
-                        const destPackagePath = path.join(outputPath, 'libs', packageName);
-
-                        const sourcePath = (fs.existsSync(path.join(__dirname, 'node_modules', packageName + "/dist"))) ?
-                            path.join(__dirname, 'node_modules', packageName + "/dist")
-                            : path.join(__dirname, 'node_modules', packageName);
-
-                        try {
-                            await fs.access(sourcePath, fs.constants.F_OK);
-                            await fs.copy(sourcePath, destPackagePath);
-                        } catch (error) {
-                            console.error(`Package ${packageName} does not exist.`);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error copying and renaming packages:', error);
+                await cp(path.join(root, 'resources/js/layout.js'), path.join(output, 'js/layout.js'));
+                const { packagesToCopy } = JSON.parse(await readFile(path.join(root, 'package-copy-config.json'), 'utf8'));
+                for (const name of packagesToCopy) {
+                    const source = path.join(root, 'node_modules', name, 'dist');
+                    // Missing dependencies must fail the build, never produce a partial release.
+                    await stat(source);
+                    await cp(source, path.join(output, 'libs', name), { recursive: true });
                 }
             },
         },
-
     ],
 });
-
