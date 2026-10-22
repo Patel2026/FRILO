@@ -31,8 +31,11 @@ class OrderPaymentController extends Controller
                 $request->user(),
                 $request->validated()
             );
+        } catch (HttpException $exception) {
+            throw $exception;
         } catch (Throwable $exception) {
-            throw new HttpException(422, $exception->getMessage(), $exception);
+            \Illuminate\Support\Facades\Log::warning('payment.initiation_failed', ['order_id' => $order->id, 'exception_type' => $exception::class]);
+            throw new HttpException(503, 'Le paiement ne peut pas être confirmé pour le moment. Consultez votre commande avant de réessayer.', $exception);
         }
 
         /** @var Order $updatedOrder */
@@ -60,7 +63,8 @@ class OrderPaymentController extends Controller
             try {
                 $order = $this->orderPaymentService->refreshPaymentStatus($order);
             } catch (Throwable $exception) {
-                throw new HttpException(422, $exception->getMessage(), $exception);
+                \Illuminate\Support\Facades\Log::warning('payment.refresh_failed', ['order_id' => $order->id, 'exception_type' => $exception::class]);
+                throw new HttpException(503, 'La vérification du paiement est temporairement indisponible. Réessayez dans quelques instants.', $exception);
             }
         } else {
             $order = $order->fresh(['latestPayment']);

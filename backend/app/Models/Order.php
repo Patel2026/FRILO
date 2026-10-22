@@ -16,6 +16,8 @@ class Order extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'idempotency_key',
+        'request_fingerprint',
         'user_id',
         'template_id',
         'status',

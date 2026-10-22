@@ -1,4 +1,5 @@
 import api from './api';
+import { clearCompletedSubmission, getSubmissionKey, rememberSubmissionOrder } from '@/lib/orderSubmission';
 
 export interface Sector {
     id: number;
@@ -342,9 +343,22 @@ export const businessService = {
         };
     },
 
-    async createOrder(data: CreateOrderPayload): Promise<Order> {
-        const response = await api.post('/orders', data);
-        return response.data;
+    async createOrder(data: CreateOrderPayload, userId: number): Promise<Order> {
+        const canonical = JSON.stringify({ ...data, option_ids: [...(data.option_ids ?? [])].sort((a, b) => a - b) });
+        const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical));
+        const fingerprint = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+        // Web Locks also serialize two tabs before they choose a submission key.
+        return navigator.locks.request(`frilo-order-${userId}-${fingerprint}`, async () => {
+            const key = getSubmissionKey(localStorage, userId, fingerprint);
+            const response = await api.post('/orders', { ...data, idempotency_key: key });
+            rememberSubmissionOrder(localStorage, userId, fingerprint, response.data.id);
+            return response.data as Order;
+        });
+    },
+
+    startNewOrder(orderId: number): void {
+        clearCompletedSubmission(localStorage, orderId);
+        localStorage.removeItem('frilo.order.draft.v1');
     },
 
     async getOrders(page = 1, perPage = 10, filters: OrderListFilters = {}): Promise<PaginatedResponse<Order>> {

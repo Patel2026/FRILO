@@ -8,8 +8,10 @@ use App\Models\PaymentTransaction;
 use App\Models\User;
 use App\Notifications\OrderPaymentStatusUpdatedNotification;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class OrderPaymentService
 {
@@ -25,51 +27,114 @@ class OrderPaymentService
             throw new RuntimeException('Cette commande ne vous appartient pas.');
         }
 
-        $currentStatus = $this->normalizeOrderPaymentStatus($order);
-        if ($currentStatus->isPaid()) {
-            return [
-                'order' => $order->fresh(['latestPayment']),
-                'payment' => $order->latestPayment,
-                'already_paid' => true,
-            ];
-        }
-
-        $mode = strtolower((string) ($payload['mode'] ?? 'checkout'));
-        $mode = trim($mode) !== '' ? trim($mode) : 'checkout';
+        $mode = strtolower(trim((string) ($payload['mode'] ?? 'checkout'))) ?: 'checkout';
         $directMode = $mode !== 'checkout' ? $mode : null;
         $phoneNumber = $this->sanitizePhoneNumber($payload['phone_number'] ?? null);
-
-        $customerId = $this->resolveFedapayCustomerId($user, $phoneNumber);
         $paymentConfig = $this->platformSettingsService->getRuntimePaymentConfiguration();
-        $transactionPayload = [
-            'description' => 'Commande FRILO '.$this->orderReference($order->id),
-            'amount' => (int) $order->price,
-            'currency' => [
-                'iso' => (string) ($paymentConfig['currency'] ?? 'XOF'),
-            ],
-            'callback_url' => $this->buildCallbackUrl($order),
-            'customer' => [
-                'id' => $customerId,
-            ],
-            'merchant_reference' => $this->merchantReference($order->id),
-            'custom_metadata' => [
-                'order_id' => (string) $order->id,
-                'order_reference' => $this->orderReference($order->id),
-                'user_id' => (string) $user->id,
-            ],
-        ];
+        $this->fedapayClient->assertConfigured();
 
-        if ($directMode) {
-            $transactionPayload['mode'] = $directMode;
+        // Commit the reservation before any external request. An interrupted request
+        // must never release a potentially accepted payment for blind retry.
+        [$order, $payment, $reserved] = DB::transaction(function () use ($order, $mode, $paymentConfig) {
+            $order = Order::query()->lockForUpdate()->findOrFail($order->id);
+            $payment = $order->latestPayment()->first();
+            if ($this->normalizeOrderPaymentStatus($order)->isPaid()) {
+                return [$order, $payment, false];
+            }
+            if ($order->status === \App\Enums\OrderStatus::Cancelled || $this->normalizeOrderPaymentStatus($order) === PaymentStatus::Refunded) {
+                throw new HttpException(409, 'Cette commande ne peut plus être payée.');
+            }
+            if ($payment && ($payment->status === 'checkout_token_failed' || ($payment->status === 'pending' && $payment->last_error_code === 'checkout_token_failed')) && $payment->fedapay_transaction_id && $mode === 'checkout' && $payment->mode === 'checkout') {
+                $payment->update(['status' => 'initiating']);
+
+                return [$order, $payment, true];
+            }
+            if ($payment && ! in_array($payment->status, ['initialization_failed', 'declined', 'canceled', 'cancelled', 'expired'], true)) {
+                if ($payment->status === 'initiating' || ! $payment->checkout_url || $payment->mode !== $mode) {
+                    throw new HttpException(409, 'Un paiement est déjà en cours de vérification. Consultez votre commande ou contactez le support avant de réessayer.');
+                }
+
+                return [$order, $payment, false];
+            }
+            $payment = PaymentTransaction::create([
+                'order_id' => $order->id,
+                'provider' => 'fedapay',
+                'mode' => $mode,
+                'amount' => (int) $order->price,
+                'currency' => (string) ($paymentConfig['currency'] ?? 'XOF'),
+                'status' => 'initiating',
+                'initiated_at' => now(),
+            ]);
+
+            return [$order, $payment, true];
+        });
+        if (! $reserved) {
+            return ['order' => $order->load('latestPayment'), 'payment' => $payment, 'already_paid' => $this->normalizeOrderPaymentStatus($order)->isPaid()];
         }
 
-        $transaction = $this->fedapayClient->createTransaction($transactionPayload);
-        $transactionId = (int) ($transaction['id'] ?? 0);
-        if ($transactionId < 1) {
-            throw new RuntimeException('FedaPay n’a pas retourné un identifiant de transaction valide.');
+        if (! $payment->fedapay_transaction_id) {
+            try {
+                $customerId = $this->resolveFedapayCustomerId($user, $phoneNumber);
+            } catch (\Throwable $exception) {
+                $payment->update(['status' => 'initialization_failed']);
+                throw $exception;
+            }
+            $paymentConfig = $this->platformSettingsService->getRuntimePaymentConfiguration();
+            $transactionPayload = [
+                'description' => 'Commande FRILO '.$this->orderReference($order->id),
+                'amount' => (int) $order->price,
+                'currency' => [
+                    'iso' => (string) ($paymentConfig['currency'] ?? 'XOF'),
+                ],
+                'callback_url' => $this->buildCallbackUrl($order),
+                'customer' => [
+                    'id' => $customerId,
+                ],
+                'merchant_reference' => $this->merchantReference($order->id),
+                'custom_metadata' => [
+                    'order_id' => (string) $order->id,
+                    'order_reference' => $this->orderReference($order->id),
+                    'user_id' => (string) $user->id,
+                ],
+            ];
+
+            if ($directMode) {
+                $transactionPayload['mode'] = $directMode;
+            }
+
+            $transaction = $this->fedapayClient->createTransaction($transactionPayload);
+            $transactionId = (int) ($transaction['id'] ?? 0);
+            if ($transactionId < 1) {
+                throw new RuntimeException('FedaPay n’a pas retourné un identifiant de transaction valide.');
+            }
+
+            $payment->update(['fedapay_transaction_id' => $transactionId]);
+        } else {
+            $transactionId = (int) $payment->fedapay_transaction_id;
+            try {
+                $transaction = $this->fedapayClient->getTransaction($transactionId);
+            } catch (\Throwable $exception) {
+                PaymentTransaction::whereKey($payment->id)->whereIn('status', ['initiating', 'pending'])->update(['status' => 'checkout_token_failed', 'last_error_code' => 'checkout_token_failed']);
+                throw $exception;
+            }
+            if ($this->isFedapayFinalStatus((string) ($transaction['status'] ?? 'pending'))) {
+                $this->updateFromTransactionPayload($order, $payment, $transaction);
+
+                return ['order' => $order->fresh(['latestPayment']), 'payment' => $payment->fresh(), 'already_paid' => $this->mapFedapayStatus($transaction['status'])->isPaid()];
+            }
         }
 
-        $tokenData = $this->fedapayClient->createTransactionToken($transactionId);
+        try {
+            $tokenData = $this->fedapayClient->createTransactionToken($transactionId);
+            if (empty($tokenData['token']) || ($mode === 'checkout' && empty($tokenData['url']))) {
+                throw new RuntimeException('Lien de paiement manquant.');
+            }
+        } catch (\Throwable $exception) {
+            if ($mode === 'checkout') {
+                PaymentTransaction::whereKey($payment->id)->whereIn('status', ['initiating', 'pending'])->update(['status' => 'checkout_token_failed', 'last_error_code' => 'checkout_token_failed']);
+            }
+            throw $exception;
+        }
         $token = (string) ($tokenData['token'] ?? '');
         $checkoutUrl = Arr::get($tokenData, 'url');
         $checkoutUrl = is_string($checkoutUrl) ? $checkoutUrl : null;
@@ -90,7 +155,7 @@ class OrderPaymentService
             $remoteStatus = (string) ($sendResult['status'] ?? $remoteStatus);
         }
 
-        $payment = PaymentTransaction::create([
+        $payment->update([
             'order_id' => $order->id,
             'provider' => 'fedapay',
             'fedapay_transaction_id' => $transactionId,
@@ -100,7 +165,6 @@ class OrderPaymentService
             'mode' => $directMode ?? 'checkout',
             'amount' => (int) $order->price,
             'currency' => (string) ($paymentConfig['currency'] ?? 'XOF'),
-            'status' => $remoteStatus,
             'last_error_code' => Arr::get($transaction, 'last_error_code') ?? Arr::get($sendResult ?? [], 'last_error_code'),
             'raw_payload' => [
                 'transaction' => $transaction,
@@ -108,10 +172,9 @@ class OrderPaymentService
                 'send_result' => $sendResult,
             ],
             'initiated_at' => now(),
-            'completed_at' => $this->isFedapayFinalStatus($remoteStatus) ? now() : null,
         ]);
 
-        $this->applyOrderPaymentStatus($order, $this->mapFedapayStatus($remoteStatus));
+        $this->updateFromTransactionPayload($order, $payment, array_replace($transaction, ['status' => $remoteStatus]));
 
         Log::info('payment.fedapay.initiated', [
             'order_id' => $order->id,
@@ -214,29 +277,42 @@ class OrderPaymentService
         array $transactionPayload,
         ?array $eventPayload = null
     ): void {
-        $remoteStatus = (string) ($transactionPayload['status'] ?? $payment->status ?? 'pending');
-        $payment->update([
-            'fedapay_reference' => Arr::get($transactionPayload, 'reference') ?? $payment->fedapay_reference,
-            'status' => $remoteStatus,
-            'last_error_code' => Arr::get($transactionPayload, 'last_error_code') ?? $payment->last_error_code,
-            'raw_payload' => [
-                'transaction' => $transactionPayload,
-                'event' => $eventPayload,
-            ],
-            'completed_at' => $this->isFedapayFinalStatus($remoteStatus)
-                ? ($payment->completed_at ?? now())
-                : null,
-        ]);
+        DB::transaction(function () use ($order, $payment, $transactionPayload, $eventPayload) {
+            // Always lock in the same order as initiation; reload stale model instances.
+            $order = Order::query()->lockForUpdate()->findOrFail($order->id);
+            $payment = PaymentTransaction::query()->lockForUpdate()->findOrFail($payment->id);
+            $remoteStatus = strtolower((string) ($transactionPayload['status'] ?? $payment->status));
+            $current = $this->mapFedapayStatus($payment->status);
+            $incoming = $this->mapFedapayStatus($remoteStatus);
+            if ($current === PaymentStatus::Refunded
+                || ($current === PaymentStatus::Paid && ! in_array($incoming, [PaymentStatus::Paid, PaymentStatus::Refunded], true))
+                || ($this->isFedapayFinalStatus($payment->status) && $incoming === PaymentStatus::AwaitingPayment)) {
+                return;
+            }
+            $payment->update([
+                'fedapay_reference' => Arr::get($transactionPayload, 'reference') ?? $payment->fedapay_reference,
+                'status' => $remoteStatus,
+                'last_error_code' => Arr::get($transactionPayload, 'last_error_code') ?? $payment->last_error_code,
+                'raw_payload' => ['transaction' => $transactionPayload, 'event' => $eventPayload],
+                'completed_at' => $this->isFedapayFinalStatus($remoteStatus) ? ($payment->completed_at ?? now()) : null,
+            ]);
 
-        $this->applyOrderPaymentStatus($order, $this->mapFedapayStatus($remoteStatus));
-
-        Log::info('payment.fedapay.status_synced', [
-            'order_id' => $order->id,
-            'payment_id' => $payment->id,
-            'transaction_id' => $payment->fedapay_transaction_id,
-            'status' => $remoteStatus,
-            'event_name' => Arr::get($eventPayload, 'name'),
-        ]);
+            // An old attempt may settle after a newer one: aggregate successful
+            // transactions before considering the latest unsuccessful attempt.
+            $payments = $order->payments()->orderByDesc('id')->get();
+            $status = $this->mapFedapayStatus($payments->first()->status);
+            foreach ($payments as $attempt) {
+                if ($this->mapFedapayStatus($attempt->status) === PaymentStatus::Paid) {
+                    $status = PaymentStatus::Paid;
+                    break;
+                }
+                if ($this->mapFedapayStatus($attempt->status) === PaymentStatus::Refunded) {
+                    $status = PaymentStatus::Refunded;
+                }
+            }
+            $this->applyOrderPaymentStatus($order, $status);
+            Log::info('payment.fedapay.status_synced', ['order_id' => $order->id, 'payment_id' => $payment->id, 'status' => $remoteStatus]);
+        });
     }
 
     private function resolveFedapayCustomerId(User $user, ?array $phoneNumber): int

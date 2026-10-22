@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
@@ -60,7 +60,8 @@ function OrderTunnelContent() {
   const selectedPaletteId = searchParams.get('palette') ?? undefined;
   const selectedFontPairingId = searchParams.get('font') ?? undefined;
   const requestedStep = searchParams.get('step');
-  const { isAuthenticated } = useAuthState();
+  const { isAuthenticated, user } = useAuthState();
+  const paymentInFlight = useRef(false);
   const [currentMoment, setCurrentMoment] = useState<OrderMoment>('personalize');
   const [redirectingToAuth, setRedirectingToAuth] = useState(false);
   const [formData, setFormData] = useState<ProjectDetails & { templateId: string | null }>({ templateId });
@@ -257,6 +258,8 @@ function OrderTunnelContent() {
   };
 
   const handlePayment = async () => {
+    if (paymentInFlight.current || !user) return;
+    paymentInFlight.current = true;
     setIsSubmitting(true);
     setRedirectingToPayment(false);
     setPaymentError(null);
@@ -267,36 +270,25 @@ function OrderTunnelContent() {
         throw new Error('Les options de commande ne sont pas disponibles.');
       }
 
-      let orderIdToPay = createdOrderId;
-      let orderAmount = finalPrice;
-
-      if (!orderIdToPay) {
-        const order = await businessService.createOrder({
-          template_id: templateId,
-          enterprise_name: formData.domainName,
-          activity_description: formData.description,
-          colors: selectedPalette?.colors ?? [],
-          specific_instructions: formData.specific_instructions,
-          color_palette_id: selectedPalette?.id,
-          font_pairing_id: selectedFontPairing?.id,
-          option_ids: selectedOptions.map(option => option.id),
-        });
-
-        orderIdToPay = order.id;
-        orderAmount = order.price;
-        setCreatedOrderId(order.id);
-        setOrderRef(String(order.id).padStart(5, '0'));
-        localStorage.removeItem(ORDER_DRAFT_STORAGE_KEY);
-        trackFunnelEvent('submit_order', {
-          template_id: templateId ? Number(templateId) : null,
-          order_id: order.id,
-          amount: order.price,
-        });
-      }
-
-      if (!orderIdToPay) {
-        throw new Error('Commande introuvable pour initialiser le paiement.');
-      }
+      const order = await businessService.createOrder({
+        template_id: templateId,
+        enterprise_name: formData.domainName,
+        activity_description: formData.description,
+        colors: selectedPalette?.colors ?? [],
+        specific_instructions: formData.specific_instructions,
+        color_palette_id: selectedPalette?.id,
+        font_pairing_id: selectedFontPairing?.id,
+        option_ids: selectedOptions.map(option => option.id),
+      }, user.id);
+      const orderIdToPay = order.id;
+      const orderAmount = order.price;
+      setCreatedOrderId(order.id);
+      setOrderRef(String(order.id).padStart(5, '0'));
+      trackFunnelEvent('submit_order', {
+        template_id: templateId ? Number(templateId) : null,
+        order_id: order.id,
+        amount: order.price,
+      });
 
       const payment = await businessService.initiateOrderPayment(orderIdToPay, { mode: 'checkout' });
 
@@ -329,6 +321,7 @@ function OrderTunnelContent() {
         setPaymentError('Nous n’avons pas pu lancer le paiement. Veuillez réessayer.');
       }
     } finally {
+      paymentInFlight.current = false;
       setIsSubmitting(false);
       setRedirectingToPayment(false);
     }
@@ -752,7 +745,10 @@ function OrderTunnelContent() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/dashboard/orders" className="rounded-lg bg-slate-950 px-5 py-3 text-sm font-black text-white">Suivre ma commande</Link>
-            <Link href="/" className="rounded-lg border border-slate-200 px-5 py-3 text-sm font-black">Retour à l’accueil</Link>
+            <button type="button" className="rounded-lg border border-slate-200 px-5 py-3 text-sm font-black" onClick={() => {
+              if (createdOrderId) businessService.startNewOrder(createdOrderId);
+              router.push('/templates');
+            }}>Créer une nouvelle commande</button>
           </div>
         </main>
       )}

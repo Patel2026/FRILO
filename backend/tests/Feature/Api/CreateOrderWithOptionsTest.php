@@ -20,6 +20,7 @@ class CreateOrderWithOptionsTest extends TestCase
         $template = $this->createTemplate();
 
         $response = $this->postJson('/api/orders', [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
             'template_id' => $template->id,
             'enterprise_name' => 'ABC SARL',
         ]);
@@ -47,6 +48,7 @@ class CreateOrderWithOptionsTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/orders', [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
             'template_id' => $template->id,
             'enterprise_name' => 'ABC SARL',
             'option_ids' => [$gallery->id, $catalogue->id, $gallery->id],
@@ -75,6 +77,7 @@ class CreateOrderWithOptionsTest extends TestCase
         $inactive = OrderOption::factory()->create(['is_active' => false]);
 
         $this->postJson('/api/orders', [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
             'template_id' => $template->id,
             'option_ids' => [$inactive->id],
         ])->assertUnprocessable()

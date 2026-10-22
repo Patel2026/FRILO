@@ -177,6 +177,12 @@ function PaymentReturnContent() {
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   )}
+                  {paymentStatus === 'paid' && orderId && (
+                    <Link href="/templates" onClick={() => businessService.startNewOrder(Number(orderId))}
+                      className="inline-flex items-center justify-center rounded-full border border-gray-200 px-6 py-3 text-sm font-black text-gray-600">
+                      Créer une nouvelle commande
+                    </Link>
+                  )}
                   <button
                     type="button"
                     onClick={fetchStatus}

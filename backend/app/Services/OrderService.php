@@ -12,6 +12,7 @@ use App\Notifications\OrderCreatedNotification;
 use App\Notifications\OrderStatusUpdatedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -30,11 +31,35 @@ class OrderService
             ->unique()
             ->values();
 
-        $order = DB::transaction(function () use ($data, $user, $optionIds) {
+        $key = $data['idempotency_key'] ?? (string) Str::uuid();
+        $canonical = [];
+        foreach (['template_id', 'enterprise_name', 'activity_description', 'colors', 'specific_instructions', 'color_palette_id', 'font_pairing_id'] as $field) {
+            $canonical[$field] = $data[$field] ?? null;
+        }
+        $canonical['template_id'] = (int) $data['template_id'];
+        $canonical['option_ids'] = $optionIds->sort()->values()->all();
+        $fingerprint = hash('sha256', json_encode($canonical, JSON_THROW_ON_ERROR));
+        $created = false;
+
+        $order = DB::transaction(function () use ($data, $user, $optionIds, $key, $fingerprint, &$created) {
+            // Serialize submissions for one customer, including the first insert.
+            User::query()->whereKey($user->id)->lockForUpdate()->firstOrFail();
+            $existing = Order::withTrashed()->where('user_id', $user->id)->where('idempotency_key', $key)->first();
+            if ($existing) {
+                if ($existing->trashed() || ! hash_equals($existing->request_fingerprint, $fingerprint)) {
+                    throw new HttpException(409, 'Cette soumission a déjà été utilisée pour une autre commande.');
+                }
+
+                return $existing->load(['template.sector', 'instruction', 'optionSelections']);
+            }
+
             $template = Template::query()
                 ->active()
                 ->lockForUpdate()
-                ->findOrFail($data['template_id']);
+                ->find($data['template_id']);
+            if (! $template) {
+                throw ValidationException::withMessages(['template_id' => 'Ce modèle n’est plus disponible.']);
+            }
 
             $options = $optionIds->isEmpty()
                 ? collect()
@@ -47,9 +72,13 @@ class OrderService
                     ->get();
 
             if ($options->count() !== $optionIds->count()) {
-                throw ValidationException::withMessages([
-                    'option_ids' => 'Une ou plusieurs options sélectionnées ne sont plus disponibles.',
-                ]);
+                $errors = ['option_ids' => 'Une ou plusieurs options sélectionnées ne sont plus disponibles.'];
+                foreach ($data['option_ids'] ?? [] as $index => $optionId) {
+                    if (! $options->contains('id', (int) $optionId)) {
+                        $errors['option_ids.'.$index] = 'Cette option n’est plus disponible.';
+                    }
+                }
+                throw ValidationException::withMessages($errors);
             }
 
             $optionsTotal = (int) $options->sum('price');
@@ -68,6 +97,8 @@ class OrderService
             );
 
             $order = Order::create([
+                'idempotency_key' => $key,
+                'request_fingerprint' => $fingerprint,
                 'user_id' => $user->id,
                 'template_id' => $template->id,
                 'status' => OrderStatus::Pending,
@@ -101,8 +132,14 @@ class OrderService
                 'price' => (int) $order->price,
             ]);
 
+            $created = true;
+
             return $order->load(['template.sector', 'instruction', 'optionSelections']);
         });
+
+        if (! $created) {
+            return $order;
+        }
 
         if ($user->isClient()) {
             $user->notify(new OrderCreatedNotification($order));

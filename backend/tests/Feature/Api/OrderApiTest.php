@@ -24,6 +24,7 @@ class OrderApiTest extends TestCase
         $template = $this->createTemplate(price: 50000, isActive: true);
 
         $payload = [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
             'template_id' => $template->id,
             'enterprise_name' => 'Chez Marcel',
             'activity_description' => 'Restaurant gastronomique',
@@ -65,6 +66,7 @@ class OrderApiTest extends TestCase
         $template = $this->createTemplate(price: 50000, isActive: false);
 
         $this->postJson('/api/orders', [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
             'template_id' => $template->id,
         ])->assertStatus(422);
     }
@@ -89,6 +91,7 @@ class OrderApiTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/orders', [
+            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
             'template_id' => $template->id,
             'color_palette_id' => 'bleu',
             'font_pairing_id' => 'editorial',

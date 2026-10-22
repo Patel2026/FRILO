@@ -14,6 +14,11 @@ class FedapayClient
         private readonly ?string $baseUrl = null,
     ) {}
 
+    public function assertConfigured(): void
+    {
+        $this->client();
+    }
+
     public function createCustomer(array $payload): array
     {
         return $this->post('/customers', $payload);
