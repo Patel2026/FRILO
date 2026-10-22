@@ -1,10 +1,9 @@
-import type { NextConfig } from "next";
-
 const backendApiUrl = process.env.API_INTERNAL_URL
   || process.env.NEXT_PUBLIC_API_URL
   || 'http://localhost:8000/api';
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   async rewrites() {
     return [
       {

@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2.35-fpm-alpine
 
 WORKDIR /var/www/html
 
@@ -31,6 +31,8 @@ COPY template/ /var/www/html/template-source/
 COPY docker/backend/entrypoint.sh /usr/local/bin/frilo-backend-entrypoint
 
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
+ && chmod -R a+rX app bootstrap config database public resources routes template-source vendor \
+ && chmod a+r artisan composer.json composer.lock \
  && chmod +x /usr/local/bin/frilo-backend-entrypoint
 
 EXPOSE 9000
